@@ -26,7 +26,7 @@
 
 <script>
 import { baseStyleData, controlAlignmentOptions } from '@/utils/attr'
-import { calculateOffsetCoordinate } from '@/utils/calculateOffsetCoordinate'
+import calculateOffsetCoordinate from '@/utils/calculateOffsetCoordinate'
 
 export default {
     data () {

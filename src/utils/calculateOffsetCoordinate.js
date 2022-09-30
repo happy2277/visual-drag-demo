@@ -1,7 +1,7 @@
 import { $ } from './utils'
 import store from '@/store'
 
-export function calculateOffsetCoordinate (curComponent, isNeedCalcOffset) {
+export default function calculateOffsetCoordinate (curComponent, isNeedCalcOffset) {
     if (!isNeedCalcOffset) return
     // 获取根容器信息 
     let rectInfo
@@ -21,7 +21,6 @@ export function calculateOffsetCoordinate (curComponent, isNeedCalcOffset) {
         // 否则 对齐根容器
         rectInfo = parentRectInfo
     }
-
     // 获取基准点
     const curX = Number(left) // 当前组件left
     const curY = Number(top) // 当前组件top
@@ -139,10 +138,6 @@ export function calculateOffsetCoordinate (curComponent, isNeedCalcOffset) {
             break;
     }
 
-    setOffset({ curComponent, curX, curY, calcPoint })
-}
-
-function setOffset ({ curComponent, curX, curY, calcPoint }) {
     curComponent.style.xOffset = Math.round(curX - calcPoint.x)
     curComponent.style.yOffset = Math.round(curY - calcPoint.y)
 }

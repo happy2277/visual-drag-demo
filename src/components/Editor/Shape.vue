@@ -12,6 +12,7 @@
 import eventBus from '@/utils/eventBus'
 import { mapState } from 'vuex'
 import calculateComponentPositonAndSize from '@/utils/calculateComponentPositonAndSize'
+import calculateOffsetCoordinate from '@/utils/calculateOffsetCoordinate'
 import { mod360 } from '@/utils/translate'
 import { isPreventDrop } from '@/utils/utils'
 
@@ -334,6 +335,8 @@ export default {
                 })
 
                 this.$store.commit('setShapeStyle', style)
+
+                calculateOffsetCoordinate(this.element, true)
             }
 
             const up = () => {
