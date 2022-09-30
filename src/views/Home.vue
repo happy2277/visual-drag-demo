@@ -214,6 +214,7 @@ export default {
                     component.style.top = y
                     component.style.left = x
                     component.id = generateID()
+                    component.style.objAlign = 1
                     component.style.name = `group_${this.groupIndex}`
                     this.groupIndex++
                 }

@@ -100,11 +100,11 @@ export default {
         },
         handleVisibleChange (val) {
             // 控件对齐方式选择无改变值下拉框隐藏时
-            if (!val) {
-                if (this.objAlign == this.curComponent.style.objAlign) {
-                    this.getComponentOption(this.objAlign)
-                }
-            }
+            // if (!val) {
+            //     if (this.objAlign == this.curComponent.style.objAlign) {
+            //         this.getComponentOption(this.objAlign)
+            //     }
+            // }
         },
         // 控件对齐方式选择
         handleControlChange (val) {
