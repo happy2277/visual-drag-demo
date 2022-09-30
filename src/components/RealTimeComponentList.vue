@@ -1,6 +1,6 @@
 <template>
     <div class="real-time-component-list">
-        <div v-for="(item, index) in componentData" :key="index" class="list" :class="{ actived: transformIndex(index) === curComponentIndex }" @click="onClick(transformIndex(index))">
+        <div v-for="(item, index) in componentData" :key="item.id" class="list" :class="{ actived: transformIndex(index) === curComponentIndex }" @click="onClick(transformIndex(index))">
             <span class="iconfont" :class="'icon-' + getComponent(index).icon"></span>
             <span>{{ getComponent(index).style.name }}</span>
             <div class="icon-container">

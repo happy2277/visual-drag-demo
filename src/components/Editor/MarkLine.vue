@@ -1,13 +1,6 @@
 <template>
     <div class="mark-line">
-        <div
-            v-for="line in lines"
-            v-show="lineStatus[line] || false"
-            :key="line"
-            :ref="line"
-            class="line"
-            :class="line.includes('x')? 'xline' : 'yline'"
-        ></div>
+        <div v-for="line in lines" v-show="lineStatus[line] || false" :key="line" :ref="line" class="line" :class="line.includes('x')? 'xline' : 'yline'"></div>
     </div>
 </template>
 
@@ -17,7 +10,7 @@ import { mapState } from 'vuex'
 import { getComponentRotatedStyle } from '@/utils/style'
 
 export default {
-    data() {
+    data () {
         return {
             lines: ['xt', 'xc', 'xb', 'yl', 'yc', 'yr'], // 分别对应三条横线和三条竖线
             diff: 3, // 相距 dff 像素将自动吸附
@@ -35,7 +28,7 @@ export default {
         'curComponent',
         'componentData',
     ]),
-    mounted() {
+    mounted () {
         // 监听元素移动和不移动的事件
         eventBus.$on('move', (isDownward, isRightward) => {
             this.showLine(isDownward, isRightward)
@@ -46,13 +39,13 @@ export default {
         })
     },
     methods: {
-        hideLine() {
+        hideLine () {
             Object.keys(this.lineStatus).forEach(line => {
                 this.lineStatus[line] = false
             })
         },
 
-        showLine(isDownward, isRightward) {
+        showLine (isDownward, isRightward) {
             const lines = this.$refs
             const components = this.componentData
             const curComponentStyle = getComponentRotatedStyle(this.curComponent.style)
@@ -171,7 +164,7 @@ export default {
             })
         },
 
-        translatecurComponentShift(key, condition, curComponentStyle) {
+        translatecurComponentShift (key, condition, curComponentStyle) {
             const { width, height } = this.curComponent.style
             if (key == 'top') {
                 return Math.round(condition.dragShift - (height - curComponentStyle.height) / 2)
@@ -180,7 +173,7 @@ export default {
             return Math.round(condition.dragShift - (width - curComponentStyle.width) / 2)
         },
 
-        chooseTheTureLine(needToShow, isDownward, isRightward) {
+        chooseTheTureLine (needToShow, isDownward, isRightward) {
             // 如果鼠标向右移动 则按从右到左的顺序显示竖线 否则按相反顺序显示
             // 如果鼠标向下移动 则按从下到上的顺序显示横线 否则按相反顺序显示
             if (isRightward) {
@@ -222,7 +215,7 @@ export default {
             }
         },
 
-        isNearly(dragValue, targetValue) {
+        isNearly (dragValue, targetValue) {
             return Math.abs(dragValue - targetValue) <= this.diff
         },
     },

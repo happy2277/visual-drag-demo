@@ -11,7 +11,10 @@
                         <el-option v-for="(item, i) in parentOptions" :key="item.value" :value="item.value" :label="item.label"></el-option>
                     </el-select>
                     <el-select v-else v-model="curComponent.style[key]" placeholder="请选择" @change="handlecontrolChange">
-                        <el-option v-for="(item, i) in controlAlignmentOptions" :key="item.value" :value="item.value" :label="item.label"></el-option>
+                        <el-option v-for="(item, i) in controlAlignmentOptions" :key="item.value" :value="item.value" :label="item.labelCn">
+                            <!-- <span style="float:left;margin-right:10px;color: #8492a6; font-size: 13px">{{ item.labelCn }}</span>
+                            <span style="float:right">{{ item.label }}</span> -->
+                        </el-option>
                     </el-select>
                     <!-- <el-select :ref="`select_${key}`" v-model="curComponent.style[key]" placeholder="请选择" @change="handleChange" @blur="handleBlur">
                         <el-option v-for="(item, i) in (key == 'parent' || key == 'base' ? parentOptions : controlAlignmentOptions)" :key="item.value" :value="item.value" :label="item.label"></el-option>

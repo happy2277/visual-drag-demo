@@ -129,6 +129,51 @@ export default {
             const rectInfo = this.editor.getBoundingClientRect()
             const y = Math.floor(e.clientY - rectInfo.y)
             const x = Math.floor(e.clientX - rectInfo.x)
+
+            let arrKeyObj = {
+                label: [],
+                img: [],
+                cont: [],
+                line: [],
+                group: []
+            }
+            // 获取各类组件已存在的数量
+            this.componentData.forEach(v => {
+                for (const key in arrKeyObj) {
+                    if (Object.hasOwnProperty.call(arrKeyObj, key)) {
+                        const element = arrKeyObj[key];
+                        if (v.type == key) {
+                            element.push(v)
+                        }
+                    }
+                }
+            })
+            // 刷新各类组件初始索引
+            for (const key in arrKeyObj) {
+                if (Object.hasOwnProperty.call(arrKeyObj, key)) {
+                    const element = arrKeyObj[key];
+                    switch (key) {
+                        case 'label':
+                            this.labelIndex = element.length
+                            break;
+                        case 'img':
+                            this.imgIndex = element.length
+                            break;
+                        case 'cont':
+                            this.contIndex = element.length
+                            break;
+                        case 'line':
+                            this.lineIndex = element.length
+                            break;
+                        case 'group':
+                            this.groupIndex = element.length
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
             if (index) {
                 let component
                 // 拖拽单个组件

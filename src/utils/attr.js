@@ -1,13 +1,13 @@
 import { exp } from "mathjs"
 export const baseStyleData = [
-    { key: 'parent', label: '上级控件' },
+    { key: 'parent', label: '上级控件（默认根容器）' },
     { key: 'name', label: '控件名称（唯一）' },
     { key: 'base', label: '对齐控件' },
     { key: 'objAlign', label: '控件对齐方式' },
     { key: 'left', label: 'x 坐标' },
     { key: 'top', label: 'y 坐标' },
-    { key: 'xOffset', label: '偏移横坐标' },
-    { key: 'yOffset', label: '偏移纵坐标' },
+    // { key: 'xOffset', label: '偏移横坐标' },
+    // { key: 'yOffset', label: '偏移纵坐标' },
 ]
 
 export const styleData = [
@@ -109,27 +109,27 @@ export const verticalAlignOptions = [
 
 // 控件对齐方式
 export const controlAlignmentOptions = [
-    { label: 'LV_ALIGN_CENTER', value: 0 },    //中对齐
-    { label: 'LV_ALIGN_IN_TOP_LEFT', value: 1 },  //内部上左
-    { label: 'LV_ALIGN_IN_TOP_MID', value: 2 },  //内部上中
-    { label: 'LV_ALIGN_IN_TOP_RIGHT', value: 3 },  //内部上右
-    { label: 'LV_ALIGN_IN_BOTTOM_LEFT', value: 4 },  //内部下左
-    { label: 'LV_ALIGN_IN_BOTTOM_MID', value: 5 },  //内部下中
-    { label: 'LV_ALIGN_IN_BOTTOM_RIGHT', value: 6 },  //内部下右
-    { label: 'LV_ALIGN_IN_LEFT_MID', value: 7 },  //内部左中
-    { label: 'LV_ALIGN_IN_RIGHT_MID', value: 8 },  //内部右中
-    { label: 'LV_ALIGN_OUT_TOP_LEFT', value: 9 },  //外部上左
-    { label: 'LV_ALIGN_OUT_TOP_MID', value: 10 }, //外部上中
-    { label: 'LV_ALIGN_OUT_TOP_RIGHT', value: 11 }, //外部上右
-    { label: 'LV_ALIGN_OUT_BOTTOM_LEFT', value: 12 }, //外部下左
-    { label: 'LV_ALIGN_OUT_BOTTOM_MID', value: 13 }, //外部下中
-    { label: 'LV_ALIGN_OUT_BOTTOM_RIGHT', value: 14 }, //外部下右
-    { label: 'LV_ALIGN_OUT_LEFT_TOP', value: 15 }, //外部左上
-    { label: 'LV_ALIGN_OUT_LEFT_MID', value: 16 }, //外部左中
-    { label: 'LV_ALIGN_OUT_LEFT_BOTTOM', value: 17 }, //外部左下
-    { label: 'LV_ALIGN_OUT_RIGHT_TOP', value: 18 }, //外部右上
-    { label: 'LV_ALIGN_OUT_RIGHT_MID', value: 19 }, //外部右中
-    { label: 'LV_ALIGN_OUT_RIGHT_BOTTOM', value: 20 }, //外部右下
+    { label: 'LV_ALIGN_CENTER', value: 0, labelCn: '中对齐' },    //中对齐
+    { label: 'LV_ALIGN_IN_TOP_LEFT', value: 1, labelCn: '内部上左' },  //内部上左
+    { label: 'LV_ALIGN_IN_TOP_MID', value: 2, labelCn: '内部上中' },  //内部上中
+    { label: 'LV_ALIGN_IN_TOP_RIGHT', value: 3, labelCn: '内部上右' },  //内部上右
+    { label: 'LV_ALIGN_IN_BOTTOM_LEFT', value: 4, labelCn: '内部下左' },  //内部下左
+    { label: 'LV_ALIGN_IN_BOTTOM_MID', value: 5, labelCn: '内部下中' },  //内部下中
+    { label: 'LV_ALIGN_IN_BOTTOM_RIGHT', value: 6, labelCn: '内部下右' },  //内部下右
+    { label: 'LV_ALIGN_IN_LEFT_MID', value: 7, labelCn: '内部左中' },  //内部左中
+    { label: 'LV_ALIGN_IN_RIGHT_MID', value: 8, labelCn: '内部右中' },  //内部右中
+    { label: 'LV_ALIGN_OUT_TOP_LEFT', value: 9, labelCn: '外部上左' },  //外部上左
+    { label: 'LV_ALIGN_OUT_TOP_MID', value: 10, labelCn: '外部上中' }, //外部上中
+    { label: 'LV_ALIGN_OUT_TOP_RIGHT', value: 11, labelCn: '外部上右' }, //外部上右
+    { label: 'LV_ALIGN_OUT_BOTTOM_LEFT', value: 12, labelCn: '外部下左' }, //外部下左
+    { label: 'LV_ALIGN_OUT_BOTTOM_MID', value: 13, labelCn: '外部下中' }, //外部下中
+    { label: 'LV_ALIGN_OUT_BOTTOM_RIGHT', value: 14, labelCn: '外部下右' }, //外部下右
+    { label: 'LV_ALIGN_OUT_LEFT_TOP', value: 15, labelCn: '外部左上' }, //外部左上
+    { label: 'LV_ALIGN_OUT_LEFT_MID', value: 16, labelCn: '外部左中' }, //外部左中
+    { label: 'LV_ALIGN_OUT_LEFT_BOTTOM', value: 17, labelCn: '外部左下' }, //外部左下
+    { label: 'LV_ALIGN_OUT_RIGHT_TOP', value: 18, labelCn: '外部右上' }, //外部右上
+    { label: 'LV_ALIGN_OUT_RIGHT_MID', value: 19, labelCn: '外部右中' }, //外部右中
+    { label: 'LV_ALIGN_OUT_RIGHT_BOTTOM', value: 20, labelCn: '外部右下' }, //外部右下
 ]
 
 // 长文本模式
