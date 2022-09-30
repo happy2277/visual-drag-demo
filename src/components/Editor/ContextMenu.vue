@@ -3,9 +3,9 @@
         <ul @mouseup="handleMouseUp">
             <template v-if="curComponent">
                 <template v-if="!curComponent.isLock">
-                    <li @click="copy">复制</li>
+                    <!-- <li @click="copy">复制</li>
                     <li @click="paste">粘贴</li>
-                    <li @click="cut">剪切</li>
+                    <li @click="cut">剪切</li> -->
                     <li @click="deleteComponent">删除</li>
                     <li @click="lock">锁定</li>
                     <li @click="topComponent">置顶</li>
@@ -24,7 +24,7 @@
 import { mapState } from 'vuex'
 
 export default {
-    data() {
+    data () {
         return {
             copyData: null,
         }
@@ -36,53 +36,53 @@ export default {
         'curComponent',
     ]),
     methods: {
-        lock() {
+        lock () {
             this.$store.commit('lock')
         },
 
-        unlock() {
+        unlock () {
             this.$store.commit('unlock')
         },
 
         // 点击菜单时不取消当前组件的选中状态
-        handleMouseUp() {
+        handleMouseUp () {
             this.$store.commit('setClickComponentStatus', true)
         },
 
-        cut() {
+        cut () {
             this.$store.commit('cut')
         },
 
-        copy() {
+        copy () {
             this.$store.commit('copy')
         },
 
-        paste() {
+        paste () {
             this.$store.commit('paste', true)
             this.$store.commit('recordSnapshot')
         },
 
-        deleteComponent() {
+        deleteComponent () {
             this.$store.commit('deleteComponent')
             this.$store.commit('recordSnapshot')
         },
 
-        upComponent() {
+        upComponent () {
             this.$store.commit('upComponent')
             this.$store.commit('recordSnapshot')
         },
 
-        downComponent() {
+        downComponent () {
             this.$store.commit('downComponent')
             this.$store.commit('recordSnapshot')
         },
 
-        topComponent() {
+        topComponent () {
             this.$store.commit('topComponent')
             this.$store.commit('recordSnapshot')
         },
 
-        bottomComponent() {
+        bottomComponent () {
             this.$store.commit('bottomComponent')
             this.$store.commit('recordSnapshot')
         },
@@ -99,7 +99,7 @@ export default {
         border: 1px solid #e4e7ed;
         border-radius: 4px;
         background-color: #fff;
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         box-sizing: border-box;
         margin: 5px 0;
         padding: 6px 0;

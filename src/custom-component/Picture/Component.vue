@@ -1,26 +1,27 @@
 <template>
     <div style="overflow: hidden;">
-        <canvas ref="canvas"></canvas>
+        <!-- <canvas ref="canvas"></canvas> -->
+        <img v-if="element.propValue.url" :src="element.propValue.url" :width="element.style.width" :height="element.style.height" alt="">
     </div>
 </template>
 
 <script>
-import OnEvent from '../common/OnEvent'
+
 
 export default {
-    extends: OnEvent,
+
     props: {
         propValue: {
             type: Object,
             required: true,
-            default: () => {},
+            default: () => { },
         },
         element: {
             type: Object,
-            default: () => {},
+            default: () => { },
         },
     },
-    data() {
+    data () {
         return {
             width: 0,
             height: 0,
@@ -31,26 +32,26 @@ export default {
         }
     },
     watch: {
-        'element.style.width': function () {
-            this.drawImage()
-        },
-        'element.style.height': function () {
-            this.drawImage()
-        },
-        'propValue.flip.vertical': function () {
-            this.mirrorFlip()
-        },
-        'propValue.flip.horizontal': function () {
-            this.mirrorFlip()
-        },
+        // 'element.style.width': function () {
+        //     this.drawImage()
+        // },
+        // 'element.style.height': function () {
+        //     this.drawImage()
+        // },
+        // 'propValue.flip.vertical': function () {
+        //     this.mirrorFlip()
+        // },
+        // 'propValue.flip.horizontal': function () {
+        //     this.mirrorFlip()
+        // },
     },
-    mounted() {
-        this.canvas = this.$refs.canvas
-        this.ctx = this.canvas.getContext('2d')
-        this.drawImage()
+    mounted () {
+        // this.canvas = this.$refs.canvas
+        // this.ctx = this.canvas.getContext('2d')
+        // this.drawImage()
     },
     methods: {
-        drawImage() {
+        drawImage () {
             const { width, height } = this.element.style
             this.canvas.width = width
             this.canvas.height = height
@@ -67,7 +68,7 @@ export default {
             }
         },
 
-        mirrorFlip() {
+        mirrorFlip () {
             const { vertical, horizontal } = this.propValue.flip
             const { width, height } = this.element.style
             const hvalue = horizontal ? -1 : 1

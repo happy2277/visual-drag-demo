@@ -5,22 +5,9 @@ export const commonStyle = {
 }
 
 export const commonAttr = {
-    animations: [],
-    events: {},
     groupStyle: {}, // 当一个组件成为 Group 的子组件时使用
     isLock: false, // 是否锁定组件
-    collapseName: 'style', // 编辑组件时记录当前使用的是哪个折叠面板，再次回来时恢复上次打开的折叠面板，优化用户体验
-    linkage: {
-        duration: 0, // 过渡持续时间
-        data: [ // 组件联动
-            {
-                id: '', // 联动的组件 id
-                label: '', // 联动的组件名称
-                event: '', // 监听事件
-                style: [{ key: '', value: '' }], // 监听的事件触发时，需要改变的属性
-            },
-        ],
-    },
+    collapseName: 'base', // 编辑组件时记录当前使用的是哪个折叠面板，再次回来时恢复上次打开的折叠面板，优化用户体验
 }
 
 // 编辑器左侧组件列表
@@ -28,187 +15,146 @@ const list = [
     {
         component: 'VText',
         label: '文字',
-        propValue: '双击编辑文字',
+        type: 'label',
+        propValue: '',
         icon: 'wenben',
-        request: {
-            method: 'GET',
-            data: [],
-            url: '',
-            series: false, // 是否定时发送请求
-            time: 1000, // 定时更新时间
-            paramType: '', // string object array
-            requestCount: 0, // 请求次数限制，0 为无限
-        },
         style: {
+            parent: '',
+            name: '',
+            base: '',
+            str: '请输入内容',
             width: 200,
-            height: 28,
-            fontSize: '',
+            height: 60,
+            font: './res/font/bls.ttf',
+            fontSize: '14',
             fontWeight: 400,
             lineHeight: '',
             letterSpacing: 0,
-            textAlign: '',
-            color: '',
+            textAlign: 'left',
+            // // longMode: 'LV_LABEL_LONG_EXPAND',
+            baseLine: 6,
+            color: 'rgba(0, 0, 0, 1)',
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            objAlign: 1,
+            xOffset: 0,
+            yOffset: 0
         },
     },
     {
-        component: 'VButton',
-        label: '按钮',
-        propValue: '按钮',
-        icon: 'button',
+        component: 'VText',
+        label: '价格',
+        type: 'label',
+        propValue: '',
+        icon: 'wenben',
         style: {
-            width: 100,
-            height: 34,
-            borderWidth: 1,
-            borderColor: '',
-            borderRadius: '',
-            fontSize: '',
+            parent: '',
+            name: '',
+            base: '',
+            numStr: '请输入价格',
+            width: 200,
+            height: 60,
+            font: './res/font/bls_pri.ttf',
+            fontSize: '14',
             fontWeight: 400,
             lineHeight: '',
             letterSpacing: 0,
-            textAlign: '',
-            color: '',
-            backgroundColor: '',
+            textAlign: 'left',
+            // // longMode: 'LV_LABEL_LONG_EXPAND',
+            baseLine: 7,
+            color: 'rgba(0, 0, 0, 1)',
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            objAlign: 1,
+            xOffset: 0,
+            yOffset: 0
         },
     },
     {
         component: 'Picture',
         label: '图片',
         icon: 'tupian',
+        type: 'img',
         propValue: {
-            url: require('@/assets/title.jpg'),
+            url: require('@/assets/img/pangyou.gif'),
             flip: {
                 horizontal: false,
                 vertical: false,
             },
         },
         style: {
+            url: '',
+            name: '',
+            parent: '',
             width: 300,
             height: 200,
             borderRadius: '',
+            objAlign: 1,
+            xOffset: 0,
+            yOffset: 0,
+            rotate: 0
         },
     },
     {
         component: 'RectShape',
-        label: '矩形',
-        propValue: '&nbsp;',
+        label: '容器',
+        propValue: '',
+        type: 'cont',
         icon: 'juxing',
         style: {
+            name: '',
+            parent: '',
             width: 200,
             height: 200,
-            fontSize: '',
-            fontWeight: 400,
-            lineHeight: '',
-            letterSpacing: 0,
-            textAlign: 'center',
-            color: '',
-            borderColor: '#000',
+            // fontSize: '14',
+            // fontWeight: 400,
+            // lineHeight: '',
+            // letterSpacing: 0,
+            // textAlign: 'left',
+            // color: '',
+            // borderColor: '#000',
             borderWidth: 1,
-            backgroundColor: '',
-            borderStyle: 'solid',
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            // borderStyle: 'solid',
             borderRadius: '',
-            verticalAlign: 'middle',
+            // verticalAlign: 'middle',
+            objAlign: 1,
+            xOffset: 0,
+            yOffset: 0
         },
     },
     {
         component: 'LineShape',
         label: '直线',
         propValue: '',
+        type: 'line',
         icon: 'zhixian',
         style: {
+            name: '',
+            parent: '',
             width: 200,
-            height: 2,
-            backgroundColor: '#000',
+            height: 1,
+            backgroundColor: 'rgba(0, 0, 0, 1)',
+            display: 0,
+            objAlign: 1,
+            xOffset: 0,
+            yOffset: 0
         },
     },
-    {
-        component: 'CircleShape',
-        label: '圆形',
-        propValue: '&nbsp;',
-        icon: '24gl-circle',
-        style: {
-            width: 200,
-            height: 200,
-            fontSize: '',
-            fontWeight: 400,
-            lineHeight: '',
-            letterSpacing: 0,
-            textAlign: 'center',
-            color: '',
-            borderColor: '#000',
-            borderWidth: 1,
-            backgroundColor: '',
-            borderStyle: 'solid',
-            borderRadius: '',
-            verticalAlign: 'middle',
-        },
-    },
-    {
-        component: 'SVGStar',
-        label: '星形',
-        icon: 'kongwujiaoxing',
-        propValue: '',
-        style: {
-            width: 80,
-            height: 80,
-            fontSize: '',
-            fontWeight: 400,
-            lineHeight: '',
-            letterSpacing: 0,
-            textAlign: 'center',
-            color: '',
-            borderColor: '#000',
-            backgroundColor: 'rgba(255, 255, 255, 1)',
-        },
-    },
-    {
-        component: 'SVGTriangle',
-        label: '三角形',
-        icon: 'xingzhuang-sanjiaoxing',
-        propValue: '',
-        style: {
-            width: 80,
-            height: 80,
-            fontSize: '',
-            fontWeight: 400,
-            lineHeight: '',
-            letterSpacing: 0,
-            textAlign: 'center',
-            color: '',
-            borderColor: '#000',
-            backgroundColor: 'rgba(255, 255, 255, 1)',
-        },
-    },
-    {
-        component: 'VTable',
-        label: '表格',
-        icon: 'biaoge',
-        propValue: {
-            data: [
-                ['表头1', '表头2', '表头3'],
-                ['内容1', '内容2', '内容3'],
-            ],
-            stripe: true,
-            thBold: true,
-        },
-        request: {
-            method: 'GET',
-            data: [],
-            url: '',
-            series: false,
-            time: 1000,
-            paramType: '', // string object array
-            requestCount: 0, // 请求次数限制，0 为无限
-        },
-        style: {
-            width: 600,
-            height: 200,
-            fontSize: '',
-            fontWeight: 400,
-            textAlign: 'center',
-            color: '',
-            backgroundColor: 'rgba(255, 255, 255, 1)',
-        },
-    },
+    // {
+    //     component: 'Bar',
+    //     label: '进度条',
+    //     propValue: '',
+    //     type: 'bar',
+    //     icon: 'zhixian',
+    //     style: {
+    //         name: '',
+    //         parent: '',
+    //         width: 200,
+    //         height: 26,
+    //         // backgroundColor: 'rgba(255, 255, 255, 0)',
+    //         color: '',
+    //         percentage: 0
+    //     },
+    // },
 ]
 
 for (let i = 0, len = list.length; i < len; i++) {

@@ -5,34 +5,30 @@
         <main>
             <!-- 左侧组件列表 -->
             <section class="left">
-                <ComponentList />
-                <RealTimeComponentList />
+                <el-collapse class="collapse" v-model="activeNames">
+                    <el-collapse-item title="控件" name="1">
+                        <ComponentList />
+                    </el-collapse-item>
+                    <el-collapse-item title="组合控件" name="2">
+                        <ComposeList />
+                    </el-collapse-item>
+                    <el-collapse-item title="已选控件" name="3">
+                        <RealTimeComponentList />
+                    </el-collapse-item>
+                </el-collapse>
             </section>
             <!-- 中间画布 -->
             <section class="center">
-                <div
-                    class="content"
-                    @drop="handleDrop"
-                    @dragover="handleDragOver"
-                    @mousedown="handleMouseDown"
-                    @mouseup="deselectCurComponent"
-                >
+                <div class="content" @drop="handleDrop" @dragover="handleDragOver" @mousedown="handleMouseDown" @mouseup="deselectCurComponent">
                     <Editor />
                 </div>
             </section>
             <!-- 右侧属性列表 -->
             <section class="right">
-                <el-tabs v-if="curComponent" v-model="activeName">
-                    <el-tab-pane label="属性" name="attr">
-                        <component :is="curComponent.component + 'Attr'" />
-                    </el-tab-pane>
-                    <el-tab-pane label="动画" name="animation" style="padding-top: 20px;">
-                        <AnimationList />
-                    </el-tab-pane>
-                    <el-tab-pane label="事件" name="events" style="padding-top: 20px;">
-                        <EventList />
-                    </el-tab-pane>
-                </el-tabs>
+                <div class="box" v-if="curComponent">
+                    <p class="title">控件属性</p>
+                    <component :is="curComponent.component + 'Attr'" />
+                </div>
                 <CanvasAttr v-else></CanvasAttr>
             </section>
         </main>
@@ -40,11 +36,11 @@
 </template>
 
 <script>
+import eventBus from '@/utils/eventBus'
 import Editor from '@/components/Editor/index'
 import ComponentList from '@/components/ComponentList' // 左侧列表组件
-import AnimationList from '@/components/AnimationList' // 右侧动画列表
-import EventList from '@/components/EventList' // 右侧事件列表
 import componentList from '@/custom-component/component-list' // 左侧列表数据
+import ComposeList from '@/components/ComposeList' // 左侧组合列表数据
 import Toolbar from '@/components/Toolbar'
 import { deepCopy } from '@/utils/utils'
 import { mapState } from 'vuex'
@@ -56,70 +52,153 @@ import { changeComponentSizeWithScale } from '@/utils/changeComponentsSizeWithSc
 import { setDefaultcomponentData } from '@/store/snapshot'
 
 export default {
-    components: { Editor, ComponentList, AnimationList, EventList, Toolbar, RealTimeComponentList, CanvasAttr },
-    data() {
+    components: { Editor, ComponentList, Toolbar, RealTimeComponentList, CanvasAttr, ComposeList },
+    data () {
         return {
             activeName: 'attr',
             reSelectAnimateIndex: undefined,
+            labelIndex: 0,
+            imgIndex: 0,
+            contIndex: 0,
+            lineIndex: 0,
+            barIndex: 0,
+            groupIndex: 0,
+            activeNames: ['1', '2', '3']
         }
     },
     computed: mapState([
         'componentData',
+        'componentTempData',
         'curComponent',
         'isClickComponent',
         'canvasStyleData',
         'editor',
     ]),
-    created() {
+    created () {
         this.restore()
         // 全局监听按键事件
         listenGlobalKeyDown()
     },
     methods: {
-        restore() {
+        restore () {
             // 用保存的数据恢复画布
             if (localStorage.getItem('canvasData')) {
-                setDefaultcomponentData(JSON.parse(localStorage.getItem('canvasData')))
-                this.$store.commit('setComponentData', JSON.parse(localStorage.getItem('canvasData')))
+                const canvasData = JSON.parse(localStorage.getItem('canvasData'))
+                setDefaultcomponentData(canvasData)
+                canvasData.forEach((v, i) => {
+                    if (v.rootParent) {
+                        canvasData.splice(i, 1)
+                    }
+                    switch (v.type) {
+                        case 'label':
+                            this.labelIndex++
+                            break;
+                        case 'img':
+                            this.imgIndex++
+                            break;
+                        case 'line':
+                            this.lineIndex++
+                            break;
+                        case 'cont':
+                            this.contIndex++
+                            break;
+                        case 'bar':
+                            this.barIndex++
+                            break;
+                        default:
+                            break;
+                    }
+                })
+                this.$store.commit('setComponentData', canvasData)
             }
 
             if (localStorage.getItem('canvasStyle')) {
                 this.$store.commit('setCanvasStyle', JSON.parse(localStorage.getItem('canvasStyle')))
             }
+
+            if (localStorage.getItem('canvasTempData')) {
+                this.$store.commit('setComponentTempData', JSON.parse(localStorage.getItem('canvasTempData')))
+            }
         },
 
-        handleDrop(e) {
+        handleDrop (e) {
             e.preventDefault()
             e.stopPropagation()
-
             const index = e.dataTransfer.getData('index')
+            const type = e.dataTransfer.getData('type')
             const rectInfo = this.editor.getBoundingClientRect()
+            const y = Math.floor(e.clientY - rectInfo.y)
+            const x = Math.floor(e.clientX - rectInfo.x)
             if (index) {
-                const component = deepCopy(componentList[index])
-                component.style.top = e.clientY - rectInfo.y
-                component.style.left = e.clientX - rectInfo.x
-                component.id = generateID()
+                let component
+                // 拖拽单个组件
+                if (type == 'single') {
+                    component = deepCopy(componentList[index])
+                    component.style.top = y
+                    component.style.left = x
+                    component.style.xOffset = x
+                    component.style.yOffset = y
+                    // component.style.objAlign = 1
+                    component.id = generateID()
+                    switch (component.type) {
+                        case 'label':
+                            component.style.name = `label_${this.labelIndex}`
+                            this.labelIndex++
+                            break;
+                        case 'img':
+                            component.style.name = `img_${this.imgIndex}`
+                            this.imgIndex++
+                            break;
+                        case 'cont':
+                            component.style.name = `cont_${this.contIndex}`
+                            this.contIndex++
+                            break;
+                        case 'line':
+                            component.style.name = `line_${this.lineIndex}`
+                            this.lineIndex++
+                            break
+                        case 'bar':
+                            component.style.name = `bar_${this.barIndex}`
+                            this.barIndex++
+                            break
+                        default:
+                            break;
+                    }
+                } else { // 拖拽组合组件
+                    component = deepCopy(this.componentTempData[index])
+                    component.style.top = y
+                    component.style.left = x
+                    component.id = generateID()
+                    component.style.name = `group_${this.groupIndex}`
+                    this.groupIndex++
+                }
 
                 // 根据画面比例修改组件样式比例 https://github.com/woai3c/visual-drag-demo/issues/91
                 changeComponentSizeWithScale(component)
 
                 this.$store.commit('addComponent', { component })
                 this.$store.commit('recordSnapshot')
+
+                // 拖拽并选中
+                this.$store.commit('setCurComponent', {
+                    component: component,
+                    index: this.componentData.length - 1,
+                })
             }
         },
 
-        handleDragOver(e) {
+        handleDragOver (e) {
             e.preventDefault()
             e.dataTransfer.dropEffect = 'copy'
         },
 
-        handleMouseDown(e) {
+        handleMouseDown (e) {
             e.stopPropagation()
             this.$store.commit('setClickComponentStatus', false)
             this.$store.commit('setInEditorStatus', true)
         },
 
-        deselectCurComponent(e) {
+        deselectCurComponent (e) {
             if (!this.isClickComponent) {
                 this.$store.commit('setCurComponent', { component: null, index: null })
             }
@@ -133,7 +212,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .home {
     height: 100vh;
     background: #fff;
@@ -143,18 +222,20 @@ export default {
         position: relative;
 
         .left {
+            margin-left: 10px;
             position: absolute;
             height: 100%;
-            width: 200px;
+            width: 210px;
             left: 0;
             top: 0;
+            background-color: #fff;
 
             & > div {
                 overflow: auto;
+            }
 
-                &:first-child {
-                    border-bottom: 1px solid #ddd;
-                }
+            .collapse {
+                height: 100%;
             }
         }
 
@@ -167,6 +248,16 @@ export default {
 
             .el-select {
                 width: 100%;
+            }
+            .title {
+                text-align: center;
+                margin-bottom: 10px;
+                // height: 40px;
+                line-height: 40px;
+                border-bottom: 2px solid #e4e7ed;
+                font-size: 14px;
+                font-weight: 500;
+                color: #303133;
             }
         }
 

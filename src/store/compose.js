@@ -10,6 +10,7 @@ export default {
     state: {
         areaData: { // 选中区域包含的组件以及区域位移信息
             style: {
+                backgroundColor: '#fff',
                 top: 0,
                 left: 0,
                 width: 0,
@@ -20,15 +21,15 @@ export default {
         editor: null,
     },
     mutations: {
-        getEditor(state) {
+        getEditor (state) {
             state.editor = $('#editor')
         },
 
-        setAreaData(state, data) {
+        setAreaData (state, data) {
             state.areaData = data
         },
 
-        compose({ componentData, areaData, editor }) {
+        compose ({ componentData, areaData, editor }) {
             const components = []
             areaData.components.forEach(component => {
                 if (component.component != 'Group') {
@@ -46,7 +47,12 @@ export default {
                     components.push(...component.propValue)
                 }
             })
-
+            let groupLen = 0
+            componentData.forEach(v => {
+                if (v.type == 'group') {
+                    groupLen++
+                }
+            })
             const groupComponent = {
                 id: generateID(),
                 component: 'Group',
@@ -56,8 +62,10 @@ export default {
                 style: {
                     ...commonStyle,
                     ...areaData.style,
+                    name: `group_${groupLen}`
                 },
                 propValue: components,
+                type: 'group'
             }
 
             createGroupStyle(groupComponent)
@@ -75,10 +83,11 @@ export default {
             })
 
             areaData.components = []
+
         },
 
         // 将已经放到 Group 组件数据删除，也就是在 componentData 中删除，因为它们已经从 componentData 挪到 Group 组件中了
-        batchDeleteComponent({ componentData }, deleteData) {
+        batchDeleteComponent ({ componentData }, deleteData) {
             deleteData.forEach(component => {
                 for (let i = 0, len = componentData.length; i < len; i++) {
                     if (component.id == componentData[i].id) {
@@ -89,7 +98,7 @@ export default {
             })
         },
 
-        decompose({ curComponent, editor }) {
+        decompose ({ curComponent, editor }) {
             const parentStyle = { ...curComponent.style }
             const components = curComponent.propValue
             const editorRect = editor.getBoundingClientRect()

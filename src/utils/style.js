@@ -1,6 +1,6 @@
 import { sin, cos, toPercent } from '@/utils/translate'
 
-export function getShapeStyle(style) {
+export function getShapeStyle (style) {
     const result = {};
     ['width', 'height', 'top', 'left', 'rotate'].forEach(attr => {
         if (attr != 'rotate') {
@@ -24,9 +24,9 @@ const needUnit = [
     'borderRadius',
 ]
 
-export function getSVGStyle(style, filter = []) {
+export function getSVGStyle (style, filter = []) {
     const result = {};
-
+    debugger
     [
         'opacity',
         'width',
@@ -59,14 +59,15 @@ export function getSVGStyle(style, filter = []) {
     return result
 }
 
-export function getStyle(style, filter = []) {
+export function getStyle (style, filter = []) {
     const result = {}
     Object.keys(style).forEach(key => {
         if (!filter.includes(key)) {
-            if (key != 'rotate') {
+            if (key == 'display') {
+                result[key] = style[key] == 0 ? 'block' : 'none'
+            } else if (key != 'rotate') {
                 if (style[key] !== '') {
                     result[key] = style[key]
-
                     if (needUnit.includes(key)) {
                         result[key] += 'px'
                     }
@@ -81,7 +82,7 @@ export function getStyle(style, filter = []) {
 }
 
 // 获取一个组件旋转 rotate 后的样式
-export function getComponentRotatedStyle(style) {
+export function getComponentRotatedStyle (style) {
     style = { ...style }
     if (style.rotate != 0) {
         const newWidth = style.width * cos(style.rotate) + style.height * sin(style.rotate)
@@ -105,11 +106,11 @@ export function getComponentRotatedStyle(style) {
 }
 
 const filterKeys = ['width', 'height', 'scale']
-export function getCanvasStyle(canvasStyleData) {
+export function getCanvasStyle (canvasStyleData) {
     const result = {}
     Object.keys(canvasStyleData).filter(key => !filterKeys.includes(key)).forEach(key => {
         result[key] = canvasStyleData[key]
-        if (key === 'fontSize') {
+        if (needUnit.includes(key)) {
             result[key] += 'px'
         }
     })
@@ -117,7 +118,7 @@ export function getCanvasStyle(canvasStyleData) {
     return result
 }
 
-export function createGroupStyle(groupComponent) {
+export function createGroupStyle (groupComponent) {
     const parentStyle = groupComponent.style
     groupComponent.propValue.forEach(component => {
         // component.groupStyle 的 top left 是相对于 group 组件的位置

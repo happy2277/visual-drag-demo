@@ -3,19 +3,12 @@
         <el-button v-if="!isScreenshot" class="close" @click="close">关闭</el-button>
         <el-button v-else class="close" @click="htmlToImage">确定</el-button>
         <div class="canvas-container">
-            <div
-                class="canvas"
-                :style="{
+            <div class="canvas" :style="{
                     ...getCanvasStyle(canvasStyleData),
                     width: changeStyleWithScale(canvasStyleData.width) + 'px',
                     height: changeStyleWithScale(canvasStyleData.height) + 'px',
-                }"
-            >
-                <ComponentWrapper
-                    v-for="(item, index) in copyData"
-                    :key="index"
-                    :config="item"
-                />
+                }">
+                <ComponentWrapper v-for="(item, index) in copyData" :key="index" :config="item" />
             </div>
         </div>
     </div>
@@ -37,7 +30,7 @@ export default {
             default: false,
         },
     },
-    data() {
+    data () {
         return {
             copyData: [],
         }
@@ -46,7 +39,7 @@ export default {
         'componentData',
         'canvasStyleData',
     ]),
-    created() {
+    created () {
         this.$set(this, 'copyData', deepCopy(this.componentData))
     },
     methods: {
@@ -54,22 +47,22 @@ export default {
         getCanvasStyle,
         changeStyleWithScale,
 
-        close() {
+        close () {
             this.$emit('close')
         },
 
-        htmlToImage() {
+        htmlToImage () {
             toPng(this.$refs.container.querySelector('.canvas'))
-            .then(dataUrl => {
-                const a = document.createElement('a')
-                a.setAttribute('download', 'screenshot')
-                a.href = dataUrl
-                a.click()
-            })
-            .catch(error => {
-                console.error('oops, something went wrong!', error)
-            })
-            .finally(this.close)
+                .then(dataUrl => {
+                    const a = document.createElement('a')
+                    a.setAttribute('download', 'screenshot')
+                    a.href = dataUrl
+                    a.click()
+                })
+                .catch(error => {
+                    console.error('oops, something went wrong!', error)
+                })
+                .finally(this.close)
         },
     },
 }
@@ -82,7 +75,7 @@ export default {
     top: 0;
     left: 0;
     position: fixed;
-    background: rgb(0, 0, 0, .5);
+    background: rgb(0, 0, 0, 0.5);
     z-index: 10;
     display: flex;
     align-items: center;
@@ -99,6 +92,7 @@ export default {
             background: #fff;
             position: relative;
             margin: auto;
+            overflow: hidden;
         }
     }
 

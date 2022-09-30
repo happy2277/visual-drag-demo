@@ -1,19 +1,8 @@
 <template>
-    <div
-        class="shape"
-        :class="{ active }"
-        @click="selectCurComponent"
-        @mousedown="handleMouseDownOnShape"
-    >
-        <span v-show="isActive()" class="iconfont icon-xiangyouxuanzhuan" @mousedown="handleRotate"></span>
+    <div class="shape" :class="{ active }" @click="selectCurComponent" @mousedown="handleMouseDownOnShape">
+        <span v-show="isActive() && element.type == 'buxuyao'" class="iconfont icon-xiangyouxuanzhuan" @mousedown="handleRotate"></span>
         <span v-show="element.isLock" class="iconfont icon-suo"></span>
-        <div
-            v-for="item in (isActive()? getPointList() : [])"
-            :key="item"
-            class="shape-point"
-            :style="getPointStyle(item)"
-            @mousedown="handleMouseDownOnPoint(item, $event)"
-        >
+        <div v-for="item in (isActive()? getPointList() : [])" :key="item" class="shape-point" :style="getPointStyle(item)" @mousedown="handleMouseDownOnPoint(item, $event)">
         </div>
         <slot></slot>
     </div>
@@ -21,7 +10,6 @@
 
 <script>
 import eventBus from '@/utils/eventBus'
-import runAnimation from '@/utils/runAnimation'
 import { mapState } from 'vuex'
 import calculateComponentPositonAndSize from '@/utils/calculateComponentPositonAndSize'
 import { mod360 } from '@/utils/translate'
@@ -36,12 +24,12 @@ export default {
         element: {
             required: true,
             type: Object,
-            default: () => {},
+            default: () => { },
         },
         defaultStyle: {
             required: true,
             type: Object,
-            default: () => {},
+            default: () => { },
         },
         index: {
             required: true,
@@ -49,7 +37,7 @@ export default {
             default: 0,
         },
     },
-    data() {
+    data () {
         return {
             pointList: ['lt', 't', 'rt', 'r', 'rb', 'b', 'lb', 'l'], // 八个方向
             pointList2: ['r', 'l'], // 左右两个方向
@@ -80,31 +68,26 @@ export default {
         'curComponent',
         'editor',
     ]),
-    mounted() {
+    mounted () {
         // 用于 Group 组件
         if (this.curComponent) {
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
         }
-        eventBus.$on('runAnimation', () => {
-            if (this.element == this.curComponent) {
-                runAnimation(this.$el, this.curComponent.animations)
-            }
-        })
         eventBus.$on('stopAnimation', () => {
             this.$el.classList.remove('animated', 'infinite')
         })
     },
     methods: {
-        getPointList() {
+        getPointList () {
             return this.element.component === 'line-shape' ? this.pointList2 : this.pointList
         },
 
-        isActive() {
+        isActive () {
             return this.active && !this.element.isLock
         },
 
         // 处理旋转
-        handleRotate(e) {
+        handleRotate (e) {
             this.$store.commit('setClickComponentStatus', true)
             e.preventDefault()
             e.stopPropagation()
@@ -147,7 +130,7 @@ export default {
             document.addEventListener('mouseup', up)
         },
 
-        getPointStyle(point) {
+        getPointStyle (point) {
             const { width, height } = this.defaultStyle
             const hasT = /t/.test(point)
             const hasB = /b/.test(point)
@@ -185,7 +168,7 @@ export default {
             return style
         },
 
-        getCursor() {
+        getCursor () {
             const { angleToCursor, initialAngle, pointList, curComponent } = this
             const rotate = mod360(curComponent.style.rotate) // 取余 360
             const result = {}
@@ -215,7 +198,7 @@ export default {
             return result
         },
 
-        handleMouseDownOnShape(e) {
+        handleMouseDownOnShape (e) {
             // 将当前点击组件的事件传播出去，目前的消费是 VText 组件 https://github.com/woai3c/visual-drag-demo/issues/90
             this.$nextTick(() => eventBus.$emit('componentClick'))
 
@@ -234,6 +217,11 @@ export default {
             const pos = { ...this.defaultStyle }
             const startY = e.clientY
             const startX = e.clientX
+
+            const xOffset = pos.xOffset
+            const yOffset = pos.yOffset
+
+            // debugger
             // 如果直接修改属性，值的类型会变为字符串，所以要转为数值型
             const startTop = Number(pos.top)
             const startLeft = Number(pos.left)
@@ -244,8 +232,13 @@ export default {
                 hasMove = true
                 const curX = moveEvent.clientX
                 const curY = moveEvent.clientY
+                // 控件坐标
                 pos.top = curY - startY + startTop
                 pos.left = curX - startX + startLeft
+
+                // 偏移量
+                pos.xOffset = (curX - startX) + xOffset
+                pos.yOffset = (curY - startY) + yOffset
 
                 // 修改当前组件样式
                 this.$store.commit('setShapeStyle', pos)
@@ -257,6 +250,7 @@ export default {
                     // curY - startY > 0 true 表示向下移动 false 表示向上移动
                     // curX - startX > 0 true 表示向右移动 false 表示向左移动
                     eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
+
                 })
             }
 
@@ -272,14 +266,14 @@ export default {
             document.addEventListener('mouseup', up)
         },
 
-        selectCurComponent(e) {
+        selectCurComponent (e) {
             // 阻止向父组件冒泡
             e.stopPropagation()
             e.preventDefault()
             this.$store.commit('hideContextMenu')
         },
 
-        handleMouseDownOnPoint(point, e) {
+        handleMouseDownOnPoint (point, e) {
             this.$store.commit('setInEditorStatus', true)
             this.$store.commit('setClickComponentStatus', true)
             e.stopPropagation()
@@ -352,7 +346,7 @@ export default {
             document.addEventListener('mouseup', up)
         },
 
-        isNeedLockProportion() {
+        isNeedLockProportion () {
             if (this.element.component != 'Group') return false
             const ratates = [0, 90, 180, 360]
             for (const component of this.element.propValue) {

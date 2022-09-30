@@ -3,7 +3,7 @@ import store from '@/store'
 import { divide, multiply } from 'mathjs'
 
 const needToChangeAttrs = ['top', 'left', 'width', 'height', 'fontSize']
-export default function changeComponentsSizeWithScale(scale) {
+export default function changeComponentsSizeWithScale (scale) {
     const componentData = deepCopy(store.state.componentData)
     componentData.forEach(component => {
         Object.keys(component.style).forEach(key => {
@@ -27,7 +27,7 @@ export default function changeComponentsSizeWithScale(scale) {
 }
 
 const needToChangeAttrs2 = ['width', 'height', 'fontSize']
-export function changeComponentSizeWithScale(component) {
+export function changeComponentSizeWithScale (component) {
     Object.keys(component.style).forEach(key => {
         if (needToChangeAttrs2.includes(key)) {
             if (key === 'fontSize' && component.style[key] === '') return
@@ -37,10 +37,10 @@ export function changeComponentSizeWithScale(component) {
     })
 }
 
-function format(value, scale) {
+function format (value, scale) {
     return multiply(value, divide(parseFloat(scale), 100))
 }
 
-function getOriginStyle(value, scale) {
+function getOriginStyle (value, scale) {
     return divide(value, divide(parseFloat(scale), 100))
 }

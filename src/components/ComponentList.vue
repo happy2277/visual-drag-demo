@@ -1,13 +1,8 @@
 <template>
     <div class="component-list" @dragstart="handleDragStart">
-        <div
-            v-for="(item, index) in componentList"
-            :key="index"
-            class="list"
-            draggable
-            :data-index="index"
-        >
+        <div v-for="(item, index) in componentList" :key="index" class="list" draggable :data-index="index" :data-type="'single'">
             <span class="iconfont" :class="'icon-' + item.icon"></span>
+            <span>{{item.label}}</span>
         </div>
     </div>
 </template>
@@ -16,14 +11,15 @@
 import componentList from '@/custom-component/component-list'
 
 export default {
-    data() {
+    data () {
         return {
             componentList,
         }
     },
     methods: {
-        handleDragStart(e) {
+        handleDragStart (e) {
             e.dataTransfer.setData('index', e.target.dataset.index)
+            e.dataTransfer.setData('type', e.target.dataset.type)
         },
     },
 }
@@ -31,7 +27,7 @@ export default {
 
 <style lang="scss" scoped>
 .component-list {
-    height: 65%;
+    height: 20%;
     padding: 10px;
     display: grid;
     grid-gap: 10px 19px;

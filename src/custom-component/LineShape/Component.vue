@@ -3,10 +3,10 @@
 </template>
 
 <script>
-import OnEvent from '../common/OnEvent'
+
 
 export default {
-    extends: OnEvent,
+
 }
 </script>
 

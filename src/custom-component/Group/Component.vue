@@ -1,26 +1,16 @@
 <template>
     <div class="group">
         <div>
-            <component
-                :is="item.component"
-                v-for="item in propValue"
-                :id="'component' + item.id"
-                :key="item.id"
-                class="component"
-                :style="item.groupStyle"
-                :prop-value="item.propValue"
-                :element="item"
-                :request="item.request"
-            />
+            <component :is="item.component" v-for="item in propValue" :id="'component' + item.id" :key="item.id" class="component" :style="item.groupStyle" :prop-value="item.propValue" :element="item" :request="item.request" />
         </div>
     </div>
 </template>
 
 <script>
-import OnEvent from '../common/OnEvent'
+
 
 export default {
-    extends: OnEvent,
+
     props: {
         propValue: {
             type: Array,
@@ -28,7 +18,7 @@ export default {
         },
         element: {
             type: Object,
-            default: () => {},
+            default: () => { },
         },
     },
 }

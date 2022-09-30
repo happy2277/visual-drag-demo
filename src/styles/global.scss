@@ -2,10 +2,11 @@
     overflow: hidden;
 
     .attr-list {
-        overflow: auto;
         padding: 10px 14px;
+        padding-bottom: 40px;
         padding-top: 0;
-        height: 100%;
+        height: calc(100vh - 78px);
+        overflow: auto;
     }
 
     .title {

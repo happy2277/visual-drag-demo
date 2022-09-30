@@ -1,75 +1,26 @@
 <template>
-    <div
-        id="editor"
-        class="editor"
-        :class="{ edit: isEdit }"
-        :style="{
+    <div id="editor" class="editor" :class="{ edit: isEdit }" :style="{
             ...getCanvasStyle(canvasStyleData),
             width: changeStyleWithScale(canvasStyleData.width) + 'px',
             height: changeStyleWithScale(canvasStyleData.height) + 'px',
-        }"
-        @contextmenu="handleContextMenu"
-        @mousedown="handleMouseDown"
-    >
+        }" @contextmenu="handleContextMenu" @mousedown="handleMouseDown">
         <!-- 网格线 -->
         <Grid />
 
         <!--页面组件列表展示-->
-        <Shape
-            v-for="(item, index) in componentData"
-            :key="item.id"
-            :default-style="item.style"
-            :style="getShapeStyle(item.style)"
-            :active="item.id === (curComponent || {}).id"
-            :element="item"
-            :index="index"
-            :class="{ lock: item.isLock }"
-        >
-            <component
-                :is="item.component"
-                v-if="item.component.startsWith('SVG')"
-                :id="'component' + item.id"
-                :style="getSVGStyle(item.style)"
-                class="component"
-                :prop-value="item.propValue"
-                :element="item"
-                :request="item.request"
-            />
+        <Shape v-for="(item, index) in componentData" :key="item.id" :default-style="item.style" :style="getShapeStyle(item.style)" :active="item.id === (curComponent || {}).id" :element="item" :index="index" :class="{ lock: item.isLock }">
+            <component :is="item.component" v-if="item.component.startsWith('SVG')" :id="'component' + item.id" :style="getSVGStyle(item.style)" class="component" :prop-value="item.propValue" :element="item" :request="item.request" />
 
-            <component
-                :is="item.component"
-                v-else-if="item.component != 'VText'"
-                :id="'component' + item.id"
-                class="component"
-                :style="getComponentStyle(item.style)"
-                :prop-value="item.propValue"
-                :element="item"
-                :request="item.request"
-            />
+            <component :is="item.component" v-else-if="item.component != 'VText'" :id="'component' + item.id" class="component" :style="getComponentStyle(item.style)" :prop-value="item.propValue" :element="item" :request="item.request" />
 
-            <component
-                :is="item.component"
-                v-else
-                :id="'component' + item.id"
-                class="component"
-                :style="getComponentStyle(item.style)"
-                :prop-value="item.propValue"
-                :element="item"
-                :request="item.request"
-                @input="handleInput"
-            />
+            <component :is="item.component" v-else :id="'component' + item.id" class="component" :style="getComponentStyle(item.style)" :prop-value="item.propValue" :element="item" :request="item.request" @input="handleInput" />
         </Shape>
         <!-- 右击菜单 -->
         <ContextMenu />
         <!-- 标线 -->
         <MarkLine />
         <!-- 选中区域 -->
-        <Area
-            v-show="isShowArea"
-            :start="start"
-            :width="width"
-            :height="height"
-        />
+        <Area v-show="isShowArea" :start="start" :width="width" :height="height" />
     </div>
 </template>
 
@@ -93,7 +44,7 @@ export default {
             default: true,
         },
     },
-    data() {
+    data () {
         return {
             editorX: 0,
             editorY: 0,
@@ -104,7 +55,7 @@ export default {
             width: 0,
             height: 0,
             isShowArea: false,
-            svgFilterAttrs: ['width', 'height', 'top', 'left', 'rotate'],
+            svgFilterAttrs: ['height', 'top', 'left', 'rotate'],
         }
     },
     computed: mapState([
@@ -113,7 +64,7 @@ export default {
         'canvasStyleData',
         'editor',
     ]),
-    mounted() {
+    mounted () {
         // 获取编辑器元素
         this.$store.commit('getEditor')
 
@@ -126,7 +77,8 @@ export default {
         getCanvasStyle,
         changeStyleWithScale,
 
-        handleMouseDown(e) {
+        // 选中区域
+        handleMouseDown (e) {
             // 如果没有选中组件 在画布上点击时需要调用 e.preventDefault() 防止触发 drop 事件
             if (!this.curComponent || (isPreventDrop(this.curComponent.component))) {
                 e.preventDefault()
@@ -174,7 +126,7 @@ export default {
             document.addEventListener('mouseup', up)
         },
 
-        hideArea() {
+        hideArea () {
             this.isShowArea = 0
             this.width = 0
             this.height = 0
@@ -190,7 +142,7 @@ export default {
             })
         },
 
-        createGroup() {
+        createGroup () {
             // 获取选中区域的组件数据
             const areaData = this.getSelectArea()
             if (areaData.length <= 1) {
@@ -244,7 +196,7 @@ export default {
             })
         },
 
-        getSelectArea() {
+        getSelectArea () {
             const result = []
             // 区域起点坐标
             const { x, y } = this.start
@@ -262,7 +214,7 @@ export default {
             return result
         },
 
-        handleContextMenu(e) {
+        handleContextMenu (e) {
             e.stopPropagation()
             e.preventDefault()
 
@@ -283,20 +235,20 @@ export default {
             this.$store.commit('showContextMenu', { top, left })
         },
 
-        getComponentStyle(style) {
+        getComponentStyle (style) {
             return getStyle(style, this.svgFilterAttrs)
         },
 
-        getSVGStyle(style) {
+        getSVGStyle (style) {
             return getSVGStyle(style, this.svgFilterAttrs)
         },
 
-        handleInput(element, value) {
+        handleInput (element, value) {
             // 根据文本组件高度调整 shape 高度
             this.$store.commit('setShapeStyle', { height: this.getTextareaHeight(element, value) })
         },
 
-        getTextareaHeight(element, text) {
+        getTextareaHeight (element, text) {
             let { lineHeight, fontSize, height } = element.style
             if (lineHeight === '') {
                 lineHeight = 1.5
@@ -312,11 +264,11 @@ export default {
 <style lang="scss" scoped>
 .editor {
     position: relative;
-    background: #fff;
-    margin: auto;
+    margin: 30px auto;
+    border-style: solid;
 
     .lock {
-        opacity: .5;
+        opacity: 0.5;
 
         &:hover {
             cursor: not-allowed;

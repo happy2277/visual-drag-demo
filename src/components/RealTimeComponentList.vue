@@ -1,14 +1,8 @@
 <template>
     <div class="real-time-component-list">
-        <div
-            v-for="(item, index) in componentData"
-            :key="index"
-            class="list"
-            :class="{ actived: transformIndex(index) === curComponentIndex }"
-            @click="onClick(transformIndex(index))"
-        >
+        <div v-for="(item, index) in componentData" :key="index" class="list" :class="{ actived: transformIndex(index) === curComponentIndex }" @click="onClick(transformIndex(index))">
             <span class="iconfont" :class="'icon-' + getComponent(index).icon"></span>
-            <span>{{ getComponent(index).label }}</span>
+            <span>{{ getComponent(index).style.name }}</span>
             <div class="icon-container">
                 <span class="iconfont icon-shangyi" @click="upComponent(transformIndex(index))"></span>
                 <span class="iconfont icon-xiayi" @click="downComponent(transformIndex(index))"></span>
@@ -28,40 +22,40 @@ export default {
         'curComponentIndex',
     ]),
     methods: {
-        getComponent(index) {
+        getComponent (index) {
             return this.componentData[this.componentData.length - 1 - index]
         },
 
-        transformIndex(index) {
+        transformIndex (index) {
             return this.componentData.length - 1 - index
         },
 
-        onClick(index) {
+        onClick (index) {
             this.setCurComponent(index)
         },
 
-        deleteComponent() {
+        deleteComponent () {
             setTimeout(() => {
                 this.$store.commit('deleteComponent')
                 this.$store.commit('recordSnapshot')
             })
         },
 
-        upComponent() {
+        upComponent () {
             setTimeout(() => {
                 this.$store.commit('upComponent')
                 this.$store.commit('recordSnapshot')
             })
         },
 
-        downComponent() {
+        downComponent () {
             setTimeout(() => {
                 this.$store.commit('downComponent')
                 this.$store.commit('recordSnapshot')
             })
         },
 
-        setCurComponent(index) {
+        setCurComponent (index) {
             this.$store.commit('setCurComponent', { component: this.componentData[index], index })
         },
     },
@@ -89,7 +83,7 @@ export default {
         }
 
         &:hover {
-            background-color: rgba(200, 200, 200, .2);
+            background-color: rgba(200, 200, 200, 0.2);
 
             .icon-container {
                 display: block;

@@ -3,30 +3,23 @@
         <div class="toolbar">
             <el-button @click="undo">撤消</el-button>
             <el-button @click="redo">重做</el-button>
-            <label for="input" class="insert">
+            <!-- <label for="input" class="insert">
                 插入图片
-                <input
-                    id="input"
-                    type="file"
-                    hidden
-                    @change="handleFileChange"
-                />
-            </label>
+                <input id="input" type="file" hidden @change="handleFileChange" />
+            </label> -->
 
             <el-button style="margin-left: 10px;" @click="preview(false)">预览</el-button>
-            <el-button @click="save">保存</el-button>
+            <el-button @click="handleConfirm">保存</el-button>
+            <el-button @click="saveTemp">保存为组合模板</el-button>
             <el-button @click="clearCanvas">清空画布</el-button>
             <el-button :disabled="!areaData.components.length" @click="compose">组合</el-button>
-            <el-button
-                :disabled="!curComponent || curComponent.isLock || curComponent.component != 'Group'"
-                @click="decompose"
-            >
+            <el-button :disabled="!curComponent || curComponent.isLock || curComponent.component != 'Group'" @click="decompose">
                 拆分
             </el-button>
 
             <el-button :disabled="!curComponent || curComponent.isLock" @click="lock">锁定</el-button>
             <el-button :disabled="!curComponent || !curComponent.isLock" @click="unlock">解锁</el-button>
-            <el-button @click="preview(true)">截图</el-button>
+            <!-- <el-button @click="preview(true)">截图</el-button> -->
 
             <div class="canvas-config">
                 <span>画布大小</span>
@@ -34,10 +27,10 @@
                 <span>*</span>
                 <input v-model="canvasStyleData.height">
             </div>
-            <div class="canvas-config">
+            <!-- <div class="canvas-config">
                 <span>画布比例</span>
                 <input v-model="scale" @input="handleScaleChange"> %
-            </div>
+            </div> -->
         </div>
 
         <!-- 预览 -->
@@ -52,12 +45,12 @@ import { mapState } from 'vuex'
 import Preview from '@/components/Editor/Preview'
 import { commonStyle, commonAttr } from '@/custom-component/component-list'
 import eventBus from '@/utils/eventBus'
-import { $ } from '@/utils/utils'
+import { $, deepCopy } from '@/utils/utils'
 import changeComponentsSizeWithScale, { changeComponentSizeWithScale } from '@/utils/changeComponentsSizeWithScale'
 
 export default {
     components: { Preview },
-    data() {
+    data () {
         return {
             isShowPreview: false,
             timer: null,
@@ -72,15 +65,15 @@ export default {
         'curComponent',
         'curComponentIndex',
     ]),
-    created() {
+    created () {
         eventBus.$on('preview', this.preview)
         eventBus.$on('save', this.save)
         eventBus.$on('clearCanvas', this.clearCanvas)
 
-        this.scale = this.canvasStyleData.scale
+        // this.scale = this.canvasStyleData.scale
     },
     methods: {
-        handleScaleChange() {
+        handleScaleChange () {
             clearTimeout(this.timer)
             this.timer = setTimeout(() => {
                 // 画布比例设一个最小值，不能为 0
@@ -90,33 +83,33 @@ export default {
             }, 1000)
         },
 
-        lock() {
+        lock () {
             this.$store.commit('lock')
         },
 
-        unlock() {
+        unlock () {
             this.$store.commit('unlock')
         },
 
-        compose() {
+        compose () {
             this.$store.commit('compose')
             this.$store.commit('recordSnapshot')
         },
 
-        decompose() {
+        decompose () {
             this.$store.commit('decompose')
             this.$store.commit('recordSnapshot')
         },
 
-        undo() {
+        undo () {
             this.$store.commit('undo')
         },
 
-        redo() {
+        redo () {
             this.$store.commit('redo')
         },
 
-        handleFileChange(e) {
+        handleFileChange (e) {
             const file = e.target.files[0]
             if (!file.type.includes('image')) {
                 toast('只能插入图片')
@@ -167,25 +160,241 @@ export default {
             reader.readAsDataURL(file)
         },
 
-        preview(isScreenshot) {
+        preview (isScreenshot) {
             this.isScreenshot = isScreenshot
             this.isShowPreview = true
             this.$store.commit('setEditMode', 'preview')
         },
-
-        save() {
-            localStorage.setItem('canvasData', JSON.stringify(this.componentData))
-            localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
-            this.$message.success('保存成功')
+        // 是否重复的name
+        isRepeat (arr) {
+            var hash = {};
+            for (let i = 0; i < arr.length; i++) {
+                if (!hash[arr[i].style.name]) {
+                    hash[arr[i].style.name] = true;
+                }
+            }
+            if (Object.keys(hash).length > 1) {
+                return false
+            } else {
+                return true
+            }
         },
 
-        clearCanvas() {
+        // 确定保存
+        handleConfirm () {
+            this.$confirm('确定保存?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'success'
+            }).then(() => {
+                this.save()
+            }).catch(() => {
+            });
+        },
+
+        save () {
+            const componentData = deepCopy(this.componentData)
+            let flag = false
+            const isRepeat = componentData.length > 1 ? this.isRepeat(componentData) : false
+            if (isRepeat) return this.$message.warning('存在重复的控件名称，请检查！')
+
+            componentData.some(v => {
+                if (!v.style.name) {
+                    flag = true
+                    return this.$message.warning('存在未填写控件名称的控件，请检查！')
+                }
+            })
+            if (flag) return
+            let data = []
+            const canvasStyleData = this.canvasStyleData
+            // 根容器
+            const allComponentParent = {
+                type: 'cont',
+                rootParent: true,
+                style: {
+                    xOffset: 0,
+                    yOffset: 0,
+                    name: canvasStyleData.name,
+                    width: canvasStyleData.width,
+                    height: canvasStyleData.height,
+                    borderRadius: canvasStyleData.borderRadius,
+                    borderWidth: canvasStyleData.borderWidth,
+                    backgroundColor: canvasStyleData.backgroundColor,
+                    fontSize: canvasStyleData.fontSize
+                }
+            }
+            componentData.unshift(allComponentParent)
+            componentData.forEach(v => {
+                const { style } = v
+                const common = {
+                    type: v.type,
+                    name: style.name,
+                    par: style.parent || canvasStyleData.name,
+                    base: style.base || canvasStyleData.name,
+                    obj_align: style.objAlign ?? 1,
+                    x: style.xOffset,
+                    y: style.yOffset
+                }
+                let obj
+                // 非组合
+                if (v.type != 'group') {
+                    obj = this.commonSwitch(v)
+                    const res = {
+                        ...common,
+                        ...obj
+                    }
+                    data.push(res)
+                } else {
+                    // 组合
+                    v.propValue.forEach(item => {
+                        obj = this.commonSwitch(item)
+                        const res = {
+                            ...common,
+                            ...obj,
+                            name: item.style.name || canvasStyleData.name,
+                            type: item.type,
+                            par: item.style.parent || canvasStyleData.name,
+                            base: item.style.base ?? '',
+                            obj_align: item.style.objAlign
+                        }
+                        data.push(res)
+                    })
+                }
+
+            })
+            // 删除根容器的par、base
+            delete data[0].par
+            delete data[0].base
+
+            console.table(data)
+            localStorage.setItem('canvasData', JSON.stringify(componentData))
+            localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
+            this.$message.success('保存成功')
+            this.clearCanvas()
+        },
+
+        commonSwitch (v) {
+            const { style, propValue } = v
+            const w = style.width
+            const h = style.height
+            const reg = /(?<=\()(.+?)(?=\))/g;
+            let obj, bgColorVal, bgColorObj, resBgClVal, colorVal, colorObj, resClVal
+            if (style.backgroundColor) {
+                bgColorVal = (style.backgroundColor.match(reg))[0].split(',')
+                bgColorObj = this.getColorObj(bgColorVal)
+                resBgClVal = this.colorCalc(bgColorObj)
+            }
+            switch (v.type) {
+                case 'cont':
+                    obj = {
+                        w,
+                        h,
+                        radius: style.borderRadius,
+                        border_width: style.borderWidth,
+                        bg_color: resBgClVal
+                    }
+                    break;
+                case 'img':
+                    obj = {
+                        w,
+                        h,
+                        opa: style.opacity * 255,
+                        path: style.url,
+                        angle: style.rotate
+                    }
+                    break;
+                case 'line':
+                    obj = {
+                        width: style.width,
+                        // round: style.,
+                        color: resBgClVal,
+                        // point,
+                        // hide
+                    }
+                    break;
+                case 'label':
+                    colorVal = (style.color.match(reg))[0].split(',')
+                    colorObj = this.getColorObj(colorVal)
+                    resClVal = this.colorCalc(colorObj)
+                    const textAlign = style.textAlign == 'left' ?
+                        0 : style.textAlign == 'center' ?
+                            1 : style.textAlign == 'right' ?
+                                2 : 3
+                    obj = {
+                        w,
+                        h,
+                        radius: style.opacity,
+                        text_color: resClVal,
+                        bg_color: resBgClVal,
+                        font: style.font,
+                        size: style.fontSize,
+                        bold: style.fontWeight,
+                        base_line: style.baseLine,
+                        text_align: textAlign,
+                        // long_mode: style.longMode,
+                        str: style.str
+                    }
+                    break;
+                case 'bar':
+                    obj = {
+                        w,
+                        h,
+                        // min,
+                        // max,
+                        // anim_time,
+                        // anim_on,
+                        value: style.percentage
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return obj
+        },
+
+        getColorObj (colorVal) {
+            let obj = {}
+            obj.r = colorVal[0]
+            obj.g = colorVal[1]
+            obj.b = colorVal[2]
+            obj.a = colorVal[3]
+            return obj
+        },
+        colorCalc ({ r, g, b, a }) {
+            return a * 255 * 256 * 256 * 256 + r * 256 * 256 + g * 256 + b * 1
+        },
+
+        saveTemp () {
+            const componentData = deepCopy(this.componentData)
+            let flag = false
+            if (!componentData.length) {
+                return this.$message.warning('无组合控件')
+            }
+            componentData.some(v => {
+                if (v.type != 'group') {
+                    flag = true
+                    return this.$message.warning('存在不是组合的控件')
+                }
+            })
+            if (flag) return
+
+            const isRepeat = componentData.length > 1 ? this.isRepeat(componentData) : false
+            if (isRepeat) return this.$message.warning('存在重复的控件名称，请检查！')
+
+            this.$store.commit('setComponentTempData', componentData)
+            localStorage.setItem('canvasTempData', JSON.stringify(componentData))
+            localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
+            this.$message.success('保存成功')
+            this.clearCanvas()
+        },
+
+        clearCanvas () {
             this.$store.commit('setCurComponent', { component: null, index: null })
             this.$store.commit('setComponentData', [])
             this.$store.commit('recordSnapshot')
         },
 
-        handlePreviewChange() {
+        handlePreviewChange () {
             this.isShowPreview = false
             this.$store.commit('setEditMode', 'edit')
         },
@@ -195,6 +404,9 @@ export default {
 
 <style lang="scss" scoped>
 .toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 15px 10px;
     white-space: nowrap;
     overflow-x: auto;
@@ -234,7 +446,7 @@ export default {
         box-sizing: border-box;
         outline: 0;
         margin: 0;
-        transition: .1s;
+        transition: 0.1s;
         font-weight: 500;
         padding: 9px 15px;
         font-size: 12px;

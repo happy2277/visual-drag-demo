@@ -1,65 +1,53 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-    <div
-        v-if="editMode == 'edit'"
-        class="v-text"
-        @keydown="handleKeydown"
-        @keyup="handleKeyup"
-    >
-        <!-- tabindex >= 0 使得双击时聚焦该元素 -->
-        <div
-            ref="text"
-            :contenteditable="canEdit"
-            :class="{ 'can-edit': canEdit }"
-            tabindex="0"
-            :style="{ verticalAlign: element.style.verticalAlign }"
-            @dblclick="setEdit"
-            @paste="clearStyle"
-            @mousedown="handleMousedown"
-            @blur="handleBlur"
-            @input="handleInput"
-            v-html="element.propValue"
-        ></div>
+    <!-- <div v-if="editMode == 'edit'" class="v-text" @keydown="handleKeydown" @keyup="handleKeyup">
+        tabindex >= 0 使得双击时聚焦该元素
+        <div ref="text" :contenteditable="canEdit" :class="{ 'can-edit': canEdit }" tabindex="0" :style="{ verticalAlign: element.style.verticalAlign }" @dblclick="setEdit" @paste="clearStyle" @mousedown="handleMousedown" @blur="handleBlur" @input="handleInput" v-html="element.propValue"></div>
     </div>
     <div v-else class="v-text preview">
         <div :style="{ verticalAlign: element.style.verticalAlign }" v-html="element.propValue"></div>
+    </div> -->
+    <div class="v-text preview" :class="className">
+        {{element.style.str || element.style.numStr}}
     </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { keycodes } from '@/utils/shortcutKey.js'
-import request from '@/utils/request'
-import OnEvent from '../common/OnEvent'
+import { $ } from '@/utils/utils'
+
 import eventBus from '@/utils/eventBus'
 
 export default {
-    extends: OnEvent,
+
     props: {
-        propValue: {
-            type: String,
-            required: true,
-            default: '',
-        },
-        request: {
-            type: Object,
-            default: () => {},
-        },
+        // propValue: {
+        //     type: String,
+        //     required: true,
+        //     default: '',
+        // },
         element: {
             type: Object,
-            default: () => {},
-        },
-        linkage: {
-            type: Object,
-            default: () => {},
+            default: () => { },
         },
     },
-    data() {
+    data () {
         return {
             canEdit: false,
             ctrlKey: 17,
             isCtrlDown: false,
-            cancelRequest: null,
+            className: '',
+            intervalId: null
+        }
+    },
+    watch: {
+        'element.style.longMode': {
+            handler (val) {
+                this.getClass(val)
+            },
+            deep: true,
+            immediate: true
         }
     },
     computed: {
@@ -67,35 +55,65 @@ export default {
             'editMode',
             'curComponent',
         ]),
-    },
-    created() {
-        // 注意，修改时接口属性时不会发数据，在预览时才会发
-        // 如果要在修改接口属性的同时发请求，需要 watch 一下 request 的属性
-        if (this.request) {
-            // 第二个参数是要修改数据的父对象，第三个参数是修改数据的 key，第四个数据修改数据的类型
-            this.cancelRequest = request(this.request, this.element, 'propValue', 'string')
-        }
 
+    },
+    created () {
         eventBus.$on('componentClick', this.onComponentClick)
     },
-    beforeDestroy() {
-        // 组件销毁时取消请求
-        this.request && this.cancelRequest()
+    beforeDestroy () {
         eventBus.$off('componentClick', this.onComponentClick)
     },
     methods: {
-        onComponentClick() {
+        getClass (longMode) {
+            switch (longMode) {
+                case 0:
+
+                    break;
+                case 1:
+
+                    break;
+                case 2:
+                    this.className = 'dot'
+                    break;
+                case 3:
+                    this.className = 'auto'
+                    clearInterval(this.intervalId)
+                    this.intervalId = null
+                    break;
+                case 4:
+                    $(`#component${this.element.id}`)
+                    console.log($(`#component${this.element.id}`).style.width)
+                    if (this.intervalId != null) return
+                    //箭头解决this指向问题，由内部的指向外部
+                    this.intervalId = setInterval(() => {
+                        //获取到头的第一个字符
+                        var start = this.element.style.str.substring(0, 1)
+                        //获取到后面的所有字符
+                        var end = this.element.style.str.substring(1)
+                        //重新拼接得到新的字符串，并赋值给this.msg
+                        this.element.style.str = end + start
+                        //注意：vm实例，会监听自己身上data中所有数据的改变，只要数据一发生变化，就会把最新数据，从data上同步到页面中去
+                    }, 100)
+                    break;
+                case 5:
+                    this.className = 'crop'
+                    break;
+                default:
+                    break;
+            }
+        },
+        onComponentClick () {
             // 如果当前点击的组件 id 和 VText 不是同一个，需要设为不允许编辑 https://github.com/woai3c/visual-drag-demo/issues/90
             if (this.curComponent.id !== this.element.id) {
                 this.canEdit = false
             }
         },
 
-        handleInput(e) {
+        handleInput (e) {
             this.$emit('input', this.element, e.target.innerHTML)
         },
 
-        handleKeydown(e) {
+        handleKeydown (e) {
             // 阻止冒泡，防止触发复制、粘贴组件操作
             this.canEdit && e.stopPropagation()
             if (e.keyCode == this.ctrlKey) {
@@ -107,7 +125,7 @@ export default {
             }
         },
 
-        handleKeyup(e) {
+        handleKeyup (e) {
             // 阻止冒泡，防止触发复制、粘贴组件操作
             this.canEdit && e.stopPropagation()
             if (e.keyCode == this.ctrlKey) {
@@ -115,13 +133,13 @@ export default {
             }
         },
 
-        handleMousedown(e) {
+        handleMousedown (e) {
             if (this.canEdit) {
                 e.stopPropagation()
             }
         },
 
-        clearStyle(e) {
+        clearStyle (e) {
             e.preventDefault()
             const clp = e.clipboardData
             const text = clp.getData('text/plain') || ''
@@ -132,7 +150,7 @@ export default {
             this.$emit('input', this.element, e.target.innerHTML)
         },
 
-        handleBlur(e) {
+        handleBlur (e) {
             this.element.propValue = e.target.innerHTML || '&nbsp;'
             const html = e.target.innerHTML
             if (html !== '') {
@@ -146,7 +164,7 @@ export default {
             this.canEdit = false
         },
 
-        setEdit() {
+        setEdit () {
             if (this.element.isLock) return
 
             this.canEdit = true
@@ -154,7 +172,7 @@ export default {
             this.selectText(this.$refs.text)
         },
 
-        selectText(element) {
+        selectText (element) {
             const selection = window.getSelection()
             const range = document.createRange()
             range.selectNodeContents(element)
@@ -169,21 +187,17 @@ export default {
 .v-text {
     width: 100%;
     height: 100%;
-    display: table;
-
-    div {
-        display: table-cell;
-        width: 100%;
-        height: 100%;
-        outline: none;
-        word-break: break-all;
-        padding: 4px;
-    }
-
-    .can-edit {
-        cursor: text;
-        height: 100%;
-    }
+}
+.dot {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.auto {
+    overflow-x: auto;
+}
+.crop {
+    overflow: hidden;
 }
 
 .preview {
