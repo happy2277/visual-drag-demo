@@ -75,8 +75,8 @@ export default {
     top: 0;
     left: 0;
     position: fixed;
-    background: rgb(0, 0, 0, 0.5);
-    z-index: 10;
+    background: rgb(0, 0, 0, 0.8);
+    z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
