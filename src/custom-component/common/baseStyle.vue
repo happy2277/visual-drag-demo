@@ -10,7 +10,7 @@
                     <el-select v-else-if="key == 'base'" clearable v-model="curComponent.style[key]" placeholder="请选择" @change="handleBaseChange" @clear="handleClear">
                         <el-option v-for="(item, i) in parentOptions" :key="item.value" :value="item.value" :label="item.label"></el-option>
                     </el-select>
-                    <el-select v-else v-model="curComponent.style[key]" placeholder="请选择" @change="handlecontrolChange">
+                    <el-select v-else v-model="curComponent.style[key]" placeholder="请选择" @change="handleControlChange" @visible-change="handleVisibleChange">
                         <el-option v-for="(item, i) in controlAlignmentOptions" :key="item.value" :value="item.value" :label="item.labelCn">
                             <!-- <span style="float:left;margin-right:10px;color: #8492a6; font-size: 13px">{{ item.labelCn }}</span>
                             <span style="float:right">{{ item.label }}</span> -->
@@ -19,6 +19,10 @@
                     <!-- <el-select :ref="`select_${key}`" v-model="curComponent.style[key]" placeholder="请选择" @change="handleChange" @blur="handleBlur">
                         <el-option v-for="(item, i) in (key == 'parent' || key == 'base' ? parentOptions : controlAlignmentOptions)" :key="item.value" :value="item.value" :label="item.label"></el-option>
                     </el-select> -->
+                </template>
+                <template v-else-if="key == 'xOffset' || key == 'yOffset'">
+                    <span>{{key == 'xOffset' ? 'x轴偏移量：' : 'y轴偏移量：'}}</span>
+                    <span v-text="curComponent.style[key]"></span>
                 </template>
                 <el-input v-else-if="inputKey.includes(key)" v-model="curComponent.style[key]" placeholder="请输入"></el-input>
                 <el-input v-else v-model.number="curComponent.style[key]" type="number" @input="handleNumInput" />
@@ -94,8 +98,16 @@ export default {
                 this.getComponentOption(this.objAlign)
             }
         },
+        handleVisibleChange (val) {
+            // 控件对齐方式选择无改变值下拉框隐藏时
+            if (!val) {
+                if (this.objAlign == this.curComponent.style.objAlign) {
+                    this.getComponentOption(this.objAlign)
+                }
+            }
+        },
         // 控件对齐方式选择
-        handlecontrolChange (val) {
+        handleControlChange (val) {
             // if (!this.parent && !this.base) {
             //     this.objAlign = ''
             //     this.curComponent.style['objAlign'] = ''

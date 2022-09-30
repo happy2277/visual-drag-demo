@@ -6,8 +6,8 @@ export const baseStyleData = [
     { key: 'objAlign', label: '控件对齐方式' },
     { key: 'left', label: 'x 坐标' },
     { key: 'top', label: 'y 坐标' },
-    // { key: 'xOffset', label: '偏移横坐标' },
-    // { key: 'yOffset', label: '偏移纵坐标' },
+    { key: 'xOffset', label: '' },
+    { key: 'yOffset', label: '' },
 ]
 
 export const styleData = [

@@ -1,7 +1,7 @@
 <template>
     <div class="v-common-attr">
         <el-collapse v-model="activeName" accordion @change="onChange">
-            <BaseStyle></BaseStyle>
+            <BaseStyle ref="baseStyle"></BaseStyle>
             <el-collapse-item title="样式" name="style">
                 <el-form>
                     <el-form-item v-for="({ key, label }, index) in styleKeys" :key="index" :label="label">
@@ -91,6 +91,22 @@ export default {
         curComponent () {
             return this.$store.state.curComponent
         },
+    },
+    watch: {
+        // 'curComponent.style.width': {
+        //     handler (val) {
+        //         this.$nextTick(() => {
+        //             this.$refs.baseStyle.getComponentOption(this.curComponent.style.objAlign)
+        //         })
+        //     },
+        //     deep: true
+        // },
+        // 'curComponent.style.height': {
+        //     handler (val) {
+        //         console.log(111111)
+        //     },
+        //     deep: true
+        // }
     },
     created () {
         // this.activeName = this.curComponent.collapseName
