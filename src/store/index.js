@@ -36,6 +36,7 @@ const data = {
             borderWidth: 0,
             borderRadius: 0,
             opacity: 1,
+            rotate: 0
         },
         isInEdiotr: false, // 是否在编辑器中，用于判断复制、粘贴组件时是否生效，如果在编辑器外，则无视这些操作
         componentData: [], // 画布组件数据

@@ -49,15 +49,18 @@ export default {
             const lines = this.$refs
             const components = this.componentData
             const curComponentStyle = getComponentRotatedStyle(this.curComponent.style)
-            const curComponentHalfwidth = curComponentStyle.width / 2
+            const curComponentHalfWidth = curComponentStyle.width / 2
             const curComponentHalfHeight = curComponentStyle.height / 2
 
             this.hideLine()
             components.forEach(component => {
-                if (component == this.curComponent) return
+                if (component == this.curComponent) {
+                    eventBus.$emit('emptyNeedToShow', false)
+                    return
+                }
                 const componentStyle = getComponentRotatedStyle(component.style)
                 const { top, left, bottom, right } = componentStyle
-                const componentHalfwidth = componentStyle.width / 2
+                const componentHalfWidth = componentStyle.width / 2
                 const componentHalfHeight = componentStyle.height / 2
 
                 const conditions = {
@@ -116,11 +119,11 @@ export default {
                         },
                         {
                             // 组件与拖拽节点的中间是否对齐
-                            isNearly: this.isNearly(curComponentStyle.left + curComponentHalfwidth, left + componentHalfwidth),
+                            isNearly: this.isNearly(curComponentStyle.left + curComponentHalfWidth, left + componentHalfWidth),
                             lineNode: lines.yc[0], // yc
                             line: 'yc',
-                            dragShift: left + componentHalfwidth - curComponentHalfwidth,
-                            lineShift: left + componentHalfwidth,
+                            dragShift: left + componentHalfWidth - curComponentHalfWidth,
+                            lineShift: left + componentHalfWidth,
                         },
                         {
                             isNearly: this.isNearly(curComponentStyle.left, right),
@@ -150,7 +153,6 @@ export default {
                             key,
                             value: rotate != 0 ? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
                         })
-
                         condition.lineNode.style[key] = `${condition.lineShift}px`
                         needToShow.push(condition.line)
                     })
@@ -159,7 +161,10 @@ export default {
                 // 同一方向上同时显示三条线可能不太美观，因此才有了这个解决方案
                 // 同一方向上的线只显示一条，例如多条横条只显示一条横线
                 if (needToShow.length) {
+                    // eventBus.$emit('emptyNeedToShow', true)
                     this.chooseTheTureLine(needToShow, isDownward, isRightward)
+                } else {
+                    eventBus.$emit('emptyNeedToShow', false)
                 }
             })
         },
@@ -234,11 +239,13 @@ export default {
 }
 
 .xline {
+    left: 0;
     width: 100%;
     height: 1px;
 }
 
 .yline {
+    top: 0;
     width: 1px;
     height: 100%;
 }

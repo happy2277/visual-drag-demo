@@ -4,6 +4,9 @@
             width: changeStyleWithScale(canvasStyleData.width) + 'px',
             height: changeStyleWithScale(canvasStyleData.height) + 'px',
         }" @contextmenu="handleContextMenu" @mousedown="handleMouseDown">
+        <!-- 根容器标线 -->
+        <RootMarkLine />
+
         <!-- 网格线 -->
         <Grid />
 
@@ -31,13 +34,14 @@ import { getStyle, getComponentRotatedStyle, getShapeStyle, getSVGStyle, getCanv
 import { $, isPreventDrop } from '@/utils/utils'
 import ContextMenu from './ContextMenu'
 import MarkLine from './MarkLine'
+import RootMarkLine from './RootMarkLine'
 import Area from './Area'
 import eventBus from '@/utils/eventBus'
 import Grid from './Grid'
 import { changeStyleWithScale } from '@/utils/translate'
 
 export default {
-    components: { Shape, ContextMenu, MarkLine, Area, Grid },
+    components: { Shape, ContextMenu, MarkLine, Area, Grid, RootMarkLine },
     props: {
         isEdit: {
             type: Boolean,

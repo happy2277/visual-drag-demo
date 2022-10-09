@@ -373,7 +373,7 @@ export default {
             componentData.some(v => {
                 if (v.type != 'group') {
                     flag = true
-                    return this.$message.warning('存在不是组合的控件')
+                    return this.$message.warning('无组合控件')
                 }
             })
             if (flag) return

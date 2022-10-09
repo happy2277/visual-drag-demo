@@ -21,9 +21,9 @@ export default {
             options: {
                 name: '根容器名称(唯一)',
                 // color: '颜色',
-                opacity: '不透明度',
+                // opacity: '不透明度',
                 backgroundColor: '背景色',
-                fontSize: '字体大小',
+                // fontSize: '字体大小',
                 borderWidth: '边框宽度',
                 borderRadius: '边框半径'
             },
