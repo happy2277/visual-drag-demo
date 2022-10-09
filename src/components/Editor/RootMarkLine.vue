@@ -35,7 +35,6 @@ export default {
         // 监听元素移动和不移动的事件
         eventBus.$on('move', (isDownward, isRightward) => {
             if (!this.status) {
-                console.log(123)
                 this.showLine(isDownward, isRightward)
             }
         })

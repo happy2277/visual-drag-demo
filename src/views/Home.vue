@@ -187,7 +187,11 @@ export default {
                     component.id = generateID()
                     switch (component.type) {
                         case 'label':
-                            component.style.name = `label_${this.labelIndex}`
+                            if (component.label == '文字') {
+                                component.style.name = `label_text_${this.labelIndex}`
+                            } else {
+                                component.style.name = `label_price_${this.labelIndex}`
+                            }
                             this.labelIndex++
                             break;
                         case 'img':
@@ -282,6 +286,14 @@ export default {
 
             .collapse {
                 height: 100%;
+                // .el-collapse-item {
+                //     max-height: 33.33%;
+                //     overflow: hidden;
+                //     ::deep .el-collapse-item__wrap {
+                //         height: calc(100% - 48px);
+                //         overflow: auto;
+                //     }
+                // }
             }
         }
 

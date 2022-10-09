@@ -229,7 +229,7 @@ export default {
 
 <style lang="scss" scoped>
 .mark-line {
-    height: 100%;
+    // height: 100%;
 }
 
 .line {

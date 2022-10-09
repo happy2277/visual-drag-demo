@@ -21,12 +21,12 @@
             <el-button :disabled="!curComponent || !curComponent.isLock" @click="unlock">解锁</el-button>
             <!-- <el-button @click="preview(true)">截图</el-button> -->
 
-            <div class="canvas-config">
+            <!-- <div class="canvas-config">
                 <span>画布大小</span>
                 <input v-model="canvasStyleData.width">
                 <span>*</span>
                 <input v-model="canvasStyleData.height">
-            </div>
+            </div> -->
             <!-- <div class="canvas-config">
                 <span>画布比例</span>
                 <input v-model="scale" @input="handleScaleChange"> %
