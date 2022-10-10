@@ -47,7 +47,7 @@ const data = {
         // 如果没点中组件，并且在画布空白处弹起鼠标，则取消当前组件的选中状态
         isClickComponent: false,
         componentParents: [], // 父级数据
-        isNeedCalcOffset: true // 是否需要计算偏移值
+        isNeedCalcOffset: true, // 是否需要计算偏移值
     },
     mutations: {
         ...compose.mutations,
@@ -74,6 +74,10 @@ const data = {
             state.canvasStyleData = style
         },
 
+        setCanvasScale (state, scale) {
+            state.canvasStyleData.scale = scale
+        },
+
         setComponentTempData (state, componentTempData = []) {
             state.componentTempData = componentTempData
         },
@@ -83,7 +87,7 @@ const data = {
             state.curComponentIndex = index
             state.componentParents = []
             state.componentData.length && state.componentData.forEach(v => {
-                if (component?.id != v.id && v.style.parent != component?.id && v.style.name) {
+                if (component?.id != v.id && v.style.parent != component?.name && v.style.name) {
                     state.componentParents.push({
                         label: v.style.name,
                         value: v.style.name

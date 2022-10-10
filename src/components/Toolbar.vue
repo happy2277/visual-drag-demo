@@ -70,7 +70,7 @@ export default {
         eventBus.$on('save', this.save)
         eventBus.$on('clearCanvas', this.clearCanvas)
 
-        // this.scale = this.canvasStyleData.scale
+        this.scale = this.canvasStyleData.scale
     },
     methods: {
         handleScaleChange () {

@@ -67,6 +67,7 @@ export default {
         'curComponent',
         'canvasStyleData',
         'editor',
+        'scale'
     ]),
     mounted () {
         // 获取编辑器元素

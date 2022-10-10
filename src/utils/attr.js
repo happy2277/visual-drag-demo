@@ -28,7 +28,7 @@ export const styleData = [
     // { key: 'lineHeight', label: '行高' },
     // { key: 'letterSpacing', label: '字间距' },
     { key: 'textAlign', label: '左右对齐' },
-    // { key: 'longMode', label: '长文本模式' },
+    { key: 'longMode', label: '长文本模式' },
     { key: 'verticalAlign', label: '上下对齐' },
     { key: 'rotate', label: '旋转角度' },
     { key: 'opacity', label: '不透明度' },
@@ -54,7 +54,7 @@ export const styleMap = {
     // lineHeight: '行高',
     // letterSpacing: '字间距',
     textAlign: '左右对齐',
-    // longMode: '长文本模式',
+    longMode: '长文本模式',
     verticalAlign: '上下对齐',
     rotate: '旋转角度',
     opacity: '不透明度',
@@ -64,20 +64,24 @@ export const styleMap = {
 
 export const textAlignOptions = [
     {
-        label: 'LV_LABEL_ALIGN_LEFT',
+        label: 'LV_LABEL_ALIGN_LEFT', // LV_LABEL_ALIGN_LEFT
         value: 'left',
+        labelCn: '左对齐'
     },
     {
-        label: 'LV_LABEL_ALIGN_CENTER',
+        label: 'LV_LABEL_ALIGN_CENTER', // LV_LABEL_ALIGN_CENTER
         value: 'center',
+        labelCn: '中对齐'
     },
     {
-        label: 'LV_LABEL_ALIGN_RIGHT',
+        label: 'LV_LABEL_ALIGN_RIGHT', // LV_LABEL_ALIGN_RIGHT
         value: 'right',
+        labelCn: '右对齐'
     },
     {
-        label: 'LV_LABEL_ALIGN_AUTO',
+        label: 'LV_LABEL_ALIGN_AUTO', // LV_LABEL_ALIGN_AUTO
         value: 'auto',
+        labelCn: '自动对齐'
     },
 ]
 
@@ -134,12 +138,12 @@ export const controlAlignmentOptions = [
 
 // 长文本模式
 export const longModeOptions = [
-    { label: 'LV_LABEL_LONG_EXPAND', value: 0 }, // 将对象大小扩展到文本大小
-    { label: 'LV_LABEL_LONG_BREAK', value: 1 }, //保持对象宽度，打断过长的线条并展开对象高度
-    { label: 'LV_LABEL_LONG_DOT', value: 2 }, //保留大小，如果文本太长，则在末尾写点 
-    { label: 'LV_LABEL_LONG_SROLL', value: 3 }, // 左右滚动文本
-    { label: 'LV_LABEL_LONG_SROLL_CIRC', value: 4 }, // 保持大小并循环滚动文本
-    { label: 'LV_LABEL_LONG_CROP', value: 5 }, //保留大小并裁剪文本
+    { label: 'LV_LABEL_LONG_EXPAND', value: 0, labelCn: '将对象大小扩展到文本大小' }, // 将对象大小扩展到文本大小
+    { label: 'LV_LABEL_LONG_BREAK', value: 1, labelCn: '保持对象宽度，打断过长的线条并展开对象高度' }, //保持对象宽度，打断过长的线条并展开对象高度
+    { label: 'LV_LABEL_LONG_DOT', value: 2, labelCn: '保留大小，如果文本太长，则在末尾写点' }, //保留大小，如果文本太长，则在末尾写点 
+    { label: 'LV_LABEL_LONG_SROLL', value: 3, labelCn: '左右滚动文本' }, // 左右滚动文本
+    { label: 'LV_LABEL_LONG_SROLL_CIRC', value: 4, labelCn: '保持大小并循环滚动文本' }, // 保持大小并循环滚动文本
+    { label: 'LV_LABEL_LONG_CROP', value: 5, labelCn: '保留大小并裁剪文本' }, //保留大小并裁剪文本
 ]
 
 export const rotateOptions = [

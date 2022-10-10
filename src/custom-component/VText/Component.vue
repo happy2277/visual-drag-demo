@@ -8,9 +8,10 @@
         <div :style="{ verticalAlign: element.style.verticalAlign }" v-html="element.propValue"></div>
     </div> -->
     <div class="v-text preview" :class="className">
-        {{element.style.str || element.style.numStr}}
+        <span>{{element.style.str || element.style.numStr}}</span>
     </div>
 </template>
+
 
 <script>
 import { mapState } from 'vuex'
@@ -83,23 +84,38 @@ export default {
                 case 4:
                     $(`#component${this.element.id}`)
                     console.log($(`#component${this.element.id}`).style.width)
-                    if (this.intervalId != null) return
-                    //箭头解决this指向问题，由内部的指向外部
-                    this.intervalId = setInterval(() => {
-                        //获取到头的第一个字符
-                        var start = this.element.style.str.substring(0, 1)
-                        //获取到后面的所有字符
-                        var end = this.element.style.str.substring(1)
-                        //重新拼接得到新的字符串，并赋值给this.msg
-                        this.element.style.str = end + start
-                        //注意：vm实例，会监听自己身上data中所有数据的改变，只要数据一发生变化，就会把最新数据，从data上同步到页面中去
-                    }, 100)
+                    this.scrollImgLeft()
                     break;
                 case 5:
                     this.className = 'crop'
                     break;
                 default:
                     break;
+            }
+        },
+        scrollImgLeft () {
+            var speed = 20 //初始化速度 也就是字体的整体滚动速度
+            var MyMar = null //初始化一个变量为空 用来存放获取到的文本内容
+            var scroll_begin = document.getElementById('scroll_begin') //获取滚动的开头id
+            var scroll_end = document.getElementById('scroll_end') //获取滚动的结束id
+            var scroll_div = document.getElementById('scroll_div') //获取整体的开头id
+            scroll_end.innerHTML = scroll_begin.innerHTML //滚动的是html内部的内容,原生知识!
+            //定义一个方法
+            function Marquee () {
+                if (scroll_end.offsetWidth - scroll_div.scrollLeft <= 0) {
+                    scroll_div.scrollLeft -= scroll_begin.offsetWidth
+                } else {
+                    scroll_div.scrollLeft++
+                }
+            }
+            MyMar = setInterval(Marquee, speed)
+            //滑入暂停
+            scroll_div.onmouseover = function () {
+                clearInterval(MyMar)
+            }
+            //滑出继续
+            scroll_div.onmouseout = function () {
+                MyMar = setInterval(Marquee, speed)
             }
         },
         onComponentClick () {

@@ -14,6 +14,9 @@
                 </div>
                 <el-input v-else v-model.number="canvasStyleData[key]" type="number" />
             </el-form-item>
+            <!-- <el-form-item label="比例">
+                <el-input-number size="mini" label="%" :min="10" :step="10" v-model="rootScale" @change="handleChange"></el-input-number> %
+            </el-form-item> -->
         </el-form>
     </div>
 </template>
@@ -36,13 +39,24 @@ export default {
             },
         }
     },
-    computed: mapState([
-        'canvasStyleData',
-    ]),
+    computed:
+        mapState([
+            'canvasStyleData',
+            'curComponentIndex',
+            'componentData',
+        ])
+    ,
     methods: {
         isIncludesColor (str) {
             return str.toLowerCase().includes('color')
         },
+
+        handleChange (val) {
+            console.log(val)
+            this.$store.commit('setScale', val / 100)
+            // this.$store.commit('setComponentData', this.componentData)
+            // this.$store.commit('setCurComponent', { component: this.componentData[this.curComponentIndex], index: this.curComponentIndex })
+        }
     },
 }
 </script>

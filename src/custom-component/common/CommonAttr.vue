@@ -9,7 +9,7 @@
                         <el-color-picker v-if="isIncludesColor(key)" v-model="curComponent.style[key]" show-alpha></el-color-picker>
                         <!-- 选择 -->
                         <el-select v-else-if="selectKey.includes(key)" v-model="curComponent.style[key]" @change="handleChange">
-                            <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                            <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.labelCn" :value="item.value"></el-option>
                         </el-select>
                         <!-- 滑块 -->
                         <el-slider class="slider" v-else-if="sliderKey.includes(key)" v-model="curComponent.style[key]" :min="0" :max="key == 'opacity' ? 1 : 100" :step="key == 'opacity' ? 0.1 : 1"></el-slider>

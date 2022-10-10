@@ -42,6 +42,7 @@ export default {
         return {
             pointList: ['lt', 't', 'rt', 'r', 'rb', 'b', 'lb', 'l'], // 八个方向
             pointList2: ['r', 'l'], // 左右两个方向
+            pointList3: ['lt', 'rt', 'rb', 'lb'], // 对角四个方向
             initialAngle: { // 每个点对应的初始角度
                 lt: 0,
                 t: 45,
@@ -80,7 +81,7 @@ export default {
     },
     methods: {
         getPointList () {
-            return this.element.component === 'line-shape' ? this.pointList2 : this.pointList
+            return this.element.component === 'line-shape' ? this.pointList2 : this.element.component === 'Picture' ? this.pointList3 : this.pointList
         },
 
         isActive () {
