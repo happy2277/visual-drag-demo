@@ -206,10 +206,10 @@ export default {
     display: inline;
     padding-right: 20px;
 }
-.v-text {
-    // width: 100%;
-    // height: 100%;
-}
+// .v-text {
+// width: 100%;
+// height: 100%;
+// }
 .dot {
     overflow: hidden;
     text-overflow: ellipsis;

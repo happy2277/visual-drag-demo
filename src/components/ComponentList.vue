@@ -4,6 +4,14 @@
             <span class="iconfont" :class="'icon-' + item.icon"></span>
             <span>{{item.label}}</span>
         </div>
+        <!-- <el-collapse class="collapse" v-model="activeNames">
+            <el-collapse-item title="控件" name="1">
+            </el-collapse-item>
+            <el-collapse-item title="组合控件" name="2">
+            </el-collapse-item>
+            <el-collapse-item title="已选控件" name="3">
+            </el-collapse-item>
+        </el-collapse> -->
     </div>
 </template>
 
@@ -24,6 +32,7 @@ export default {
             lineIndex: 0,
             barIndex: 0,
             groupIndex: 0,
+            activeNames: ['1', '2', '3']
         }
     },
     computed: mapState([

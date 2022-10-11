@@ -1,6 +1,6 @@
 <template>
     <div class="v-common-attr">
-        <el-collapse v-model="activeName" accordion @change="onChange">
+        <el-collapse v-model="activeName" @change="onChange">
             <BaseStyle ref="baseStyle"></BaseStyle>
             <el-collapse-item title="样式" name="style">
                 <el-form>
@@ -54,7 +54,7 @@
 
 <script>
 import { styleData, textAlignOptions, borderStyleOptions, verticalAlignOptions, controlAlignmentOptions, longModeOptions, selectKey, optionMap } from '@/utils/attr'
-import BaseStyle from './baseStyle.vue'
+import BaseStyle from './BaseStyle.vue'
 import { $ } from '@/utils/utils'
 
 export default {
@@ -132,6 +132,9 @@ export default {
         },
         handleUploadChange (file, fileList) {
             this.fileList = fileList
+            // this.compressImage(file.raw).then(res => {
+            //     console.log(res)
+            // })
             this.$set(this.curComponent.propValue, 'url', file.url)
             this.$set(this.curComponent.style, 'url', `./res/img/${file.name}`)
         },
@@ -143,7 +146,49 @@ export default {
         handlePictureCardPreview () {
             this.dialogImageUrl = this.curComponent.propValue.url;
             this.dialogVisible = true;
+        },
+        /**
+        * @param { * } file input选择后返回的file对象
+        */
+        compressImage (file) {
+            // 参数file,是通过input 选择本地文件获取的
+            return new Promise((resolve, reject) => {
+                const { type, name, size } = file
+                let img = new Image()
+
+                // 创建一个reader实例
+                let reader = new FileReader()
+
+                // 读取拿到的文件
+                reader.readAsDataURL(file)
+                reader.onload = (e) => {
+
+                    // 文件加载成功后去转成Img对象，为了拿到图片的原始宽高
+                    img.src = e.target.result
+                    img.onload = () => {
+                        // 创建画布canvas
+                        let canvas = document.createElement('canvas')
+                        let content = canvas.getContext('2d')
+
+                        // 设置画布的宽高
+                        canvas.width = img.width // 需要压缩到的图片宽度
+                        canvas.height = img.width * (img.height / img.width)
+
+                        // 将图片画在画布上
+                        content.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+                        //画布转成blob格式的图片
+                        canvas.toBlob((blob) => {
+                            // blob 格式的图片 转成file对象，这里主要看接口支不支持blob格式的文件上传，如果支持就没有必要转
+                            let file = new File([blob], name, { type: type, size: size })
+                            resolve({ type: type, compressFile: file })
+                        }, `image/${type.split('/')[1]}`, 0.3) // 0.7 是文件压缩程度
+                    }
+                }
+            })
         }
+
+
     },
 }
 </script>
