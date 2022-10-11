@@ -331,8 +331,8 @@ export default {
                         bold: style.fontWeight,
                         base_line: style.baseLine,
                         text_align: textAlign,
-                        // long_mode: style.longMode,
-                        str: style.str
+                        long_mode: style.longMode ?? '',
+                        str: style.str || style.numStr
                     }
                     break;
                 case 'bar':

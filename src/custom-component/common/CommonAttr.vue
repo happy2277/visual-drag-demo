@@ -8,7 +8,7 @@
                         <!-- 颜色 -->
                         <el-color-picker v-if="isIncludesColor(key)" v-model="curComponent.style[key]" show-alpha></el-color-picker>
                         <!-- 选择 -->
-                        <el-select v-else-if="selectKey.includes(key)" v-model="curComponent.style[key]" @change="handleChange">
+                        <el-select v-else-if="selectKey.includes(key)" v-model="curComponent.style[key]">
                             <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.labelCn" :value="item.value"></el-option>
                         </el-select>
                         <!-- 滑块 -->
@@ -40,7 +40,7 @@
                         <!-- 文本输入 -->
                         <el-input v-else-if="key == 'str'" v-model.trim="curComponent.style[key]" />
                         <!-- 数字输入 -->
-                        <el-input v-else v-model.number="curComponent.style[key]" type="number" @input="handleNumInput" />
+                        <el-input v-else v-model.number="curComponent.style[key]" type="number" />
                     </el-form-item>
                 </el-form>
             </el-collapse-item>
@@ -55,6 +55,7 @@
 <script>
 import { styleData, textAlignOptions, borderStyleOptions, verticalAlignOptions, controlAlignmentOptions, longModeOptions, selectKey, optionMap } from '@/utils/attr'
 import BaseStyle from './baseStyle.vue'
+import { $ } from '@/utils/utils'
 
 export default {
     components: { BaseStyle },
@@ -73,7 +74,7 @@ export default {
             dialogImageUrl: '',
             dialogVisible: false,
             disabled: false,
-            fileList: []
+            fileList: [],
         }
     },
     computed: {
@@ -93,20 +94,12 @@ export default {
         },
     },
     watch: {
-        // 'curComponent.style.width': {
-        //     handler (val) {
-        //         this.$nextTick(() => {
-        //             this.$refs.baseStyle.getComponentOption(this.curComponent.style.objAlign)
-        //         })
-        //     },
-        //     deep: true
-        // },
-        // 'curComponent.style.height': {
-        //     handler (val) {
-        //         console.log(111111)
-        //     },
-        //     deep: true
-        // }
+        'curComponent.style.fontSize': {
+            handler (val) {
+                this.getTextHeight(this.curComponent)
+            },
+            deep: true
+        }
     },
     created () {
         // this.activeName = this.curComponent.collapseName
@@ -119,30 +112,17 @@ export default {
         }
     },
     methods: {
-        handleChange (val) {
-            console.log(val)
-            switch (val) {
-                case 'LV_LABEL_LONG_EXPAND':
-                    this.$set(this.curComponent.style, 'width', 'auto')
-                    break;
-                case 'LV_LABEL_LONG_BREAK':
-
-                    break;
-                case 'LV_LABEL_LONG_DOT':
-
-                    break;
-                case 'LV_LABEL_LONG_SROLL':
-
-                    break;
-                case 'LV_LABEL_LONG_SROLL_CIRC':
-
-                    break;
-                case 'LV_LABEL_LONG_CROP':
-                    break;
-                default:
-                    break;
+        // 获取文本高度 限制字体大小
+        getTextHeight ({ id }) {
+            const dom = $(`#component${id} .v-text`)
+            const { height } = dom.getBoundingClientRect()
+            if (height > this.curComponent.style.height) {
+                this.curComponent.style.height = this.curComponent.style.height
+                this.curComponent.style.fontSize = this.curComponent.style.fontSize - 1
+                this.$message.warning('已至该控件可容纳最大尺寸')
             }
         },
+
         onChange () {
             // this.curComponent.collapseName = this.activeName
         },
@@ -163,22 +143,6 @@ export default {
         handlePictureCardPreview () {
             this.dialogImageUrl = this.curComponent.propValue.url;
             this.dialogVisible = true;
-        },
-        handleNumInput (val) {
-            // console.log(val)
-            // const { objAlign, left, top, xOffset, yOffset } = this.curComponent.style
-            // switch (objAlign) {
-            //     case 0:
-            //         left = val + left
-            //         top = val + top
-            //         break;
-
-            //     default:
-            //         break;
-            // }
-        },
-        calculateOffset () {
-
         }
     },
 }

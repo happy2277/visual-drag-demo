@@ -7,9 +7,17 @@
     <div v-else class="v-text preview">
         <div :style="{ verticalAlign: element.style.verticalAlign }" v-html="element.propValue"></div>
     </div> -->
-    <div class="v-text preview" :class="className">
-        <span>{{element.style.str || element.style.numStr}}</span>
+    <div>
+        <!-- 循环滚动 长文本模式4 -->
+        <div v-if="element.style.str && element.style.longMode == 4" id="scroll-div">
+            <div class="v-text" id="scroll-begin">{{element.style.str}}</div>
+            <div id="scroll-end"></div>
+        </div>
+        <div v-else class="v-text preview" :class="className">
+            {{element.style.str || element.style.numStr}}
+        </div>
     </div>
+
 </template>
 
 
@@ -39,7 +47,7 @@ export default {
             ctrlKey: 17,
             isCtrlDown: false,
             className: '',
-            intervalId: null
+            timer: null
         }
     },
     watch: {
@@ -66,25 +74,23 @@ export default {
     },
     methods: {
         getClass (longMode) {
+            if (longMode != 4) {
+                clearInterval(this.timer)
+            }
             switch (longMode) {
-                case 0:
-
-                    break;
-                case 1:
-
+                case 0: case 1:
+                    this.className = ''
                     break;
                 case 2:
                     this.className = 'dot'
                     break;
                 case 3:
-                    this.className = 'auto'
-                    clearInterval(this.intervalId)
-                    this.intervalId = null
+                    this.className = 'scroll'
                     break;
                 case 4:
-                    $(`#component${this.element.id}`)
-                    console.log($(`#component${this.element.id}`).style.width)
-                    this.scrollImgLeft()
+                    this.$nextTick(() => {
+                        this.scrollStr()
+                    })
                     break;
                 case 5:
                     this.className = 'crop'
@@ -93,30 +99,21 @@ export default {
                     break;
             }
         },
-        scrollImgLeft () {
+        // 长文本模式4  循环滚动 
+        scrollStr () {
             var speed = 20 //初始化速度 也就是字体的整体滚动速度
-            var MyMar = null //初始化一个变量为空 用来存放获取到的文本内容
-            var scroll_begin = document.getElementById('scroll_begin') //获取滚动的开头id
-            var scroll_end = document.getElementById('scroll_end') //获取滚动的结束id
-            var scroll_div = document.getElementById('scroll_div') //获取整体的开头id
+            var scroll_begin = $('#scroll-begin') //获取滚动的开头id
+            var scroll_end = $('#scroll-end') //获取滚动的结束id
+            var scroll_div = $('#scroll-div') //获取整体的开头id
             scroll_end.innerHTML = scroll_begin.innerHTML //滚动的是html内部的内容,原生知识!
-            //定义一个方法
             function Marquee () {
-                if (scroll_end.offsetWidth - scroll_div.scrollLeft <= 0) {
-                    scroll_div.scrollLeft -= scroll_begin.offsetWidth
+                if (scroll_end.offsetWidth - scroll_div.scrollLeft <= -20) {
+                    scroll_div.scrollLeft -= (scroll_begin.offsetWidth)
                 } else {
                     scroll_div.scrollLeft++
                 }
             }
-            MyMar = setInterval(Marquee, speed)
-            //滑入暂停
-            scroll_div.onmouseover = function () {
-                clearInterval(MyMar)
-            }
-            //滑出继续
-            scroll_div.onmouseout = function () {
-                MyMar = setInterval(Marquee, speed)
-            }
+            this.timer = setInterval(Marquee, speed)
         },
         onComponentClick () {
             // 如果当前点击的组件 id 和 VText 不是同一个，需要设为不允许编辑 https://github.com/woai3c/visual-drag-demo/issues/90
@@ -200,14 +197,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#scroll-div {
+    overflow: hidden;
+    white-space: nowrap;
+}
+#scroll-begin,
+#scroll-end {
+    display: inline;
+    padding-right: 20px;
+}
 .v-text {
-    width: 100%;
-    height: 100%;
+    // width: 100%;
+    // height: 100%;
 }
 .dot {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.scroll {
+    white-space: nowrap;
+    overflow: auto;
 }
 .auto {
     overflow-x: auto;
