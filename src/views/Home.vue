@@ -50,6 +50,7 @@ import RealTimeComponentList from '@/components/RealTimeComponentList'
 import CanvasAttr from '@/components/CanvasAttr'
 import { changeComponentSizeWithScale } from '@/utils/changeComponentsSizeWithScale'
 import { setDefaultcomponentData } from '@/store/snapshot'
+import decomposeComponent from '@/utils/decomposeComponent'
 
 export default {
     components: { Editor, ComponentList, Toolbar, RealTimeComponentList, CanvasAttr, ComposeList },
@@ -221,6 +222,13 @@ export default {
                     component.style.objAlign = 1
                     component.style.name = `group_${this.groupIndex}`
                     this.groupIndex++
+
+                    setTimeout(() => {
+                        const editorRect = this.editor.getBoundingClientRect()
+                        component.propValue.forEach(v => {
+                            decomposeComponent(v, editorRect, component.style)
+                        })
+                    }, 100)
                 }
 
                 // 根据画面比例修改组件样式比例 https://github.com/woai3c/visual-drag-demo/issues/91

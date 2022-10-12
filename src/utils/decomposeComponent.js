@@ -19,5 +19,4 @@ export default function decomposeComponent (component, editorRect, parentStyle) 
     component.style.top = center.y - component.style.height / 2
     component.groupStyle = {}
     calculateOffsetCoordinate(component, true)
-    console.log(component)
 }
