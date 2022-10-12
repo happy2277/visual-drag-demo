@@ -81,7 +81,10 @@ export default {
     },
     methods: {
         getPointList () {
-            return this.element.component === 'line-shape' ? this.pointList2 : this.element.component === 'Picture' ? this.pointList3 : this.pointList
+            return this.element.component === 'line-shape' ? this.pointList2
+                : this.element.component === 'Picture' ? this.pointList3
+                    : this.element.component === 'Group' ? []
+                        : this.pointList
         },
 
         isActive () {

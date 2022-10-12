@@ -1,8 +1,9 @@
 import { $ } from './utils'
 import { mod360 } from './translate'
+import calculateOffsetCoordinate from './calculateOffsetCoordinate'
 
 // 将组合中的各个子组件拆分出来，并计算它们新的 style
-export default function decomposeComponent(component, editorRect, parentStyle) {
+export default function decomposeComponent (component, editorRect, parentStyle) {
     const componentRect = $(`#component${component.id}`).getBoundingClientRect()
     // 获取元素的中心点坐标
     const center = {
@@ -17,4 +18,6 @@ export default function decomposeComponent(component, editorRect, parentStyle) {
     component.style.left = center.x - component.style.width / 2
     component.style.top = center.y - component.style.height / 2
     component.groupStyle = {}
+    calculateOffsetCoordinate(component, true)
+    console.log(component)
 }

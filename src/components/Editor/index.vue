@@ -159,6 +159,7 @@ export default {
         createGroup () {
             // 获取选中区域的组件数据
             const deepComponentData = deepCopy(this.componentData)
+            // isSaveTemp为true，则所有控件，否则为组合控件
             const areaData = this.isSaveTemp ? deepComponentData : this.getSelectArea()
             if (areaData.length <= 1) {
                 this.hideArea()
@@ -194,6 +195,7 @@ export default {
                 if (style.bottom > bottom) bottom = style.bottom
             })
 
+            // true 则根容器内所有组件保存为模板
             if (this.isSaveTemp) {
                 this.start.x = 0
                 this.start.y = 0
@@ -217,9 +219,8 @@ export default {
                 localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
                 this.$message.success('保存成功')
                 this.isSaveTemp = false
-
-
             } else {
+                // 否则选中的组合为模板
                 this.start.x = left
                 this.start.y = top
                 this.width = right - left

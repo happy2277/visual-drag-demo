@@ -4,13 +4,18 @@
             <BaseStyle ref="baseStyle"></BaseStyle>
             <el-collapse-item title="样式" name="style">
                 <el-form>
-                    <el-form-item v-for="({ key, label }, index) in styleKeys" :key="index" :label="label">
+                    <el-form-item v-for="({ key, label }, index) in styleKeys" :key="index" :label="showLabel({key, label})" :style="{'margin-bottom': showLabel({key, label}) == '' || label == ''? 0 : `18px` }">
                         <!-- 颜色 -->
                         <el-color-picker v-if="isIncludesColor(key)" v-model="curComponent.style[key]" show-alpha></el-color-picker>
                         <!-- 选择 -->
-                        <el-select v-else-if="selectKey.includes(key)" v-model="curComponent.style[key]">
-                            <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.labelCn" :value="item.value"></el-option>
-                        </el-select>
+                        <template v-else-if="selectKey.includes(key)">
+                            <el-select v-if="key != 'rotate' && curComponent.type != 'img'" v-model="curComponent.style[key]">
+                                <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.labelCn" :value="item.value"></el-option>
+                            </el-select>
+                            <el-select v-if="key == 'rotate' && curComponent.type == 'img'" v-model="curComponent.style[key]">
+                                <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.labelCn" :value="item.value"></el-option>
+                            </el-select>
+                        </template>
                         <!-- 滑块 -->
                         <el-slider class="slider" v-else-if="sliderKey.includes(key)" v-model="curComponent.style[key]" :min="0" :max="key == 'opacity' ? 1 : 100" :step="key == 'opacity' ? 0.1 : 1"></el-slider>
                         <!-- 上传图片 -->
@@ -40,7 +45,9 @@
                         <!-- 文本输入 -->
                         <el-input v-else-if="key == 'str'" v-model.trim="curComponent.style[key]" />
                         <!-- 数字输入 -->
-                        <el-input v-else v-model.number="curComponent.style[key]" type="number" />
+                        <template v-else-if="curComponent.type != 'group'">
+                            <el-input v-model.number="curComponent.style[key]" type="number" />
+                        </template>
                     </el-form-item>
                 </el-form>
             </el-collapse-item>
@@ -112,6 +119,13 @@ export default {
         }
     },
     methods: {
+        showLabel ({ key, label }) {
+            const res = this.curComponent.type != 'group' && this.curComponent.type != 'img' && key != 'rotate' ? label
+                : this.curComponent.type != 'group' && this.curComponent.type == 'img' ? label
+                    : this.curComponent.type == 'group' && key == 'opacity' ? label
+                        : ''
+            return res
+        },
         // 获取文本高度 限制字体大小
         getTextHeight ({ id }) {
             const dom = $(`#component${id} .v-text`)
