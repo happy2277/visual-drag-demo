@@ -79,7 +79,7 @@ const data = {
         },
 
         setComponentTempData (state, componentTempData = []) {
-            state.componentTempData = componentTempData
+            state.componentTempData = componentTempData.filter(v => v.type == 'group')
         },
 
         setCurComponent (state, { component, index }) {

@@ -368,24 +368,43 @@ export default {
             const componentData = deepCopy(this.componentData)
             let flag = false
             if (!componentData.length) {
-                return this.$message.warning('无组合控件')
+                return this.$message.warning('无控件，请先添加控件！')
             }
-            componentData.some(v => {
-                if (v.type != 'group') {
-                    flag = true
-                    return this.$message.warning('无组合控件')
-                }
-            })
-            if (flag) return
 
             const isRepeat = componentData.length > 1 ? this.isRepeat(componentData) : false
             if (isRepeat) return this.$message.warning('存在重复的控件名称，请检查！')
 
-            this.$store.commit('setComponentTempData', componentData)
-            localStorage.setItem('canvasTempData', JSON.stringify(componentData))
-            localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
-            this.$message.success('保存成功')
-            this.clearCanvas()
+            for (let i = 0; i < componentData.length; i++) {
+                const v = componentData[i];
+                if (v.type == 'group') {
+                    flag = true
+                    break
+                }
+            }
+            // 不存在组合
+            if (!flag) {
+                this.$confirm('不存在组合，将所有控件保存为一个模板控件，是否确定?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    eventBus.$emit('saveTemp', true)
+                    this.clearCanvas()
+                }).catch(() => { });
+            } else {
+                // 存在组合
+                this.$confirm('存在组合控件，是否将组合控件保存为模板控件?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$store.commit('setComponentTempData', componentData)
+                    localStorage.setItem('canvasTempData', JSON.stringify(this.$store.state.componentTempData))
+                    localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
+                    this.$message.success('保存成功')
+                    this.clearCanvas()
+                }).catch(() => { });
+            }
         },
 
         clearCanvas () {

@@ -54,7 +54,7 @@
 
 <script>
 import { styleData, textAlignOptions, borderStyleOptions, verticalAlignOptions, controlAlignmentOptions, longModeOptions, selectKey, optionMap } from '@/utils/attr'
-import BaseStyle from './BaseStyle.vue'
+import BaseStyle from './BaseStyle'
 import { $ } from '@/utils/utils'
 
 export default {

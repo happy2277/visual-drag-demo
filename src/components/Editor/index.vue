@@ -31,7 +31,7 @@
 import { mapState } from 'vuex'
 import Shape from './Shape'
 import { getStyle, getComponentRotatedStyle, getShapeStyle, getSVGStyle, getCanvasStyle } from '@/utils/style'
-import { $, isPreventDrop } from '@/utils/utils'
+import { $, deepCopy, isPreventDrop } from '@/utils/utils'
 import ContextMenu from './ContextMenu'
 import MarkLine from './MarkLine'
 import RootMarkLine from './RootMarkLine'
@@ -60,6 +60,7 @@ export default {
             height: 0,
             isShowArea: false,
             svgFilterAttrs: ['height', 'top', 'left', 'rotate'],
+            isSaveTemp: false
         }
     },
     computed: mapState([
@@ -75,6 +76,14 @@ export default {
 
         eventBus.$on('hideArea', () => {
             this.hideArea()
+        })
+
+        eventBus.$on('saveTemp', (status) => {
+            console.log(status)
+            this.isSaveTemp = status
+            if (status) {
+                this.createGroup()
+            }
         })
     },
     methods: {
@@ -149,7 +158,8 @@ export default {
 
         createGroup () {
             // 获取选中区域的组件数据
-            const areaData = this.getSelectArea()
+            const deepComponentData = deepCopy(this.componentData)
+            const areaData = this.isSaveTemp ? deepComponentData : this.getSelectArea()
             if (areaData.length <= 1) {
                 this.hideArea()
                 return
@@ -184,21 +194,48 @@ export default {
                 if (style.bottom > bottom) bottom = style.bottom
             })
 
-            this.start.x = left
-            this.start.y = top
-            this.width = right - left
-            this.height = bottom - top
+            if (this.isSaveTemp) {
+                this.start.x = 0
+                this.start.y = 0
+                this.width = this.canvasStyleData.width
+                this.height = this.canvasStyleData.height
+                // 设置选中区域位移大小信息和区域内的组件数据
+                this.$store.commit('setAreaData', {
+                    style: {
+                        left: 0,
+                        top: 0,
+                        width: this.canvasStyleData.width,
+                        height: this.canvasStyleData.height,
+                    },
+                    components: areaData,
+                })
 
-            // 设置选中区域位移大小信息和区域内的组件数据
-            this.$store.commit('setAreaData', {
-                style: {
-                    left,
-                    top,
-                    width: this.width,
-                    height: this.height,
-                },
-                components: areaData,
-            })
+                this.$store.commit('compose')
+                this.$store.commit('recordSnapshot')
+                this.$store.commit('setComponentTempData', this.componentData)
+                localStorage.setItem('canvasTempData', JSON.stringify(this.componentData))
+                localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
+                this.$message.success('保存成功')
+                this.isSaveTemp = false
+
+
+            } else {
+                this.start.x = left
+                this.start.y = top
+                this.width = right - left
+                this.height = bottom - top
+
+                // 设置选中区域位移大小信息和区域内的组件数据
+                this.$store.commit('setAreaData', {
+                    style: {
+                        left,
+                        top,
+                        width: this.width,
+                        height: this.height,
+                    },
+                    components: areaData,
+                })
+            }
         },
 
         getSelectArea () {
