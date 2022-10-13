@@ -9,11 +9,11 @@
     </div> -->
     <div>
         <!-- 循环滚动 长文本模式4 -->
-        <div v-if="element.style.str && element.style.longMode == 4" id="scroll-div">
+        <!-- <div v-if="element.style.str && element.style.longMode == 4" id="scroll-div">
             <div class="v-text" id="scroll-begin">{{element.style.str}}</div>
             <div id="scroll-end"></div>
-        </div>
-        <div v-else class="v-text preview" :class="className">
+        </div> -->
+        <div class="v-text preview" :class="className">
             {{element.style.str || element.style.numStr}}
         </div>
     </div>
@@ -57,6 +57,13 @@ export default {
             },
             deep: true,
             immediate: true
+        },
+        'element.style.str': {
+            handler (val) {
+                this.getClass(this.element.style.longMode)
+            },
+            deep: true,
+            immediate: true
         }
     },
     computed: {
@@ -68,20 +75,50 @@ export default {
     },
     created () {
         eventBus.$on('componentClick', this.onComponentClick)
+
+        eventBus.$on('isRefreshLongModeText', (data) => {
+            if (data && this.curComponent.style.longMode == 4) {
+                clearInterval(this.timer)
+                this.getClass(4)
+            }
+        })
     },
     beforeDestroy () {
         eventBus.$off('componentClick', this.onComponentClick)
     },
     methods: {
         getClass (longMode) {
+            clearInterval(this.timer)
             if (longMode != 4) {
-                clearInterval(this.timer)
+                this.$nextTick(() => {
+                    $(`#component${this.curComponent.id} .v-text`).style.left = 0
+                    $(`#component${this.curComponent.id} .v-text`).style.position = 'static'
+                })
             }
+            const textSize = this.getTextSize(this.curComponent.style.fontSize, '', this.curComponent.style.str)
             switch (longMode) {
-                case 0: case 1:
+                case 0:
+                    switch (this.curComponent.style.objAlign) {
+                        case 3: case 6: case 8: case 11: case 14: case 18: case 19: case 20:
+                            this.curComponent.style.left = this.curComponent.style.left - (textSize.width - this.curComponent.style.width)
+                            break;
+                        case 0: case 2: case 5: case 10: case 13:
+                            this.curComponent.style.left = this.curComponent.style.left - (textSize.width - this.curComponent.style.width) / 2
+                            break;
+                        default:
+                            break;
+                    }
+                    this.curComponent.style.width = textSize.width
+                    this.curComponent.style.height = textSize.height
+                    this.className = ''
+                    break;
+                case 1:
+                    console.log(textSize, this.curComponent.style.width, textSize.width / this.curComponent.style.width, Math.ceil(textSize.width / this.curComponent.style.width))
+                    this.curComponent.style.height = textSize.height * Math.ceil((textSize.width / this.curComponent.style.width))
                     this.className = ''
                     break;
                 case 2:
+                    this.curComponent.style.height = textSize.height
                     this.className = 'dot'
                     break;
                 case 3:
@@ -93,7 +130,8 @@ export default {
                     })
                     break;
                 case 5:
-                    this.className = 'crop'
+                    this.className = ''
+                    $(`#component${this.curComponent.id}`).style.overflow = 'hidden'
                     break;
                 default:
                     break;
@@ -101,19 +139,43 @@ export default {
         },
         // 长文本模式4  循环滚动 
         scrollStr () {
-            var speed = 20 //初始化速度 也就是字体的整体滚动速度
-            var scroll_begin = $('#scroll-begin') //获取滚动的开头id
-            var scroll_end = $('#scroll-end') //获取滚动的结束id
-            var scroll_div = $('#scroll-div') //获取整体的开头id
-            scroll_end.innerHTML = scroll_begin.innerHTML //滚动的是html内部的内容,原生知识!
-            function Marquee () {
-                if (scroll_end.offsetWidth - scroll_div.scrollLeft <= -20) {
-                    scroll_div.scrollLeft -= (scroll_begin.offsetWidth)
-                } else {
-                    scroll_div.scrollLeft++
+            const componentDom = $(`#component${this.curComponent.id}`)
+            const componentW = componentDom.getBoundingClientRect().width
+            const vTextDom = $(`#component${this.curComponent.id} .v-text`)
+            const textW = vTextDom.getBoundingClientRect().width
+            let i = textW
+            const textSize = (this.getTextSize(this.curComponent.style.fontSize, '', this.curComponent.style.str))
+            this.curComponent.style.height = textSize.height
+            this.timer = setInterval(() => {
+                i--
+                if (i < -textSize.width) {
+                    i = componentW
                 }
+                vTextDom.style.position = 'absolute'
+                vTextDom.style.left = `${i}px`
+                componentDom.style.overflow = `hidden`
+            }, 20);
+        },
+        // 获取文本宽高
+        getTextSize (fontSize, fontFamily, text) {
+            var span = document.createElement("span");
+            var result = {};
+            result.width = span.offsetWidth;
+            result.height = span.offsetHeight;
+            span.style.visibility = "hidden";
+            span.style.fontSize = fontSize;
+            span.style.fontFamily = fontFamily;
+            span.style.display = "inline-block";
+            document.body.appendChild(span);
+            if (typeof span.textContent != "undefined") {
+                span.textContent = text;
+            } else {
+                span.innerText = text;
             }
-            this.timer = setInterval(Marquee, speed)
+            result.width = Math.round(parseFloat(window.getComputedStyle(span).width) - result.width);
+            result.height = Math.round(parseFloat(window.getComputedStyle(span).height) - result.height);
+            document.body.removeChild(span)
+            return result;
         },
         onComponentClick () {
             // 如果当前点击的组件 id 和 VText 不是同一个，需要设为不允许编辑 https://github.com/woai3c/visual-drag-demo/issues/90
@@ -221,9 +283,6 @@ export default {
 }
 .auto {
     overflow-x: auto;
-}
-.crop {
-    overflow: hidden;
 }
 
 .preview {

@@ -321,9 +321,10 @@ export default {
 
 .edit {
     .component {
-        outline: none;
+        position: relative;
         width: 100%;
         height: 100%;
+        outline: none;
     }
 }
 </style>

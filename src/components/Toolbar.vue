@@ -308,7 +308,7 @@ export default {
                         width: style.width,
                         // round: style.,
                         color: resBgClVal,
-                        // point,
+                        point: [{ x: style.left, y: style.top }, { x: style.left + style.width, y: style.top }],
                         // hide
                     }
                     break;

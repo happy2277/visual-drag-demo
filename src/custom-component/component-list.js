@@ -14,7 +14,7 @@ export const commonAttr = {
 const list = [
     {
         component: 'VText',
-        label: '文字',
+        label: '文本',
         type: 'label',
         propValue: '',
         icon: 'wenben',
@@ -35,6 +35,7 @@ const list = [
             baseLine: 6,
             color: 'rgba(0, 0, 0, 1)',
             backgroundColor: 'rgba(255, 255, 255, 0)',
+            display: 0,
             objAlign: 1,
             xOffset: 0,
             yOffset: 0
