@@ -8,11 +8,6 @@
         <div :style="{ verticalAlign: element.style.verticalAlign }" v-html="element.propValue"></div>
     </div> -->
     <div>
-        <!-- 循环滚动 长文本模式4 -->
-        <!-- <div v-if="element.style.str && element.style.longMode == 4" id="scroll-div">
-            <div class="v-text" id="scroll-begin">{{element.style.str}}</div>
-            <div id="scroll-end"></div>
-        </div> -->
         <div class="v-text preview" :class="className">
             {{element.style.str || element.style.numStr}}
         </div>
@@ -27,6 +22,7 @@ import { keycodes } from '@/utils/shortcutKey.js'
 import { $ } from '@/utils/utils'
 
 import eventBus from '@/utils/eventBus'
+import { log } from 'mathjs'
 
 export default {
 
@@ -56,9 +52,15 @@ export default {
                 this.getClass(val)
             },
             deep: true,
-            immediate: true
         },
         'element.style.str': {
+            handler (val) {
+                this.getClass(this.element.style.longMode)
+            },
+            deep: true,
+            immediate: true
+        },
+        'element.style.numStr': {
             handler (val) {
                 this.getClass(this.element.style.longMode)
             },
@@ -80,6 +82,8 @@ export default {
             if (data && this.curComponent.style.longMode == 4) {
                 clearInterval(this.timer)
                 this.getClass(4)
+            } else {
+                this.getClass(this.curComponent.style.longMode)
             }
         })
     },
@@ -89,21 +93,35 @@ export default {
     methods: {
         getClass (longMode) {
             clearInterval(this.timer)
+            const style = this.curComponent.style
+            let flag = true
+            if (style.str != undefined && style.str) {
+                flag = true
+            } else if (style.numStr != undefined && style.numStr) {
+                flag = true
+            } else {
+                flag = false
+            }
+            if (!flag) return
+
             if (longMode != 4) {
                 this.$nextTick(() => {
-                    $(`#component${this.curComponent.id} .v-text`).style.left = 0
-                    $(`#component${this.curComponent.id} .v-text`).style.position = 'static'
+                    const dom = $(`#component${this.curComponent.id} .v-text`)
+                    dom.style.left = 0
+                    dom.style.position = 'static'
                 })
             }
-            const textSize = this.getTextSize(this.curComponent.style.fontSize, '', this.curComponent.style.str)
+            const textSize = this.getTextSize(style.fontSize, '', style.str || style.numStr)
             switch (longMode) {
                 case 0:
-                    switch (this.curComponent.style.objAlign) {
+                    switch (style.objAlign) {
+                        // 基点在右
                         case 3: case 6: case 8: case 11: case 14: case 18: case 19: case 20:
-                            this.curComponent.style.left = this.curComponent.style.left - (textSize.width - this.curComponent.style.width)
+                            this.curComponent.style.left = style.left - (textSize.width - style.width)
                             break;
+                        // 基点在中
                         case 0: case 2: case 5: case 10: case 13:
-                            this.curComponent.style.left = this.curComponent.style.left - (textSize.width - this.curComponent.style.width) / 2
+                            this.curComponent.style.left = style.left - (textSize.width - style.width) / 2
                             break;
                         default:
                             break;
@@ -113,8 +131,7 @@ export default {
                     this.className = ''
                     break;
                 case 1:
-                    console.log(textSize, this.curComponent.style.width, textSize.width / this.curComponent.style.width, Math.ceil(textSize.width / this.curComponent.style.width))
-                    this.curComponent.style.height = textSize.height * Math.ceil((textSize.width / this.curComponent.style.width))
+                    this.curComponent.style.height = textSize.height * Math.ceil((textSize.width / style.width))
                     this.className = ''
                     break;
                 case 2:
@@ -123,14 +140,17 @@ export default {
                     break;
                 case 3:
                     this.className = 'scroll'
+                    this.curComponent.style.height = textSize.height
                     break;
                 case 4:
                     this.$nextTick(() => {
                         this.scrollStr()
+                        this.curComponent.style.height = textSize.height
                     })
                     break;
                 case 5:
                     this.className = ''
+                    this.curComponent.style.height = textSize.height
                     $(`#component${this.curComponent.id}`).style.overflow = 'hidden'
                     break;
                 default:
@@ -143,7 +163,7 @@ export default {
             const componentW = componentDom.getBoundingClientRect().width
             const vTextDom = $(`#component${this.curComponent.id} .v-text`)
             const textW = vTextDom.getBoundingClientRect().width
-            let i = textW
+            let i = 0
             const textSize = (this.getTextSize(this.curComponent.style.fontSize, '', this.curComponent.style.str))
             this.curComponent.style.height = textSize.height
             this.timer = setInterval(() => {
@@ -160,10 +180,11 @@ export default {
         getTextSize (fontSize, fontFamily, text) {
             var span = document.createElement("span");
             var result = {};
+            span.setAttribute("id", "label-span");
             result.width = span.offsetWidth;
             result.height = span.offsetHeight;
             span.style.visibility = "hidden";
-            span.style.fontSize = fontSize;
+            span.style.fontSize = fontSize + 'px';
             span.style.fontFamily = fontFamily;
             span.style.display = "inline-block";
             document.body.appendChild(span);
@@ -172,8 +193,8 @@ export default {
             } else {
                 span.innerText = text;
             }
-            result.width = Math.round(parseFloat(window.getComputedStyle(span).width) - result.width);
-            result.height = Math.round(parseFloat(window.getComputedStyle(span).height) - result.height);
+            result.width = Math.round(parseFloat(span.getBoundingClientRect().width) - result.width);
+            result.height = Math.round(parseFloat(span.getBoundingClientRect().height) - result.height);
             document.body.removeChild(span)
             return result;
         },

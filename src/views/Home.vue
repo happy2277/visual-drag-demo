@@ -188,7 +188,7 @@ export default {
                     component.id = generateID()
                     switch (component.type) {
                         case 'label':
-                            if (component.label == '文字') {
+                            if (component.label == '文本') {
                                 component.style.name = `label_text_${this.labelIndex}`
                             } else {
                                 component.style.name = `label_price_${this.labelIndex}`

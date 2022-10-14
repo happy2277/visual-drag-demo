@@ -9,10 +9,13 @@
                         <el-color-picker v-if="isIncludesColor(key)" v-model="curComponent.style[key]" show-alpha></el-color-picker>
                         <!-- 选择 -->
                         <template v-else-if="selectKey.includes(key)">
-                            <el-select v-if="key != 'rotate' && curComponent.type != 'img'" v-model="curComponent.style[key]">
+                            <el-select v-if="key != 'rotate' && curComponent.type != 'img' && key != 'longMode'" v-model="curComponent.style[key]">
                                 <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.labelCn" :value="item.value"></el-option>
                             </el-select>
                             <el-select v-if="key == 'rotate' && curComponent.type == 'img'" v-model="curComponent.style[key]">
+                                <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.labelCn" :value="item.value"></el-option>
+                            </el-select>
+                            <el-select v-if="key == 'longMode' && curComponent.type == 'label'" v-model="curComponent.style[key]">
                                 <el-option v-for="item in optionMap[key]" :key="item.value" :label="item.labelCn" :value="item.value"></el-option>
                             </el-select>
                         </template>
@@ -46,7 +49,8 @@
                         <el-input v-else-if="key == 'str'" v-model.trim="curComponent.style[key]" />
                         <!-- 数字输入 -->
                         <template v-else-if="curComponent.type != 'group'">
-                            <el-input v-model.number="curComponent.style[key]" type="number" />
+                            <el-input v-if="key == 'fontSize'" v-model.number="curComponent.style[key]" type="number" @change="handleFontSizeChange" />
+                            <el-input v-else v-model.number="curComponent.style[key]" type="number" />
                         </template>
                     </el-form-item>
                 </el-form>
@@ -63,6 +67,7 @@
 import { styleData, textAlignOptions, borderStyleOptions, verticalAlignOptions, controlAlignmentOptions, longModeOptions, selectKey, optionMap } from '@/utils/attr'
 import BaseStyle from './BaseStyle'
 import { $ } from '@/utils/utils'
+import eventBus from '@/utils/eventBus'
 
 export default {
     components: { BaseStyle },
@@ -101,12 +106,12 @@ export default {
         },
     },
     watch: {
-        'curComponent.style.fontSize': {
-            handler (val) {
-                this.getTextHeight(this.curComponent)
-            },
-            deep: true
-        }
+        // 'curComponent.style.fontSize': {
+        //     handler (val) {
+        //         this.getTextHeight(this.curComponent)
+        //     },
+        //     deep: true
+        // }
     },
     created () {
         // this.activeName = this.curComponent.collapseName
@@ -118,7 +123,15 @@ export default {
             this.curComponent.style.url = `./res/img/${imgName}`
         }
     },
+    beforeDestroy () {
+        clearInterval(this.timer)
+    },
     methods: {
+        handleFontSizeChange (val) {
+            console.log(val)
+            this.curComponent.style.fontSize = val
+            eventBus.$emit('isRefreshLongModeText', true)
+        },
         showLabel ({ key, label }) {
             const res = this.curComponent.type != 'group' && this.curComponent.type != 'img' && key != 'rotate' ? label
                 : this.curComponent.type != 'group' && this.curComponent.type == 'img' ? label

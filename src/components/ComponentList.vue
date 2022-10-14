@@ -97,7 +97,11 @@ export default {
 
             switch (component.type) {
                 case 'label':
-                    component.style.name = `label_${this.labelIndex}`
+                    if (component.label == '文本') {
+                        component.style.name = `label_text_${this.labelIndex}`
+                    } else {
+                        component.style.name = `label_price_${this.labelIndex}`
+                    }
                     this.labelIndex++
                     break;
                 case 'img':
