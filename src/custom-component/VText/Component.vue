@@ -43,7 +43,7 @@ export default {
             ctrlKey: 17,
             isCtrlDown: false,
             className: '',
-            timer: null
+            timer: {}
         }
     },
     watch: {
@@ -79,25 +79,21 @@ export default {
         eventBus.$on('componentClick', this.onComponentClick)
 
         eventBus.$on('isRefreshLongModeText', (data) => {
-            if (data && this.curComponent.style.longMode == 4) {
-                clearInterval(this.timer)
-                this.getClass(4)
-            } else {
+            if (data) {
                 this.getClass(this.curComponent.style.longMode)
             }
         })
     },
     beforeDestroy () {
+        clearInterval(this.timer[this.curComponent.id])
         eventBus.$off('componentClick', this.onComponentClick)
     },
     methods: {
         getClass (longMode) {
-            clearInterval(this.timer)
+            clearInterval(this.timer[this.curComponent.id])
             const style = this.curComponent.style
             let flag = true
-            if (style.str != undefined && style.str) {
-                flag = true
-            } else if (style.numStr != undefined && style.numStr) {
+            if ((style.str != undefined && style.str) || (style.numStr != undefined && style.numStr)) {
                 flag = true
             } else {
                 flag = false
@@ -164,9 +160,9 @@ export default {
             const vTextDom = $(`#component${this.curComponent.id} .v-text`)
             const textW = vTextDom.getBoundingClientRect().width
             let i = 0
-            const textSize = (this.getTextSize(this.curComponent.style.fontSize, '', this.curComponent.style.str))
+            const textSize = (this.getTextSize(this.curComponent.style.fontSize, '', this.curComponent.style.str || this.curComponent.style.numStr))
             this.curComponent.style.height = textSize.height
-            this.timer = setInterval(() => {
+            this.timer[this.curComponent.id] = setInterval(() => {
                 i--
                 if (i < -textSize.width) {
                     i = componentW
