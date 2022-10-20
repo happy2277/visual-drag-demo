@@ -332,7 +332,8 @@ export default {
                         base_line: style.baseLine,
                         text_align: textAlign,
                         long_mode: style.longMode ?? '',
-                        str: style.str || style.numStr
+                        str: style.str || style.numStr,
+                        hide: style.display == 'block' ? 1 : 0
                     }
                     break;
                 case 'bar':

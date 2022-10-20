@@ -9,6 +9,7 @@ import snapshot from './snapshot'
 import lock from './lock'
 import toast from '@/utils/toast'
 import { unique } from '@/utils/utils'
+import eventBus from '@/utils/eventBus'
 
 Vue.use(Vuex)
 
@@ -48,6 +49,22 @@ const data = {
         isClickComponent: false,
         componentParents: [], // 父级数据
         isNeedCalcOffset: true, // 是否需要计算偏移值
+        childPageData: {
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+        }, // 子页面数据
+        priceControlStatusData: {
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+        }, // 价格控件状态数据
+        priceStatusAndControlRelevancy: {
+            priceStatusIndex: undefined,
+            name: undefined
+        }
     },
     mutations: {
         ...compose.mutations,
@@ -57,6 +74,14 @@ const data = {
         ...layer.mutations,
         ...snapshot.mutations,
         ...lock.mutations,
+
+        setpPriceStatusAndControlRelevancy (state, priceStatusAndControlRelevancy) {
+            state.priceStatusAndControlRelevancy = priceStatusAndControlRelevancy
+        },
+
+        setChildPageData (state, childPageData) {
+            state.childPageData = childPageData
+        },
 
         setClickComponentStatus (state, status) {
             state.isClickComponent = status
@@ -94,6 +119,7 @@ const data = {
                     })
                 }
             })
+            eventBus.$emit('clearPriceStatusChecked')
             // state.componentParents = unique(state.componentParents, 'value')
         },
 
@@ -129,6 +155,7 @@ const data = {
                         value: v.style.name
                     })
                 }
+
             })
             // state.componentParents = unique(state.componentParents, 'value')
         },

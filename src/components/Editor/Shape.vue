@@ -347,7 +347,7 @@ export default {
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
                 needSave && this.$store.commit('recordSnapshot')
-                eventBus.$emit('isRefreshLongModeText', true)
+                eventBus.$emit('isRefreshLongModeText', true, this.curComponent)
 
             }
 

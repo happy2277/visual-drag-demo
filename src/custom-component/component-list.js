@@ -18,11 +18,12 @@ const list = [
         type: 'label',
         propValue: '',
         icon: 'wenben',
+        tag: 'normal',
         style: {
             parent: '',
             name: '',
             base: '',
-            str: '',
+            str: 'label',
             width: 200,
             height: 60,
             font: './res/font/bls.ttf',
@@ -43,15 +44,16 @@ const list = [
     },
     {
         component: 'VText',
-        label: '价格',
+        label: '价格    ',
         type: 'label',
         propValue: '',
         icon: 'wenben',
+        tag: 'price',
         style: {
             parent: '',
             name: '',
             base: '',
-            numStr: '',
+            numStr: '100',
             width: 200,
             height: 60,
             font: './res/font/bls_pri.ttf',
@@ -64,16 +66,105 @@ const list = [
             baseLine: 7,
             color: 'rgba(0, 0, 0, 1)',
             backgroundColor: 'rgba(255, 255, 255, 0)',
+            display: 0,
             objAlign: 1,
             xOffset: 0,
             yOffset: 0
         },
     },
+    // {
+    //     component: 'VText',
+    //     label: '零售价',
+    //     type: 'label',
+    //     propValue: '',
+    //     icon: 'wenben',
+    //     tag: 'price',
+    //     style: {
+    //         parent: '',
+    //         name: '',
+    //         base: '',
+    //         numStr: '',
+    //         width: 200,
+    //         height: 60,
+    //         font: './res/font/bls_pri.ttf',
+    //         fontSize: '14',
+    //         fontWeight: 400,
+    //         lineHeight: '',
+    //         letterSpacing: 0,
+    //         textAlign: 'left',
+    //         longMode: 0,
+    //         baseLine: 7,
+    //         color: 'rgba(0, 0, 0, 1)',
+    //         backgroundColor: 'rgba(255, 255, 255, 0)',
+    //         objAlign: 1,
+    //         xOffset: 0,
+    //         yOffset: 0
+    //     },
+    // },
+    // {
+    //     component: 'VText',
+    //     label: '会员价',
+    //     type: 'label',
+    //     propValue: '',
+    //     icon: 'wenben',
+    //     tag: 'price',
+    //     style: {
+    //         parent: '',
+    //         name: '',
+    //         base: '',
+    //         numStr: '',
+    //         width: 200,
+    //         height: 60,
+    //         font: './res/font/bls_pri.ttf',
+    //         fontSize: '14',
+    //         fontWeight: 400,
+    //         lineHeight: '',
+    //         letterSpacing: 0,
+    //         textAlign: 'left',
+    //         longMode: 0,
+    //         baseLine: 7,
+    //         color: 'rgba(0, 0, 0, 1)',
+    //         backgroundColor: 'rgba(255, 255, 255, 0)',
+    //         objAlign: 1,
+    //         xOffset: 0,
+    //         yOffset: 0
+    //     },
+    // },
+    // {
+    //     component: 'VText',
+    //     label: '胖柚价',
+    //     type: 'label',
+    //     propValue: '',
+    //     icon: 'wenben',
+    //     tag: 'price',
+    //     style: {
+    //         parent: '',
+    //         name: '',
+    //         base: '',
+    //         numStr: '',
+    //         width: 200,
+    //         height: 60,
+    //         font: './res/font/bls_pri.ttf',
+    //         fontSize: '14',
+    //         fontWeight: 400,
+    //         lineHeight: '',
+    //         letterSpacing: 0,
+    //         textAlign: 'left',
+    //         longMode: 0,
+    //         baseLine: 7,
+    //         color: 'rgba(0, 0, 0, 1)',
+    //         backgroundColor: 'rgba(255, 255, 255, 0)',
+    //         objAlign: 1,
+    //         xOffset: 0,
+    //         yOffset: 0
+    //     },
+    // },
     {
         component: 'Picture',
         label: '图片',
         icon: 'tupian',
         type: 'img',
+        tag: 'img',
         propValue: {
             url: require('@/assets/img/pangyou.gif'),
             flip: {
@@ -94,12 +185,39 @@ const list = [
             rotate: 0
         },
     },
+    // {
+    //     component: 'Picture',
+    //     label: '商品',
+    //     icon: 'tupian',
+    //     type: 'img',
+    //     tag: 'img',
+    //     propValue: {
+    //         url: require('@/assets/img/pangyou.gif'),
+    //         flip: {
+    //             horizontal: false,
+    //             vertical: false,
+    //         },
+    //     },
+    //     style: {
+    //         url: '',
+    //         name: '',
+    //         parent: '',
+    //         width: 300,
+    //         height: 200,
+    //         borderRadius: '',
+    //         objAlign: 1,
+    //         xOffset: 0,
+    //         yOffset: 0,
+    //         rotate: 0
+    //     },
+    // },
     {
         component: 'RectShape',
         label: '容器',
         propValue: '',
         type: 'cont',
         icon: 'juxing',
+        tag: 'normal',
         style: {
             name: '',
             parent: '',
@@ -128,6 +246,7 @@ const list = [
         propValue: '',
         type: 'line',
         icon: 'zhixian',
+        tag: 'normal',
         style: {
             name: '',
             parent: '',
@@ -157,11 +276,29 @@ const list = [
     //     },
     // },
 ]
-
+// let newList = {
+//     normal: [],
+//     price: [],
+//     img: []
+// }
 for (let i = 0, len = list.length; i < len; i++) {
     const item = list[i]
     item.style = { ...commonStyle, ...item.style }
     list[i] = { ...commonAttr, ...item }
+
+    // switch (item.tag) {
+    //     case 'normal':
+    //         newList.normal.push(item)
+    //         break;
+    //     case 'price':
+    //         newList.price.push(item)
+    //         break;
+    //     case 'img':
+    //         newList.img.push(item)
+    //         break;
+    //     default:
+    //         break;
+    // }
 }
 
 export default list

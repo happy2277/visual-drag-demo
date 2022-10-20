@@ -17,11 +17,17 @@
                     </el-collapse-item>
                 </el-collapse>
             </section>
+            <!-- 子页面 -->
+            <section class="child-page">
+                <ChildPageList />
+            </section>
             <!-- 中间画布 -->
             <section class="center">
                 <div class="content" @drop="handleDrop" @dragover="handleDragOver" @mousedown="handleMouseDown" @mouseup="deselectCurComponent">
                     <Editor />
                 </div>
+
+                <PriceControlStatusList />
             </section>
             <!-- 右侧属性列表 -->
             <section class="right">
@@ -41,6 +47,8 @@ import Editor from '@/components/Editor/index'
 import ComponentList from '@/components/ComponentList' // 左侧列表组件
 import componentList from '@/custom-component/component-list' // 左侧列表数据
 import ComposeList from '@/components/ComposeList' // 左侧组合列表数据
+import ChildPageList from '@/components/ChildPageList' // 子页面
+import PriceControlStatusList from '@/components/PriceControlStatusList' // 价格控件状态
 import Toolbar from '@/components/Toolbar'
 import { deepCopy } from '@/utils/utils'
 import { mapState } from 'vuex'
@@ -53,7 +61,7 @@ import { setDefaultcomponentData } from '@/store/snapshot'
 import decomposeComponent from '@/utils/decomposeComponent'
 
 export default {
-    components: { Editor, ComponentList, Toolbar, RealTimeComponentList, CanvasAttr, ComposeList },
+    components: { Editor, ComponentList, Toolbar, RealTimeComponentList, CanvasAttr, ComposeList, ChildPageList, PriceControlStatusList },
     data () {
         return {
             activeName: 'attr',
@@ -90,25 +98,7 @@ export default {
                     if (v.rootParent) {
                         canvasData.splice(i, 1)
                     }
-                    switch (v.type) {
-                        case 'label':
-                            this.labelIndex++
-                            break;
-                        case 'img':
-                            this.imgIndex++
-                            break;
-                        case 'line':
-                            this.lineIndex++
-                            break;
-                        case 'cont':
-                            this.contIndex++
-                            break;
-                        case 'bar':
-                            this.barIndex++
-                            break;
-                        default:
-                            break;
-                    }
+                    this[`${v.type}Index`]++
                 })
                 this.$store.commit('setComponentData', canvasData)
             }
@@ -127,6 +117,7 @@ export default {
             e.stopPropagation()
             const index = e.dataTransfer.getData('index')
             const type = e.dataTransfer.getData('type')
+            // const tag = e.dataTransfer.getData('tag')
             const rectInfo = this.editor.getBoundingClientRect()
             const y = Math.floor(e.clientY - rectInfo.y)
             const x = Math.floor(e.clientX - rectInfo.x)
@@ -153,25 +144,7 @@ export default {
             for (const key in arrKeyObj) {
                 if (Object.hasOwnProperty.call(arrKeyObj, key)) {
                     const element = arrKeyObj[key];
-                    switch (key) {
-                        case 'label':
-                            this.labelIndex = element.length
-                            break;
-                        case 'img':
-                            this.imgIndex = element.length
-                            break;
-                        case 'cont':
-                            this.contIndex = element.length
-                            break;
-                        case 'line':
-                            this.lineIndex = element.length
-                            break;
-                        case 'group':
-                            this.groupIndex = element.length
-                            break;
-                        default:
-                            break;
-                    }
+                    this[`${key}Index`] = element.length
                 }
             }
 
@@ -179,6 +152,7 @@ export default {
                 let component
                 // 拖拽单个组件
                 if (type == 'single') {
+                    // component = deepCopy(componentList[tag][index])
                     component = deepCopy(componentList[index])
                     component.style.top = y
                     component.style.left = x
@@ -195,23 +169,8 @@ export default {
                             }
                             this.labelIndex++
                             break;
-                        case 'img':
-                            component.style.name = `img_${this.imgIndex}`
-                            this.imgIndex++
-                            break;
-                        case 'cont':
-                            component.style.name = `cont_${this.contIndex}`
-                            this.contIndex++
-                            break;
-                        case 'line':
-                            component.style.name = `line_${this.lineIndex}`
-                            this.lineIndex++
-                            break
-                        case 'bar':
-                            component.style.name = `bar_${this.barIndex}`
-                            this.barIndex++
-                            break
                         default:
+                            component.style.name = `${component.type}_${this[`${component.type}Index`]}`
                             break;
                     }
                 } else { // 拖拽组合组件
@@ -287,6 +246,7 @@ export default {
             left: 0;
             top: 0;
             background-color: #fff;
+            z-index: 1;
 
             & > div {
                 overflow: auto;
@@ -303,6 +263,14 @@ export default {
                 //     }
                 // }
             }
+        }
+
+        .child-page {
+            position: absolute;
+            left: 230px;
+            top: 0;
+            // background-color: #fff;
+            z-index: 10;
         }
 
         .right {
@@ -328,12 +296,14 @@ export default {
         }
 
         .center {
+            position: relative;
+            padding: 20px;
+            padding-bottom: 200px;
             margin-left: 200px;
             margin-right: 288px;
-            background: #f5f5f5;
             height: 100%;
+            background: #f5f5f5;
             overflow: auto;
-            padding: 20px;
 
             .content {
                 width: 100%;

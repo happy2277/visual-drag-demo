@@ -130,7 +130,7 @@ export default {
         handleFontSizeChange (val) {
             console.log(val)
             this.curComponent.style.fontSize = val
-            eventBus.$emit('isRefreshLongModeText', true)
+            eventBus.$emit('isRefreshLongModeText', true, this.curComponent)
         },
         showLabel ({ key, label }) {
             const res = this.curComponent.type != 'group' && this.curComponent.type != 'img' && key != 'rotate' ? label

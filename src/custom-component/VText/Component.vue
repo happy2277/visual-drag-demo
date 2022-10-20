@@ -20,12 +20,9 @@
 import { mapState } from 'vuex'
 import { keycodes } from '@/utils/shortcutKey.js'
 import { $ } from '@/utils/utils'
-
 import eventBus from '@/utils/eventBus'
-import { log } from 'mathjs'
 
 export default {
-
     props: {
         // propValue: {
         //     type: String,
@@ -58,14 +55,12 @@ export default {
                 this.getClass(this.element.style.longMode)
             },
             deep: true,
-            immediate: true
         },
         'element.style.numStr': {
             handler (val) {
                 this.getClass(this.element.style.longMode)
             },
             deep: true,
-            immediate: true
         }
     },
     computed: {
@@ -78,20 +73,20 @@ export default {
     created () {
         eventBus.$on('componentClick', this.onComponentClick)
 
-        eventBus.$on('isRefreshLongModeText', (data) => {
+        eventBus.$on('isRefreshLongModeText', (data, curComponent) => {
             if (data) {
-                this.getClass(this.curComponent.style.longMode)
+                this.getClass(curComponent?.style.longMode, curComponent)
             }
         })
     },
     beforeDestroy () {
-        clearInterval(this.timer[this.curComponent.id])
+        clearInterval(this.timer[this.curComponent?.id])
         eventBus.$off('componentClick', this.onComponentClick)
     },
     methods: {
-        getClass (longMode) {
-            clearInterval(this.timer[this.curComponent.id])
-            const style = this.curComponent.style
+        getClass (longMode, curComponent) {
+            clearInterval(this.timer[this.curComponent?.id])
+            const style = this.curComponent?.style || curComponent
             let flag = true
             if ((style.str != undefined && style.str) || (style.numStr != undefined && style.numStr)) {
                 flag = true
@@ -122,21 +117,25 @@ export default {
                         default:
                             break;
                     }
-                    this.curComponent.style.width = textSize.width
+                    this.curComponent.style.width = textSize.width + 1
                     this.curComponent.style.height = textSize.height
                     this.className = ''
+                    $(`#component${this.curComponent.id}`).style.overflow = ''
                     break;
                 case 1:
                     this.curComponent.style.height = textSize.height * Math.ceil((textSize.width / style.width))
                     this.className = ''
+                    $(`#component${this.curComponent.id}`).style.overflow = ''
                     break;
                 case 2:
                     this.curComponent.style.height = textSize.height
                     this.className = 'dot'
+                    $(`#component${this.curComponent.id}`).style.overflow = ''
                     break;
                 case 3:
                     this.className = 'scroll'
                     this.curComponent.style.height = textSize.height
+                    $(`#component${this.curComponent.id}`).style.overflow = ''
                     break;
                 case 4:
                     this.$nextTick(() => {

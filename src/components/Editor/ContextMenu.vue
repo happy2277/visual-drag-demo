@@ -3,9 +3,9 @@
         <ul @mouseup="handleMouseUp">
             <template v-if="curComponent">
                 <template v-if="!curComponent.isLock">
-                    <!-- <li @click="copy">复制</li>
+                    <li @click="copy">复制</li>
                     <li @click="paste">粘贴</li>
-                    <li @click="cut">剪切</li> -->
+                    <li @click="cut">剪切</li>
                     <li @click="deleteComponent">删除</li>
                     <li @click="lock">锁定</li>
                     <li @click="topComponent">置顶</li>

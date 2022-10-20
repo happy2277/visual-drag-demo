@@ -62,7 +62,8 @@ export default {
                 style: {
                     ...commonStyle,
                     ...areaData.style,
-                    name: `group_${groupLen}`
+                    name: `group_${groupLen}`,
+                    objAlign: 1
                 },
                 propValue: components,
                 type: 'group'

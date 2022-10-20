@@ -1,18 +1,25 @@
 <template>
+    <!-- <div class="component-list-box">
+        <template v-for="{key, value} in tags">
+            <div class="component-list" @dragstart="handleDragStart">
+                <p>{{value}}</p>
+                <div class="component-list-item">
+                    <div v-for="(item, index) in componentList[key]" :key="index" class="list" draggable :data-index="index" :data-type="'single'" :data-tag="key" @click="handleAddComponent(item)">
+                        <span class="iconfont" :class="'icon-' + item.icon"></span>
+                        <span>{{item.label}}</span>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div> -->
+
     <div class="component-list" @dragstart="handleDragStart">
         <div v-for="(item, index) in componentList" :key="index" class="list" draggable :data-index="index" :data-type="'single'" @click="handleAddComponent(item)">
             <span class="iconfont" :class="'icon-' + item.icon"></span>
             <span>{{item.label}}</span>
         </div>
-        <!-- <el-collapse class="collapse" v-model="activeNames">
-            <el-collapse-item title="控件" name="1">
-            </el-collapse-item>
-            <el-collapse-item title="组合控件" name="2">
-            </el-collapse-item>
-            <el-collapse-item title="已选控件" name="3">
-            </el-collapse-item>
-        </el-collapse> -->
     </div>
+
 </template>
 
 <script>
@@ -32,7 +39,8 @@ export default {
             lineIndex: 0,
             barIndex: 0,
             groupIndex: 0,
-            activeNames: ['1', '2', '3']
+            activeNames: ['normal', 'price', 'img'],
+            tags: [{ key: 'normal', value: '普通' }, { key: 'price', value: '价格' }, { key: 'img', value: '图片' }]
         }
     },
     computed: mapState([
@@ -42,6 +50,7 @@ export default {
         handleDragStart (e) {
             e.dataTransfer.setData('index', e.target.dataset.index)
             e.dataTransfer.setData('type', e.target.dataset.type)
+            e.dataTransfer.setData('tag', e.target.dataset.tag)
         },
         handleAddComponent (item) {
             const component = deepCopy(item)
@@ -73,25 +82,7 @@ export default {
             for (const key in arrKeyObj) {
                 if (Object.hasOwnProperty.call(arrKeyObj, key)) {
                     const element = arrKeyObj[key];
-                    switch (key) {
-                        case 'label':
-                            this.labelIndex = element.length
-                            break;
-                        case 'img':
-                            this.imgIndex = element.length
-                            break;
-                        case 'cont':
-                            this.contIndex = element.length
-                            break;
-                        case 'line':
-                            this.lineIndex = element.length
-                            break;
-                        case 'group':
-                            this.groupIndex = element.length
-                            break;
-                        default:
-                            break;
-                    }
+                    this[`${key}Index`] = element.length
                 }
             }
 
@@ -104,23 +95,8 @@ export default {
                     }
                     this.labelIndex++
                     break;
-                case 'img':
-                    component.style.name = `img_${this.imgIndex}`
-                    this.imgIndex++
-                    break;
-                case 'cont':
-                    component.style.name = `cont_${this.contIndex}`
-                    this.contIndex++
-                    break;
-                case 'line':
-                    component.style.name = `line_${this.lineIndex}`
-                    this.lineIndex++
-                    break
-                case 'bar':
-                    component.style.name = `bar_${this.barIndex}`
-                    this.barIndex++
-                    break
                 default:
+                    component.style.name = `${component.type}_${this[`${component.type}Index`]}`
                     break;
             }
             // 根据画面比例修改组件样式比例 https://github.com/woai3c/visual-drag-demo/issues/91
@@ -140,15 +116,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.component-list-box {
+    height: 380px;
+}
 .component-list {
-    height: 20%;
     padding: 10px;
     display: grid;
     grid-gap: 10px 19px;
     grid-template-columns: repeat(auto-fill, 80px);
     grid-template-rows: repeat(auto-fill, 40px);
+    .component-list-item {
+        display: flex;
+        flex-wrap: wrap;
+    }
 
     .list {
+        // margin: 10px 10px 0 0;
         width: 80px;
         height: 40px;
         border: 1px solid #ddd;
