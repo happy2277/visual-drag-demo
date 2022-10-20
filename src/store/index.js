@@ -26,6 +26,19 @@ const data = {
         ...lock.state,
 
         editMode: 'edit', // 编辑器模式 edit preview
+        deepCanvasStyleData: { // 页面全局初始数据
+            name: 'cont_par',
+            width: 800,
+            height: 1280,
+            scale: 100,
+            // color: 'rgba(0, 0, 0, 1)',
+            backgroundColor: 'rgba(255, 255, 255, 1)',
+            fontSize: 14,
+            borderWidth: 0,
+            borderRadius: 0,
+            opacity: 1,
+            rotate: 0
+        },
         canvasStyleData: { // 页面全局数据
             name: 'cont_par',
             width: 800,
@@ -42,18 +55,30 @@ const data = {
         isInEdiotr: false, // 是否在编辑器中，用于判断复制、粘贴组件时是否生效，如果在编辑器外，则无视这些操作
         componentData: [], // 画布组件数据
         componentTempData: [], // 模板数据
-        curComponent: null,
-        curComponentIndex: null,
+        curComponent: null, // 当前组件
+        curComponentIndex: null, // 当前组件索引
         // 点击画布时是否点中组件，主要用于取消选中组件用。
         // 如果没点中组件，并且在画布空白处弹起鼠标，则取消当前组件的选中状态
         isClickComponent: false,
         componentParents: [], // 父级数据
         isNeedCalcOffset: true, // 是否需要计算偏移值
         childPageData: {
-            0: [],
-            1: [],
-            2: [],
-            3: [],
+            childPage0: {
+                data: [],
+                rootData: {}
+            },
+            childPage1: {
+                data: [],
+                rootData: {}
+            },
+            childPage2: {
+                data: [],
+                rootData: {}
+            },
+            childPage3: {
+                data: [],
+                rootData: {}
+            },
         }, // 子页面数据
         priceControlStatusData: {
             0: [],
@@ -64,8 +89,13 @@ const data = {
         priceStatusAndControlRelevancy: {
             priceStatusIndex: undefined,
             name: undefined
-        },
-        childPageIndex: undefined
+        }, // 价格控件状态与控件绑定
+        childPageIndex: undefined, // 子页面索引
+        indexPageData: {
+            data: [],
+            rootData: {}
+        }, // 初始页数据
+        isSaveIndexPageData: true, // 是否保存到初始页数据属性
     },
     mutations: {
         ...compose.mutations,
@@ -76,6 +106,17 @@ const data = {
         ...snapshot.mutations,
         ...lock.mutations,
 
+        setIsSaveIndexPageData (state, isSaveIndexPageData) {
+            state.isSaveIndexPageData = isSaveIndexPageData
+        },
+
+        setIndexPageData (state, { data, rootData }) {
+            state.indexPageData = {
+                data,
+                rootData
+            }
+        },
+
         setChildPageIndex (state, childPageIndex) {
             state.childPageIndex = childPageIndex
         },
@@ -84,8 +125,9 @@ const data = {
             state.priceStatusAndControlRelevancy = priceStatusAndControlRelevancy
         },
 
-        setChildPageData (state, childPageData) {
-            state.childPageData = childPageData
+        setChildPageData (state, { childPageData, rootData, key }) {
+            Vue.set(state.childPageData[key], 'data', childPageData)
+            Vue.set(state.childPageData[key], 'rootData', rootData)
         },
 
         setClickComponentStatus (state, status) {
