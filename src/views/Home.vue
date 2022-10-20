@@ -87,6 +87,10 @@ export default {
         this.restore()
         // 全局监听按键事件
         listenGlobalKeyDown()
+
+        eventBus.$on('restore', () => {
+            this.restore()
+        })
     },
     methods: {
         restore () {
@@ -201,6 +205,8 @@ export default {
                     component: component,
                     index: this.componentData.length - 1,
                 })
+
+                eventBus.$emit('setOldName', component.style.name)
             }
         },
 

@@ -276,6 +276,7 @@ export default {
             e.stopPropagation()
             e.preventDefault()
             this.$store.commit('hideContextMenu')
+            eventBus.$emit('setOldName', this.curComponent.style.name)
         },
 
         handleMouseDownOnPoint (point, e) {

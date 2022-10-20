@@ -14,6 +14,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import eventBus from '@/utils/eventBus'
 
 export default {
     computed: mapState([
@@ -57,6 +58,7 @@ export default {
 
         setCurComponent (index) {
             this.$store.commit('setCurComponent', { component: this.componentData[index], index })
+            eventBus.$emit('setOldName', this.componentData[index].style.name)
         },
     },
 }

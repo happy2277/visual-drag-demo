@@ -87,7 +87,7 @@ export default {
                 return this.$message.warning('请选择容器控件')
             }
             this.priceStatusIndex = index
-            this.$store.commit('setpPriceStatusAndControlRelevancy', {
+            this.$store.commit('setPriceStatusAndControlRelevancy', {
                 priceStatusIndex: index,
                 name: this.curComponent.style.name
             })

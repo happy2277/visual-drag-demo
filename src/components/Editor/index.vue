@@ -24,6 +24,7 @@
         <MarkLine />
         <!-- 选中区域 -->
         <Area v-show="isShowArea" :start="start" :width="width" :height="height" />
+
     </div>
 </template>
 

@@ -24,7 +24,7 @@
                     <span>{{key == 'xOffset' ? 'x轴偏移量：' : 'y轴偏移量：'}}</span>
                     <span v-text="curComponent.style[key]"></span>
                 </template>
-                <el-input v-else-if="inputKey.includes(key)" v-model="curComponent.style[key]" placeholder="请输入"></el-input>
+                <el-input v-else-if="inputKey.includes(key)" v-model="curComponent.style[key]" placeholder="请输入" @change="handleNameChange"></el-input>
                 <el-input v-else v-model.number="curComponent.style[key]" type="number" @input="handleNumInput" />
             </el-form-item>
         </el-form>
@@ -34,18 +34,20 @@
 <script>
 import { baseStyleData, controlAlignmentOptions } from '@/utils/attr'
 import calculateOffsetCoordinate from '@/utils/calculateOffsetCoordinate'
+import eventBus from '@/utils/eventBus'
 
 export default {
     data () {
         return {
             baseStyleData,
             controlAlignmentOptions,
-            inputKey: ['name', 'base'],
+            inputKey: ['name'],
             selectKey: ['parent', 'objAlign', 'base'],
             parent: '',
             base: '',
             objAlign: 1,
             clearStatus: false,
+            oldName: ''
         }
     },
     computed: {
@@ -78,8 +80,27 @@ export default {
         this.parent = this.curComponent.style.parent
         this.base = this.curComponent.style.base
         this.objAlign = this.curComponent.style.objAlign
+
+        eventBus.$on('setOldName', (val) => {
+            this.oldName = val
+        })
     },
     methods: {
+        handleNameChange (val) {
+            let flag = false
+            for (let i = 0; i < this.componentData.length; i++) {
+                const element = this.componentData[i];
+                if (element.id != this.curComponent.id && element.style.name == val) {
+                    this.curComponent.style.name = this.oldName
+                    flag = true
+                    this.$message.warning('名称重复了')
+                    break
+                }
+            }
+            if (!flag) {
+                this.curComponent.style.name = val
+            }
+        },
         // 父级选择
         handleParentChange (val) {
             this.parent = val

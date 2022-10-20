@@ -64,7 +64,8 @@ const data = {
         priceStatusAndControlRelevancy: {
             priceStatusIndex: undefined,
             name: undefined
-        }
+        },
+        childPageIndex: undefined
     },
     mutations: {
         ...compose.mutations,
@@ -75,7 +76,11 @@ const data = {
         ...snapshot.mutations,
         ...lock.mutations,
 
-        setpPriceStatusAndControlRelevancy (state, priceStatusAndControlRelevancy) {
+        setChildPageIndex (state, childPageIndex) {
+            state.childPageIndex = childPageIndex
+        },
+
+        setPriceStatusAndControlRelevancy (state, priceStatusAndControlRelevancy) {
             state.priceStatusAndControlRelevancy = priceStatusAndControlRelevancy
         },
 

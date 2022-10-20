@@ -1,6 +1,6 @@
 <template>
     <div class="child-page-list">
-        <div v-for="(item, index) in 4" class="box" :class="index == pageIndex ? 'active' : ''" @click="handleClick(index)">
+        <div v-for="(item, index) in 4" class="box" :class="index == childPageIndex ? 'active' : ''" @click="handleClick(index)">
             子页面{{index + 1}}
         </div>
     </div>
@@ -13,7 +13,6 @@ import eventBus from '@/utils/eventBus'
 export default {
     data () {
         return {
-            pageIndex: 0,
         }
     },
     computed:
@@ -21,25 +20,46 @@ export default {
             'canvasStyleData',
             'curComponentIndex',
             'componentData',
-            'childPageData'
+            'childPageData',
+            'childPageIndex'
         ])
     ,
     methods: {
+        // 保存子页面数据
         saveData () {
             for (const key in this.childPageData) {
                 if (Object.hasOwnProperty.call(this.childPageData, key)) {
-                    if (this.pageIndex == key) {
+                    if (this.childPageIndex == key) {
                         this.childPageData[key] = this.componentData
                     }
                 }
             }
-            eventBus.$emit('clearCanvas')
         },
+        // 点击
         handleClick (index) {
-            this.saveData()
-            this.pageIndex = index
-            this.$store.commit('setComponentData', this.childPageData[index])
+            // 1.点击子页面初始化，如果存在数据则反显
+            // 2.切换子页面时，首先保存上个子页面的数据，然后如果新子页面存在数据则反显，否则初始化
+            if (index == this.childPageIndex) {
+                this.saveData()
+                this.$store.commit('setChildPageIndex', undefined)
+                eventBus.$emit('clearCanvas')
+                eventBus.$emit('restore')
+            } else {
+                if (this.childPageIndex != undefined) {
+                    this.saveData()
+                }
+                this.initChildPage(index)
+                this.$store.commit('setChildPageIndex', index)
+            }
         },
+        // 初始化子页面数据
+        initChildPage (index) {
+            if (this.childPageData[index].length) {
+                this.$store.commit('setComponentData', this.childPageData[index])
+            } else {
+                eventBus.$emit('clearCanvas')
+            }
+        }
     },
 }
 </script>
