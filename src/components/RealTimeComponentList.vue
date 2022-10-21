@@ -1,6 +1,6 @@
 <template>
     <div class="real-time-component-list">
-        <div v-for="(item, index) in componentData" :key="item.id" class="list" :class="{ actived: transformIndex(index) === curComponentIndex }" @click="onClick(transformIndex(index))">
+        <div v-for="(item, index) in componentData" :key="item.id" class="list" :class="{ actived: transformIndex(index) === curComponentIndex, drag: transformIndex(index) == dragIndex }" @click="onClick(transformIndex(index))" v-dragging="{ list: componentData, item: getComponent(index), group: 'item' }">
             <span class="iconfont" :class="'icon-' + getComponent(index).icon"></span>
             <span>{{ getComponent(index).style.name }}</span>
             <div class="icon-container">
@@ -17,11 +17,28 @@ import { mapState } from 'vuex'
 import eventBus from '@/utils/eventBus'
 
 export default {
+    data () {
+        return {
+            dragIndex: undefined
+        }
+    },
     computed: mapState([
         'componentData',
         'curComponent',
         'curComponentIndex',
     ]),
+    mounted () {
+        this.$dragging.$on('dragged', (res) => {
+            res.value.list.forEach((v, i) => {
+                if (v.id == res.draged.id) {
+                    this.dragIndex = i
+                }
+            })
+        })
+        this.$dragging.$on('dragend', (res) => {
+            this.dragIndex = undefined
+        })
+    },
     methods: {
         getComponent (index) {
             return this.componentData[this.componentData.length - 1 - index]
@@ -59,7 +76,7 @@ export default {
         setCurComponent (index) {
             this.$store.commit('setCurComponent', { component: this.componentData[index], index })
             eventBus.$emit('setOldName', this.componentData[index].style.name)
-        },
+        }
     },
 }
 </script>
@@ -117,5 +134,8 @@ export default {
         background: #ecf5ff;
         color: #409eff;
     }
+}
+.drag {
+    border: 1px solid blue;
 }
 </style>

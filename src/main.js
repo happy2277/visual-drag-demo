@@ -11,6 +11,9 @@ import 'element-ui/lib/theme-chalk/index.css'
 import '@/styles/reset.css'
 import '@/styles/global.scss'
 
+import VueDND from 'awe-dnd'
+Vue.use(VueDND)
+
 Vue.use(ElementUI, { size: 'small' })
 Vue.config.productionTip = false
 
