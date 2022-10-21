@@ -12,9 +12,9 @@
 
         <!--页面组件列表展示-->
         <Shape v-for="(item, index) in componentData" :key="item.id" :default-style="item.style" :style="getShapeStyle(item.style)" :active="item.id === (curComponent || {}).id" :element="item" :index="index" :class="{ lock: item.isLock }">
-            <component :is="item.component" v-if="item.component.startsWith('SVG')" :id="'component' + item.id" :style="getSVGStyle(item.style)" class="component" :prop-value="item.propValue" :element="item" :request="item.request" />
+            <!-- <component :is="item.component" v-if="item.component.startsWith('SVG')" :id="'component' + item.id" :style="getSVGStyle(item.style)" class="component" :prop-value="item.propValue" :element="item" :request="item.request" /> -->
 
-            <component :is="item.component" v-else-if="item.component != 'VText'" :id="'component' + item.id" class="component" :style="getComponentStyle(item.style)" :prop-value="item.propValue" :element="item" :request="item.request" />
+            <component :is="item.component" v-if="item.component != 'VText'" :id="'component' + item.id" class="component" :style="getComponentStyle(item.style)" :prop-value="item.propValue" :element="item" :request="item.request" />
 
             <component :is="item.component" v-else :id="'component' + item.id" class="component" :style="getComponentStyle(item.style)" :prop-value="item.propValue" :element="item" :request="item.request" @input="handleInput" />
         </Shape>

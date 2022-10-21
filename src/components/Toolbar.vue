@@ -193,7 +193,31 @@ export default {
         },
 
         save () {
-            const componentData = deepCopy(this.componentData)
+            let resData = {
+                indexPageData: this.$store.state.indexPageData,
+                ...this.$store.state.childPageData
+            }
+            let res = []
+            for (const key in resData) {
+                if (Object.hasOwnProperty.call(resData, key)) {
+                    const element = resData[key];
+                    const data = this.handleSave(element)
+                    res.push(data)
+                }
+            }
+
+
+            localStorage.setItem('canvasData', JSON.stringify(resData))
+            localStorage.setItem('json', JSON.stringify(res))
+            // localStorage.setItem('canvasData', JSON.stringify(componentData))
+            // localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
+            this.$message.success('保存成功')
+            this.clearCanvas()
+        },
+
+        handleSave (item) {
+            // const componentData = deepCopy(this.componentData)
+            const componentData = item.data
             let flag = false
             const isRepeat = componentData.length > 1 ? this.isRepeat(componentData) : false
             if (isRepeat) return this.$message.warning('存在重复的控件名称，请检查！')
@@ -206,7 +230,8 @@ export default {
             })
             if (flag) return
             let data = []
-            const canvasStyleData = this.canvasStyleData
+            // const canvasStyleData = this.canvasStyleData
+            const canvasStyleData = item.rootData
             // 根容器
             const allComponentParent = {
                 type: 'cont',
@@ -266,11 +291,7 @@ export default {
             delete data[0].par
             delete data[0].base
 
-            console.table(data)
-            localStorage.setItem('canvasData', JSON.stringify(componentData))
-            localStorage.setItem('canvasStyle', JSON.stringify(this.canvasStyleData))
-            this.$message.success('保存成功')
-            this.clearCanvas()
+            return data
         },
 
         commonSwitch (v) {

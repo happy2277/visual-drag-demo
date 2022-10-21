@@ -95,20 +95,33 @@ export default {
     methods: {
         restore () {
             // 用保存的数据恢复画布
+            const canvasData = JSON.parse(localStorage.getItem('canvasData'))
             if (localStorage.getItem('canvasData')) {
-                const canvasData = JSON.parse(localStorage.getItem('canvasData'))
-                setDefaultcomponentData(canvasData)
-                canvasData.forEach((v, i) => {
-                    if (v.rootParent) {
-                        canvasData.splice(i, 1)
+                setDefaultcomponentData(canvasData.indexPageData.data)
+
+                for (const key in canvasData) {
+                    if (Object.hasOwnProperty.call(canvasData, key)) {
+                        const item = canvasData[key]
+                        const data = canvasData[key].data;
+                        const rootData = canvasData[key].rootData
+                        data.forEach((v, i) => {
+                            if (v.rootParent) {
+                                data.splice(i, 1)
+                            }
+                            this[`${v.type}Index`]++
+                        })
+                        if (key.startsWith('childPage')) {
+                            this.$store.commit('setChildPageData', { childPageData: data, rootData, key })
+                        }
                     }
-                    this[`${v.type}Index`]++
-                })
-                this.$store.commit('setComponentData', canvasData)
+                }
+
+                this.$store.commit('setComponentData', canvasData.indexPageData.data)
             }
 
             if (localStorage.getItem('canvasStyle')) {
-                this.$store.commit('setCanvasStyle', JSON.parse(localStorage.getItem('canvasStyle')))
+                // this.$store.commit('setCanvasStyle', JSON.parse(localStorage.getItem('canvasStyle'))) 
+                this.$store.commit('setCanvasStyle', canvasData.indexPageData.rootData)
             }
 
             if (localStorage.getItem('canvasTempData')) {
