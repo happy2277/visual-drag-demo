@@ -58,6 +58,7 @@ export default {
             return this.$store.state.componentData
         },
         parentOptions () {
+            console.log(this.$store.state)
             return this.$store.state.componentParents
         },
         canvasStyleData () {

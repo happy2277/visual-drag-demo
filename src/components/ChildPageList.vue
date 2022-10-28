@@ -107,6 +107,10 @@ export default {
         background-color: #fff;
         border: 1px solid #f2f2f2;
         cursor: pointer;
+        &:hover {
+            color: #fff;
+            background-color: rgba(0, 128, 255, 0.5);
+        }
         &:nth-child(n + 2) {
             margin-top: 10px;
         }

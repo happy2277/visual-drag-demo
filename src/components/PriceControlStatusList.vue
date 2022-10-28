@@ -1,7 +1,7 @@
 <template>
     <div class="price-control-status-list">
-        <div v-for="(item, index) in 4" class="box" :class="index == priceStatusIndex || (priceStatusAndControlRelevancy.priceStatusIndex != null && priceStatusAndControlRelevancy.name != null && index == priceStatusAndControlRelevancy.priceStatusIndex) ? 'active' : ''" @click="handleClick(index)">
-            价格控件状态{{index + 1}}
+        <div v-for="(item, index) in arr" class="box" :class="`priceStatus${index}` == priceStatusIndex || (priceStatusAndControlRelevancy.priceStatusIndex && priceStatusAndControlRelevancy.name != null && index == priceStatusAndControlRelevancy.priceStatusIndex) ? 'active' : ''" :key="index" @click="handleClick(index)">
+            {{item.name}}
             <!-- <template v-if="compData.length">
                 <div v-for="(item, index) in compData" :key="item.id" :default-style="item.style" :style="getShapeStyle(item.style)" :active="item.id === (curComponent || {}).id" :element="item" :index="index" :class="{ lock: item.isLock }" class="component">
                     <component :is="item.component" v-if="item.component != 'VText'" :id="'component' + item.id" class="component" :style="getComponentStyle(item.style)" :prop-value="item.propValue" :element="item" :request="item.request" />
@@ -24,6 +24,12 @@ export default {
     data () {
         return {
             priceStatusIndex: undefined,
+            arr: [
+                { name: '零售价' },
+                { name: '零售价+原价' },
+                { name: '零售价+会员价' },
+                { name: '零售价+胖柚价' },
+            ]
             // compData: []
         }
     },
@@ -33,18 +39,21 @@ export default {
             'curComponentIndex',
             'componentData',
             'curComponent',
-            'priceStatusAndControlRelevancy'
+            'priceStatusAndControlRelevancy',
+            'priceControlStatusData'
         ]),
         compData () {
-            let priceStatusAndControlRelevancy = this.$store.state.priceStatusAndControlRelevancy
-            let priceControlStatusData = this.$store.state.priceControlStatusData
-            const componentData = this.$store.state.componentData
+            // 关联数据
+            let priceStatusAndControlRelevancy = this.priceStatusAndControlRelevancy
+            // 价格控件状态数据
+            let priceControlStatusData = this.priceControlStatusData
+            const componentData = this.componentData
             if (priceStatusAndControlRelevancy.priceStatusIndex != null && priceStatusAndControlRelevancy.name != null) {
                 this.priceStatusIndex = priceStatusAndControlRelevancy.priceStatusIndex
                 priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex] = []
                 componentData.forEach(v => {
                     if (v.style.base == priceStatusAndControlRelevancy.name) {
-                        priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex].push(v)
+                        priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex]['data'].push(v)
                     }
                 })
             }
@@ -88,7 +97,7 @@ export default {
             }
             this.priceStatusIndex = index
             this.$store.commit('setPriceStatusAndControlRelevancy', {
-                priceStatusIndex: index,
+                priceStatusIndex: `priceStatus${index}`,
                 name: this.curComponent.style.name
             })
         },
@@ -98,7 +107,7 @@ export default {
         },
         changeComponentsSizeWithScale (scale) {
             const needToChangeAttrs = ['top', 'left', 'width', 'height', 'fontSize']
-            const componentData = this.priceStatusIndex != undefined ? this.compData[this.priceStatusIndex] : []
+            const componentData = this.priceStatusIndex ? this.compData[this.priceStatusIndex] : []
             componentData.length && componentData.forEach(component => {
                 Object.keys(component.style).forEach(key => {
                     if (needToChangeAttrs.includes(key)) {
@@ -137,10 +146,17 @@ export default {
     .box {
         position: relative;
         margin: 0 10px;
-        width: 200px;
-        height: 200px;
+        padding: 5px 10px;
+        // width: 200px;
+        // height: 200px;
         background-color: #fff;
-        border: 1px solid #606266;
+        border: 1px solid #d8dbdc;
+        cursor: pointer;
+
+        &:hover {
+            color: #fff;
+            background-color: rgba(0, 128, 255, 0.5);
+        }
 
         .component {
             position: absolute;

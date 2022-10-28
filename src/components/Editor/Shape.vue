@@ -69,6 +69,7 @@ export default {
     computed: mapState([
         'curComponent',
         'editor',
+        'componentData'
     ]),
     mounted () {
         // 用于 Group 组件
@@ -83,8 +84,8 @@ export default {
         getPointList () {
             return this.element.component === 'line-shape' ? this.pointList2
                 // : this.element.component === 'Picture' ? this.pointList3
-                : this.element.component === 'Group' ? []
-                    : this.pointList
+                // : this.element.component === 'Group' ? []
+                : this.pointList
         },
 
         isActive () {
@@ -238,9 +239,8 @@ export default {
                 const curX = moveEvent.clientX
                 const curY = moveEvent.clientY
                 // 控件坐标
-                pos.top = curY - startY + startTop
-                pos.left = curX - startX + startLeft
-
+                pos.top = Math.round(curY - startY + startTop)
+                pos.left = Math.round(curX - startX + startLeft)
                 // 偏移量
                 pos.xOffset = (curX - startX) + xOffset
                 pos.yOffset = (curY - startY) + yOffset
@@ -265,6 +265,7 @@ export default {
                 eventBus.$emit('unmove')
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
+
             }
 
             document.addEventListener('mousemove', move)
@@ -383,6 +384,7 @@ export default {
 .active {
     outline: 1px solid #70c0ff;
     user-select: none;
+    z-index: 999;
 }
 
 .shape-point {

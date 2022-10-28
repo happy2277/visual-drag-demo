@@ -46,19 +46,25 @@ export default {
     watch: {
         'element.style.longMode': {
             handler (val) {
-                this.getClass(val)
+                if (val != undefined) {
+                    this.getClass(val)
+                }
             },
             deep: true,
         },
         'element.style.str': {
             handler (val) {
-                this.getClass(this.element.style.longMode)
+                if (val != undefined) {
+                    this.getClass(this.element.style.longMode)
+                }
             },
             deep: true,
         },
         'element.style.numStr': {
             handler (val) {
-                this.getClass(this.element.style.longMode)
+                if (val != undefined) {
+                    this.getClass(this.element.style.longMode)
+                }
             },
             deep: true,
         }

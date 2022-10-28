@@ -23,16 +23,16 @@ export default {
         getSVGStyle,
 
         onClick () {
-            const events = this.config.events
-            Object.keys(events).forEach(event => {
-                this[event](events[event])
-            })
+            // const events = this.config.events
+            // Object.keys(events).forEach(event => {
+            //     this[event](events[event])
+            // })
 
-            eventBus.$emit('v-click', this.config.id)
+            // eventBus.$emit('v-click', this.config.id)
         },
 
         onMouseEnter () {
-            eventBus.$emit('v-hover', this.config.id)
+            // eventBus.$emit('v-hover', this.config.id)
         },
     },
 }

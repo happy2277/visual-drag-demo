@@ -102,8 +102,8 @@ export default {
                 for (const key in canvasData) {
                     if (Object.hasOwnProperty.call(canvasData, key)) {
                         const item = canvasData[key]
-                        const data = canvasData[key].data;
-                        const rootData = canvasData[key].rootData
+                        const data = item.data;
+                        const rootData = item.rootData
                         data.forEach((v, i) => {
                             if (v.rootParent) {
                                 data.splice(i, 1)
@@ -177,6 +177,9 @@ export default {
                     component.style.yOffset = y
                     // component.style.objAlign = 1
                     component.id = generateID()
+                    const par = this.handleGetPar(component)
+                    component.style.parent = par
+                    component.style.base = par
                     switch (component.type) {
                         case 'label':
                             if (component.label == '文本') {
@@ -198,13 +201,6 @@ export default {
                     component.style.objAlign = 1
                     component.style.name = `group_${this.groupIndex}`
                     this.groupIndex++
-
-                    setTimeout(() => {
-                        const editorRect = this.editor.getBoundingClientRect()
-                        component.propValue.forEach(v => {
-                            decomposeComponent(v, editorRect, component.style)
-                        })
-                    }, 100)
                 }
 
                 // 根据画面比例修改组件样式比例 https://github.com/woai3c/visual-drag-demo/issues/91
@@ -221,6 +217,34 @@ export default {
 
                 eventBus.$emit('setOldName', component.style.name)
             }
+        },
+
+        handleGetPar (component) {
+            const componentData = this.componentData
+            const curComp = component
+            let parArr = []
+            componentData.forEach(v => {
+                const parX = v.style.left
+                const parY = v.style.top
+                const curX = curComp.style.left
+                const curY = curComp.style.top
+                const parRBX = parX + v.style.width
+                const parRBY = parY + v.style.height
+                const curRBX = curX + curComp.style.width
+                const curRBY = curY + curComp.style.height
+                // 左上角 与 右下角 坐标比较 获取所有包含当前控件的控件
+                if ((v.id != curComp.id) && (v.type == 'cont') && (curX >= parX) && (curY >= parY) && (curRBX <= parRBX) && (curRBY <= parRBY)) {
+                    parArr.push(v)
+                }
+            })
+
+            let par
+            parArr.forEach(v => {
+                if (v.style.name.startsWith('ga')) {
+                    par = v.style.name
+                }
+            })
+            return par
         },
 
         handleDragOver (e) {
@@ -316,8 +340,7 @@ export default {
 
         .center {
             position: relative;
-            padding: 20px;
-            padding-bottom: 200px;
+            padding: 20px 20px 50px;
             margin-left: 200px;
             margin-right: 288px;
             height: 100%;

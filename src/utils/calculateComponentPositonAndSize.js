@@ -96,7 +96,7 @@ function calculateRightBottom (style, curPositon, proportion, needLockProportion
 
     if (needLockProportion) {
         if (newWidth / newHeight > proportion) {
-            newBottomRightPoint.x -= Math.abs(newWidth - newHeight * proportion)
+            newBottomRightPoint.x -= newBottomRightPoint - Math.abs(newWidth - newHeight * proportion)
             newWidth = newHeight * proportion
         } else {
             newBottomRightPoint.y -= Math.abs(newHeight - newWidth / proportion)

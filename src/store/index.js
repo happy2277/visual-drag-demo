@@ -10,6 +10,7 @@ import lock from './lock'
 import toast from '@/utils/toast'
 import { unique } from '@/utils/utils'
 import eventBus from '@/utils/eventBus'
+import decomposeComponent from '@/utils/decomposeComponent'
 
 Vue.use(Vuex)
 
@@ -26,19 +27,6 @@ const data = {
         ...lock.state,
 
         editMode: 'edit', // 编辑器模式 edit preview
-        deepCanvasStyleData: { // 页面全局初始数据
-            name: 'cont_par',
-            width: 800,
-            height: 1280,
-            scale: 100,
-            // color: 'rgba(0, 0, 0, 1)',
-            backgroundColor: 'rgba(255, 255, 255, 1)',
-            fontSize: 14,
-            borderWidth: 0,
-            borderRadius: 0,
-            opacity: 1,
-            rotate: 0
-        },
         canvasStyleData: { // 页面全局数据
             name: 'cont_par',
             width: 800,
@@ -81,10 +69,18 @@ const data = {
             },
         }, // 子页面数据
         priceControlStatusData: {
-            0: [],
-            1: [],
-            2: [],
-            3: [],
+            priceStatus0: {
+                data: [],
+            },
+            priceStatus1: {
+                data: [],
+            },
+            priceStatus2: {
+                data: [],
+            },
+            priceStatus3: {
+                data: [],
+            },
         }, // 价格控件状态数据
         priceStatusAndControlRelevancy: {
             priceStatusIndex: undefined,
@@ -108,6 +104,10 @@ const data = {
 
         setIsSaveIndexPageData (state, isSaveIndexPageData) {
             state.isSaveIndexPageData = isSaveIndexPageData
+        },
+
+        setPriceControlStatusData (state, { PriceControlStatusData, key }) {
+            Vue.set(state.childPageData[key], 'data', PriceControlStatusData)
         },
 
         setIndexPageData (state, { data, rootData }) {
@@ -167,7 +167,6 @@ const data = {
                 }
             })
             eventBus.$emit('clearPriceStatusChecked')
-            // state.componentParents = unique(state.componentParents, 'value')
         },
 
         setShapeStyle ({ curComponent }, { top, left, width, height, rotate, xOffset, yOffset }) {
@@ -202,8 +201,8 @@ const data = {
                         value: v.style.name
                     })
                 }
-
             })
+            console.log(state)
             // state.componentParents = unique(state.componentParents, 'value')
         },
 

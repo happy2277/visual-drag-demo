@@ -228,9 +228,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.mark-line {
-    // height: 100%;
-}
+// .mark-line {
+// height: 100%;
+// }
 
 .line {
     background: #59c7f9;
