@@ -50,7 +50,7 @@
                         <!-- 数字输入 -->
                         <template v-else-if="curComponent.type != 'group'">
                             <el-input v-if="key == 'fontSize'" v-model.number="curComponent.style[key]" type="number" @change="handleFontSizeChange" />
-                            <el-input v-else v-model.number="curComponent.style[key]" type="number" />
+                            <el-input v-else v-model.trim="curComponent.style[key]" type="text" @input="handlePriceInput" />
                         </template>
                     </el-form-item>
                 </el-form>
@@ -150,8 +150,12 @@ export default {
             }
         },
 
+        handlePriceInput (val) {
+            this.curComponent.style.numStr = val.replace(/[^\d^\.]/g, '')
+        },
+
         onChange () {
-            // this.curComponent.collapseName = this.activeName
+
         },
 
         isIncludesColor (str) {

@@ -177,7 +177,7 @@ export default {
                     component.style.yOffset = y
                     // component.style.objAlign = 1
                     component.id = generateID()
-                    const par = this.handleGetPar(component)
+                    const par = this.handleGetPar(component) || ''
                     component.style.parent = par
                     component.style.base = par
                     switch (component.type) {

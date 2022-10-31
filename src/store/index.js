@@ -159,7 +159,7 @@ const data = {
             state.curComponentIndex = index
             state.componentParents = []
             state.componentData.length && state.componentData.forEach(v => {
-                if (component?.id != v.id && v.style.parent != component?.name && v.style.name) {
+                if (component?.id != v?.id && v.style.parent != component?.name && v.style.name) {
                     state.componentParents.push({
                         label: v.style.name,
                         value: v.style.name
@@ -202,7 +202,6 @@ const data = {
                     })
                 }
             })
-            console.log(state)
             // state.componentParents = unique(state.componentParents, 'value')
         },
 
