@@ -123,7 +123,7 @@ export default {
     padding: 10px;
     display: grid;
     grid-gap: 10px 19px;
-    grid-template-columns: repeat(auto-fill, 80px);
+    // grid-template-columns: repeat(auto-fill, 80px);
     grid-template-rows: repeat(auto-fill, 40px);
     .component-list-item {
         display: flex;
@@ -132,7 +132,7 @@ export default {
 
     .list {
         // margin: 10px 10px 0 0;
-        width: 80px;
+        // width: 80px;
         height: 40px;
         border: 1px solid #ddd;
         cursor: grab;
@@ -141,7 +141,7 @@ export default {
         padding: 2px 5px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        // justify-content: center;
 
         &:active {
             cursor: grabbing;

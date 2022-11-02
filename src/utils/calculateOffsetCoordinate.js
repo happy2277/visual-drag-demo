@@ -11,12 +11,17 @@ export default function calculateOffsetCoordinate (curComponent, isNeedCalcOffse
     let { left, top, width, height, objAlign, base } = curComponent.style
     // 存在对齐组件
     if (base) {
-        componentData.forEach(v => {
-            if (v.style.name == base) {
-                rectInfo = $(`#component${v.id}`).getBoundingClientRect()
-                baseComponentData = v.style
-            }
-        })
+        // 如果对齐组件为根容器
+        if (base == 'bg_scr') {
+            baseComponentData = parentRectInfo
+        } else {
+            componentData.forEach(v => {
+                if (v.style.name == base) {
+                    rectInfo = $(`#component${v.id}`).getBoundingClientRect()
+                    baseComponentData = v.style
+                }
+            })
+        }
     } else {
         // 否则 对齐根容器
         rectInfo = parentRectInfo

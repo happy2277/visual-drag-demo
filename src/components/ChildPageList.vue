@@ -1,7 +1,18 @@
 <template>
     <div class="child-page-list">
-        <div v-for="(item, index) in 4" class="box" :class="`childPage${index}` == childPageIndex ? 'active' : ''" @click="handleClick(index)">
+        <div v-for="(item, index) in 8" class="box" :class="`childPage${index}` == childPageIndex ? 'active' : ''" @click="handleClick(index)">
             子页面{{index + 1}}
+
+            <div class="canvas" :style="{
+                    ...getCanvasStyle(canvasStyleData),
+                    width: changeStyleWithScale(canvasStyleData.width) + 'px',
+                    height: changeStyleWithScale(canvasStyleData.height) + 'px',
+                    transform: `scale(0.1)`
+                }">
+                <template v-if="copyData.length && `childPage${index}` == childPageIndex">
+                    <ComponentWrapper v-for="(item1, index) in copyData" :key="index" :config="item1" />
+                </template>
+            </div>
         </div>
     </div>
 </template>
@@ -9,10 +20,16 @@
 <script>
 import { mapState } from 'vuex'
 import eventBus from '@/utils/eventBus'
+import ComponentWrapper from './Editor/ComponentWrapper'
+import { deepCopy } from '@/utils/utils'
+import { getStyle, getCanvasStyle } from '@/utils/style'
+import { changeStyleWithScale } from '@/utils/translate'
 
 export default {
+    components: { ComponentWrapper },
     data () {
         return {
+            copyData: []
         }
     },
     computed:
@@ -24,10 +41,18 @@ export default {
             'childPageIndex',
             'isSaveIndexPageData',
             'indexPageData',
-            'deepCanvasStyleData'
+            'deepCanvasStyleData',
         ])
     ,
+    created () {
+        eventBus.$on('childPageCanvas', (childPageIndex) => {
+            // this.$set(this, 'copyData', deepCopy(this.childPageData[childPageIndex].data))
+        })
+    },
     methods: {
+        getStyle,
+        getCanvasStyle,
+        changeStyleWithScale,
         // 保存子页面数据
         saveData () {
             for (const key in this.childPageData) {
@@ -98,9 +123,15 @@ export default {
 .child-page-list {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    height: calc(100vh - 63px);
+    overflow: auto;
     .box {
-        width: 80px;
-        height: 40px;
+        position: relative;
+        margin-top: 10px;
+        flex: 0 0 80px;
+        width: 80%;
+        height: 80px;
         text-align: center;
         line-height: 40px;
         font-size: 14px;
@@ -111,13 +142,16 @@ export default {
             color: #fff;
             background-color: rgba(0, 128, 255, 0.5);
         }
-        &:nth-child(n + 2) {
-            margin-top: 10px;
+
+        .canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform-origin: 0 0;
         }
     }
     .active {
-        color: #fff;
-        background-color: rgb(0, 128, 255);
+        border: 2px solid rgb(0, 128, 255);
     }
 }
 </style>

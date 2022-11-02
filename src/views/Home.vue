@@ -3,6 +3,10 @@
         <Toolbar />
 
         <main>
+            <!-- 子页面 -->
+            <section class="child-page">
+                <ChildPageList />
+            </section>
             <!-- 左侧组件列表 -->
             <section class="left">
                 <el-collapse class="collapse" v-model="activeNames">
@@ -17,10 +21,7 @@
                     </el-collapse-item>
                 </el-collapse>
             </section>
-            <!-- 子页面 -->
-            <section class="child-page">
-                <ChildPageList />
-            </section>
+
             <!-- 中间画布 -->
             <section class="center">
                 <div class="content" @drop="handleDrop" @dragover="handleDragOver" @mousedown="handleMouseDown" @mouseup="deselectCurComponent">
@@ -66,7 +67,16 @@ export default {
         return {
             activeName: 'attr',
             reSelectAnimateIndex: undefined,
-            labelIndex: 0,
+            // 控件索引
+            controlIndex: {
+                labelGnIndex: 0, // 商品名称
+                labelGiIndex: 0, // 商品附加信息
+                labelGuIndex: 0, // 单位
+                imgGpIndex: 0, // 商品图片
+                imgGbpIndex: 0, // 条码图片
+                contGaIndex: 0, // 商品容器
+                lineGpulIndex: 0, // 线条
+            },
             imgIndex: 0,
             contIndex: 0,
             lineIndex: 0,
@@ -82,6 +92,7 @@ export default {
         'isClickComponent',
         'canvasStyleData',
         'editor',
+        'childPageIndex'
     ]),
     created () {
         this.restore()
@@ -91,8 +102,20 @@ export default {
         eventBus.$on('restore', () => {
             this.restore()
         })
+        this.initChildPageData()
     },
     methods: {
+        initChildPageData () {
+            let keys = []
+            let data = {}
+            for (let i = 0; i < 8; i++) {
+                keys.push(`childPage${i}`)
+            }
+            keys.forEach(v => {
+                this.$set(data, v, { data: [], rootData: [] })
+            })
+            this.$store.commit('setInitChildPageData', data)
+        },
         restore () {
             // 用保存的数据恢复画布
             const canvasData = JSON.parse(localStorage.getItem('canvasData'))
@@ -165,60 +188,103 @@ export default {
                 }
             }
 
-            if (index) {
-                let component
-                // 拖拽单个组件
-                if (type == 'single') {
-                    // component = deepCopy(componentList[tag][index])
-                    component = deepCopy(componentList[index])
-                    component.style.top = y
-                    component.style.left = x
-                    component.style.xOffset = x
-                    component.style.yOffset = y
-                    // component.style.objAlign = 1
-                    component.id = generateID()
-                    const par = this.handleGetPar(component) || ''
-                    component.style.parent = par
-                    component.style.base = par
-                    switch (component.type) {
-                        case 'label':
-                            if (component.label == '文本') {
-                                component.style.name = `label_text_${this.labelIndex}`
+            let component, G
+            // 拖拽单个组件
+            if (type == 'single') {
+                // component = deepCopy(componentList[tag][index])
+                component = deepCopy(componentList[index])
+                component.style.top = y
+                component.style.left = x
+                component.style.xOffset = x
+                component.style.yOffset = y
+                // component.style.objAlign = 1
+                component.id = generateID()
+                const par = this.handleGetPar(component) || ''
+                component.style.parent = par
+                component.style.base = par
+                const deepG = this.$store.state.whichGoodsNum
+                if (par.startsWith('ga')) {
+                    G = par.replace(/[^\d]/g, "")
+                    if (deepG != G) {
+                        this.$store.commit('setWhichGoodsNum', G)
+                    }
+                }
+                switch (component.type) {
+                    case 'label':
+                        if (par.startsWith('ga')) {
+                            // 表示第几个位置商品,0位置开始
+                            if (component.label == '商品名称') {
+                                component.style.name = `gn${this.controlIndex.labelGnIndex}`
+                                this.controlIndex.labelGnIndex++
+                            } else if (component.label == '商品附加信息') {
+                                component.style.name = `gi${G}_${this.controlIndex.labelGiIndex}`
+                                this.controlIndex.labelGiIndex++
+                            } else if (component.label == '单位') {
+                                component.style.name = `gu${G}_${this.controlIndex.labelGuIndex}`
+                                this.controlIndex.labelGuIndex++
                             } else {
                                 component.style.name = `label_price_${this.labelIndex}`
                             }
-                            this.labelIndex++
-                            break;
-                        default:
-                            component.style.name = `${component.type}_${this[`${component.type}Index`]}`
-                            break;
-                    }
-                } else { // 拖拽组合组件
-                    component = deepCopy(this.componentTempData[index])
-                    component.style.top = y
-                    component.style.left = x
-                    component.id = generateID()
-                    component.style.objAlign = 1
-                    component.style.name = `group_${this.groupIndex}`
-                    this.groupIndex++
+                        }
+                        break;
+                    case 'img':
+                        if (par.startsWith('ga')) {
+                            if (component.label == '商品图') {
+                                this.controlIndex.imgGpIndex = G
+                                component.style.name = `gp${this.controlIndex.imgGpIndex}`
+                                this.controlIndex.imgGpIndex++
+                            } else if (component.label == '条码图片') {
+                                this.controlIndex.imgGbpIndex = G
+                                component.style.name = `gbp${this.controlIndex.imgGbpIndex}`
+                                this.controlIndex.imgGbpIndex++
+                            }
+                        }
+                        break
+                    case 'line':
+                        if (par.startsWith('ga')) {
+                            this.controlIndex.lineGpulIndex = G
+                            if (component.label == '线条') {
+                                component.style.name = `gpul${this.controlIndex.lineGpulIndex}`
+                                this.controlIndex.lineGpulIndex++
+                            }
+                        }
+                        break
+                    case 'cont':
+                        if (component.label == '商品容器') {
+                            component.style.name = `ga${this.controlIndex.contGaIndex}`
+                            this.controlIndex.contGaIndex++
+                        }
+                        break
+                    default:
+                        component.style.name = `${component.type}_${this[`${component.type}Index`]}`
+                        break;
                 }
-
-                // 根据画面比例修改组件样式比例 https://github.com/woai3c/visual-drag-demo/issues/91
-                changeComponentSizeWithScale(component)
-
-                this.$store.commit('addComponent', { component })
-                this.$store.commit('recordSnapshot')
-
-                // 拖拽并选中
-                this.$store.commit('setCurComponent', {
-                    component: component,
-                    index: this.componentData.length - 1,
-                })
-
-                eventBus.$emit('setOldName', component.style.name)
+            } else { // 拖拽组合组件
+                component = deepCopy(this.componentTempData[index])
+                component.style.top = y
+                component.style.left = x
+                component.id = generateID()
+                component.style.objAlign = 1
+                component.style.name = `group_${this.groupIndex}`
+                this.groupIndex++
             }
-        },
 
+            // 根据画面比例修改组件样式比例 https://github.com/woai3c/visual-drag-demo/issues/91
+            changeComponentSizeWithScale(component)
+
+            this.$store.commit('addComponent', { component })
+            this.$store.commit('recordSnapshot')
+
+            // 拖拽并选中
+            this.$store.commit('setCurComponent', {
+                component: component,
+                index: this.componentData.length - 1,
+            })
+
+            eventBus.$emit('setOldName', component.style.name)
+            eventBus.$emit('childPageCanvas', this.childPageIndex)
+        },
+        // 获取父级控件名称
         handleGetPar (component) {
             const componentData = this.componentData
             const curComp = component
@@ -239,11 +305,20 @@ export default {
             })
 
             let par
-            parArr.forEach(v => {
-                if (v.style.name.startsWith('ga')) {
-                    par = v.style.name
+            if (parArr.length) {
+                for (let i = 0; i < parArr.length; i++) {
+                    const v = parArr[i];
+                    if (v.style.name.startsWith('ga')) {
+                        par = v.style.name
+                        break
+                    } else {
+                        par = 'bg_scr'
+                    }
                 }
-            })
+            } else {
+                par = 'bg_scr'
+            }
+
             return par
         },
 
@@ -286,9 +361,10 @@ export default {
             position: absolute;
             height: 100%;
             width: 210px;
-            left: 0;
+            left: 150px;
             top: 0;
             background-color: #fff;
+            // box-shadow: 0 0 8px 10px #f2f2f2;
             z-index: 1;
 
             & > div {
@@ -297,22 +373,25 @@ export default {
 
             .collapse {
                 height: 100%;
-                // .el-collapse-item {
-                //     max-height: 33.33%;
-                //     overflow: hidden;
-                //     ::deep .el-collapse-item__wrap {
-                //         height: calc(100% - 48px);
-                //         overflow: auto;
-                //     }
-                // }
+                .el-collapse-item:nth-child(1) {
+                    padding-bottom: 50px;
+                    height: 50%;
+                    overflow: hidden;
+                    ::v-deep .el-collapse-item__wrap {
+                        height: 100%;
+                        overflow: auto;
+                    }
+                }
             }
         }
 
         .child-page {
             position: absolute;
-            left: 230px;
+            left: 0;
             top: 0;
-            // background-color: #fff;
+            width: 150px;
+            background-color: #fff;
+            border-right: 1px solid #f2f2f2;
             z-index: 10;
         }
 
@@ -341,7 +420,7 @@ export default {
         .center {
             position: relative;
             padding: 20px 20px 50px;
-            margin-left: 200px;
+            margin-left: 360px;
             margin-right: 288px;
             height: 100%;
             background: #f5f5f5;

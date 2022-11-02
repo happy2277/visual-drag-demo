@@ -28,7 +28,7 @@ const data = {
 
         editMode: 'edit', // 编辑器模式 edit preview
         canvasStyleData: { // 页面全局数据
-            name: 'cont_par',
+            name: 'bg_scr',
             width: 800,
             height: 1280,
             scale: 100,
@@ -67,6 +67,10 @@ const data = {
                 data: [],
                 rootData: {}
             },
+            childPage4: {
+                data: [],
+                rootData: {}
+            },
         }, // 子页面数据
         priceControlStatusData: {
             priceStatus0: {
@@ -92,6 +96,7 @@ const data = {
             rootData: {}
         }, // 初始页数据
         isSaveIndexPageData: true, // 是否保存到初始页数据属性
+        whichGoodsNum: 0, // 第几个商品
     },
     mutations: {
         ...compose.mutations,
@@ -104,6 +109,10 @@ const data = {
 
         setIsSaveIndexPageData (state, isSaveIndexPageData) {
             state.isSaveIndexPageData = isSaveIndexPageData
+        },
+
+        setWhichGoodsNum (state, whichGoodsNum) {
+            state.whichGoodsNum = whichGoodsNum
         },
 
         setPriceControlStatusData (state, { PriceControlStatusData, key }) {
@@ -123,6 +132,10 @@ const data = {
 
         setPriceStatusAndControlRelevancy (state, priceStatusAndControlRelevancy) {
             state.priceStatusAndControlRelevancy = priceStatusAndControlRelevancy
+        },
+
+        setInitChildPageData (state, childPageDatas) {
+            state.childPageData = childPageDatas
         },
 
         setChildPageData (state, { childPageData, rootData, key }) {

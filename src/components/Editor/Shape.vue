@@ -320,6 +320,10 @@ export default {
             let isFirst = true
 
             const needLockProportion = this.isNeedLockProportion()
+
+            const startY = e.clientY
+            const startX = e.clientX
+
             const move = (moveEvent) => {
                 // 第一次点击时也会触发 move，所以会有“刚点击组件但未移动，组件的大小却改变了”的情况发生
                 // 因此第一次点击时不触发 move 事件
@@ -343,6 +347,18 @@ export default {
                 this.$store.commit('setShapeStyle', style)
 
                 calculateOffsetCoordinate(this.element, true)
+
+                const curX = moveEvent.clientX
+                const curY = moveEvent.clientY
+
+                this.$nextTick(() => {
+                    // 触发元素移动事件，用于显示标线、吸附功能
+                    // 后面两个参数代表鼠标移动方向
+                    // curY - startY > 0 true 表示向下移动 false 表示向上移动
+                    // curX - startX > 0 true 表示向右移动 false 表示向左移动
+                    eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
+
+                })
             }
 
             const up = () => {
