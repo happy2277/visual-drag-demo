@@ -28,7 +28,7 @@
                     <Editor />
                 </div>
 
-                <PriceControlStatusList />
+                <!-- <PriceControlStatusList /> -->
             </section>
             <!-- 右侧属性列表 -->
             <section class="right">
@@ -95,6 +95,7 @@ export default {
         'childPageIndex'
     ]),
     created () {
+        this.initChildPageData()
         this.restore()
         // 全局监听按键事件
         listenGlobalKeyDown()
@@ -102,7 +103,13 @@ export default {
         eventBus.$on('restore', () => {
             this.restore()
         })
-        this.initChildPageData()
+        eventBus.$on('updateIndex', () => {
+            for (const key in this.controlIndex) {
+                if (Object.hasOwnProperty.call(this.controlIndex, key)) {
+                    this.controlIndex[key] = 0
+                }
+            }
+        })
     },
     methods: {
         initChildPageData () {
@@ -162,33 +169,9 @@ export default {
             const y = Math.floor(e.clientY - rectInfo.y)
             const x = Math.floor(e.clientX - rectInfo.x)
 
-            let arrKeyObj = {
-                label: [],
-                img: [],
-                cont: [],
-                line: [],
-                group: []
-            }
-            // 获取各类组件已存在的数量
-            this.componentData.forEach(v => {
-                for (const key in arrKeyObj) {
-                    if (Object.hasOwnProperty.call(arrKeyObj, key)) {
-                        const element = arrKeyObj[key];
-                        if (v.type == key) {
-                            element.push(v)
-                        }
-                    }
-                }
-            })
-            // 刷新各类组件初始索引
-            for (const key in arrKeyObj) {
-                if (Object.hasOwnProperty.call(arrKeyObj, key)) {
-                    const element = arrKeyObj[key];
-                    this[`${key}Index`] = element.length
-                }
-            }
+            let component,
+                G  // 表示第几个位置商品,0位置开始
 
-            let component, G
             // 拖拽单个组件
             if (type == 'single') {
                 // component = deepCopy(componentList[tag][index])
@@ -208,11 +191,13 @@ export default {
                     if (deepG != G) {
                         this.$store.commit('setWhichGoodsNum', G)
                     }
+                    this.updateIndex(G)
+                } else {
+                    this.updateIndex()
                 }
                 switch (component.type) {
                     case 'label':
                         if (par.startsWith('ga')) {
-                            // 表示第几个位置商品,0位置开始
                             if (component.label == '商品名称') {
                                 component.style.name = `gn${this.controlIndex.labelGnIndex}`
                                 this.controlIndex.labelGnIndex++
@@ -230,11 +215,9 @@ export default {
                     case 'img':
                         if (par.startsWith('ga')) {
                             if (component.label == '商品图') {
-                                this.controlIndex.imgGpIndex = G
                                 component.style.name = `gp${this.controlIndex.imgGpIndex}`
                                 this.controlIndex.imgGpIndex++
-                            } else if (component.label == '条码图片') {
-                                this.controlIndex.imgGbpIndex = G
+                            } else if (component.label == '商品一维码') {
                                 component.style.name = `gbp${this.controlIndex.imgGbpIndex}`
                                 this.controlIndex.imgGbpIndex++
                             }
@@ -242,7 +225,6 @@ export default {
                         break
                     case 'line':
                         if (par.startsWith('ga')) {
-                            this.controlIndex.lineGpulIndex = G
                             if (component.label == '线条') {
                                 component.style.name = `gpul${this.controlIndex.lineGpulIndex}`
                                 this.controlIndex.lineGpulIndex++
@@ -284,6 +266,81 @@ export default {
             eventBus.$emit('setOldName', component.style.name)
             eventBus.$emit('childPageCanvas', this.childPageIndex)
         },
+        // 更新控件index
+        updateIndex (G) {
+            let arrKeyObj = {
+                label: [],
+                img: [],
+                cont: [],
+                line: [],
+                group: []
+            }
+            // 获取各类组件已存在的数量
+            this.componentData.forEach(v => {
+                for (const key in arrKeyObj) {
+                    if (Object.hasOwnProperty.call(arrKeyObj, key)) {
+                        const element = arrKeyObj[key];
+                        if (v.type == key) {
+                            element.push(v)
+                        }
+                    }
+                }
+            })
+            // 刷新各类组件初始索引
+            for (const key in arrKeyObj) {
+                if (Object.hasOwnProperty.call(arrKeyObj, key)) {
+                    const item = arrKeyObj[key];
+                    switch (key) {
+                        case 'label':
+                            let giArr = [], guArr = []
+                            item.forEach(v => {
+                                if (v.label == '商品附加信息' || v.label == '单位') {
+                                    const num = (v.style.name.split('_'))[0].replace(/[^\d]/g, "")
+                                    if (num == G) {
+                                        if (v.label == '商品附加信息') {
+                                            giArr.push(v)
+                                        } else {
+                                            guArr.push(v)
+                                        }
+                                    }
+                                }
+                            })
+                            this.controlIndex.labelGiIndex = giArr.length
+                            this.controlIndex.labelGuIndex = guArr.length
+                            break;
+                        case 'line':
+                            this.controlIndex.lineGpulIndex = item.length
+                            break;
+                        case 'cont':
+                            let gaArr = []
+                            item.forEach(v => {
+                                if (v.style.name.startsWith('ga')) {
+                                    gaArr.push(v)
+                                } else {
+
+                                }
+                            })
+                            this.controlIndex.contGaIndex = gaArr.length
+                            break;
+                        case 'img':
+                            let gbpArr = [], gpArr = []
+                            item.forEach(v => {
+                                if (v.label == '商品图') {
+                                    gpArr.push(v)
+                                } else if (v.label == '商品一维码') {
+                                    gbpArr.push(v)
+                                }
+                            })
+                            this.controlIndex.imgGbpIndex = gbpArr.length
+                            this.controlIndex.imgGpIndex = gpArr.length
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        },
+
         // 获取父级控件名称
         handleGetPar (component) {
             const componentData = this.componentData
@@ -321,6 +378,18 @@ export default {
 
             return par
         },
+
+        // ArrayCallback (arr, label) {
+        //     let ary = []
+        //     arr.forEach(v => {
+        //         if (v.style.name.startsWith('ga')) {
+        //             ary.push(v)
+        //         } else if (v.style.label == label) {
+        //             ary.push(v)
+        //         }
+        //     })
+        //     return ary
+        // },
 
         handleDragOver (e) {
             e.preventDefault()
@@ -419,7 +488,7 @@ export default {
 
         .center {
             position: relative;
-            padding: 20px 20px 50px;
+            padding: 20px 20px;
             margin-left: 360px;
             margin-right: 288px;
             height: 100%;
