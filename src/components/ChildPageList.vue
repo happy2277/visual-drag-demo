@@ -1,16 +1,13 @@
 <template>
     <div class="child-page-list">
-        <div v-for="(item, index) in 8" class="box" :class="`childPage${index}` == childPageIndex ? 'active' : ''" @click="handleClick(index)">
-            子页面{{index + 1}}
-
+        <div v-for="(item, index) in getChildPageData" class="box" :class="index == childPageIndex ? 'active' : ''" @click="handleClick(index)">
             <div class="canvas" :style="{
-                    ...getCanvasStyle(canvasStyleData),
                     width: changeStyleWithScale(canvasStyleData.width) + 'px',
                     height: changeStyleWithScale(canvasStyleData.height) + 'px',
                     transform: `scale(0.1)`
                 }">
-                <template v-if="copyData.length && `childPage${index}` == childPageIndex">
-                    <ComponentWrapper v-for="(item1, index) in copyData" :key="index" :config="item1" />
+                <template>
+                    <ComponentWrapper v-for="(item1, index) in item.data" :key="index" :config="item1" />
                 </template>
             </div>
         </div>
@@ -32,8 +29,8 @@ export default {
             copyData: []
         }
     },
-    computed:
-        mapState([
+    computed: {
+        ...mapState([
             'canvasStyleData',
             'curComponentIndex',
             'componentData',
@@ -42,12 +39,24 @@ export default {
             'isSaveIndexPageData',
             'indexPageData',
             'deepCanvasStyleData',
-        ])
-    ,
+        ]),
+        getChildPageData () {
+            const childData = this.$store.state.childPageData
+            let arr = []
+            for (const key in childData) {
+                if (Object.hasOwnProperty.call(childData, key)) {
+                    const element = childData[key];
+                    arr.push(element)
+                }
+            }
+            return childData
+        }
+    },
     created () {
         eventBus.$on('childPageCanvas', (childPageIndex) => {
             // this.$set(this, 'copyData', deepCopy(this.childPageData[childPageIndex].data))
         })
+
     },
     methods: {
         getStyle,
@@ -71,11 +80,12 @@ export default {
         handleClick (index) {
             // 1.点击子页面初始化，如果存在数据则反显
             // 2.切换子页面时，首先保存上个子页面的数据，然后如果新子页面存在数据则反显，否则初始化
-            if (`childPage${index}` == this.childPageIndex) {
+            if (index == this.childPageIndex) {
                 this.saveData()
                 this.$store.commit('setChildPageIndex', undefined)
                 this.$store.commit('setIsSaveIndexPageData', true)
                 eventBus.$emit('clearCanvas')
+                eventBus.$emit('updateIndex')
                 this.$store.commit('setComponentData', this.indexPageData['data'])
                 this.$store.commit('setCanvasStyle', this.indexPageData['rootData'])
             } else {
@@ -90,16 +100,17 @@ export default {
                     this.saveData()
                 }
                 this.initChildPage(index)
-                this.$store.commit('setChildPageIndex', `childPage${index}`)
+                this.$store.commit('setChildPageIndex', index)
             }
         },
         // 初始化子页面数据
         initChildPage (index) {
-            this.$store.commit('setCanvasStyle', this.childPageData[`childPage${index}`]['rootData'])
-            if (this.childPageData[`childPage${index}`]['data'].length) {
-                this.$store.commit('setComponentData', this.childPageData[`childPage${index}`]['data'])
+            this.$store.commit('setCanvasStyle', this.childPageData[index]['rootData'])
+            if (this.childPageData[index]['data'].length) {
+                this.$store.commit('setComponentData', this.childPageData[index]['data'])
             } else {
                 eventBus.$emit('clearCanvas')
+                eventBus.$emit('updateIndex')
                 this.$store.commit('setCanvasStyle', { // 页面全局初始数据
                     name: 'cont_par',
                     width: 800,
@@ -128,6 +139,7 @@ export default {
     overflow: auto;
     .box {
         position: relative;
+        padding: 2px;
         margin-top: 10px;
         flex: 0 0 80px;
         width: 80%;
@@ -138,9 +150,10 @@ export default {
         background-color: #fff;
         border: 1px solid #f2f2f2;
         cursor: pointer;
+        overflow: hidden;
         &:hover {
             color: #fff;
-            background-color: rgba(0, 128, 255, 0.5);
+            border: 2px solid #dbdbdb;
         }
 
         .canvas {
@@ -151,7 +164,8 @@ export default {
         }
     }
     .active {
-        border: 2px solid rgb(0, 128, 255);
+        border: 2px solid;
+        border-color: rgb(0, 128, 255) !important;
     }
 }
 </style>

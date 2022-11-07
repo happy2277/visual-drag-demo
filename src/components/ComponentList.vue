@@ -53,6 +53,7 @@ export default {
             e.dataTransfer.setData('tag', e.target.dataset.tag)
         },
         handleAddComponent (item) {
+            return
             const component = deepCopy(item)
             component.style.top = 0
             component.style.left = 0

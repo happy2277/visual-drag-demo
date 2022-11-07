@@ -139,8 +139,10 @@ const data = {
         },
 
         setChildPageData (state, { childPageData, rootData, key }) {
-            Vue.set(state.childPageData[key], 'data', childPageData)
-            Vue.set(state.childPageData[key], 'rootData', rootData)
+            if (Object.keys(childPageData).length && key) {
+                Vue.set(state.childPageData[key], 'data', childPageData)
+                Vue.set(state.childPageData[key], 'rootData', rootData)
+            }
         },
 
         setClickComponentStatus (state, status) {
@@ -215,15 +217,13 @@ const data = {
                     })
                 }
             })
-            // state.componentParents = unique(state.componentParents, 'value')
-        },
 
-        // setComponentParents (state, component) {
-        //     state.componentParents.push({
-        //         label: component.name,
-        //         value: component.name
-        //     })
-        // },
+            this.commit('setChildPageData', {
+                childPageData: state.componentData,
+                rootData: state.canvasStyleData,
+                key: state.childPageIndex
+            })
+        },
 
         deleteComponent (state, index) {
             if (index === undefined) {
