@@ -110,6 +110,12 @@ export default {
                 }
             }
         })
+        eventBus.$on('updateName', (component) => {
+            if (component.type == 'cont') return
+            const par = this.handleGetPar(component) || ''
+            const deepG = par.replace(/[^\d]/g, "") || this.$store.state.whichGoodsNum
+            this.dragUpdate(component, par, deepG)
+        })
     },
     methods: {
         initChildPageData () {
@@ -195,52 +201,7 @@ export default {
                 } else {
                     this.updateIndex()
                 }
-                switch (component.type) {
-                    case 'label':
-                        if (par.startsWith('ga')) {
-                            if (component.label == '商品名称') {
-                                component.style.name = `gn${this.controlIndex.labelGnIndex}`
-                                this.controlIndex.labelGnIndex++
-                            } else if (component.label == '商品附加信息') {
-                                component.style.name = `gi${G}_${this.controlIndex.labelGiIndex}`
-                                this.controlIndex.labelGiIndex++
-                            } else if (component.label == '单位') {
-                                component.style.name = `gu${G}_${this.controlIndex.labelGuIndex}`
-                                this.controlIndex.labelGuIndex++
-                            } else {
-                                component.style.name = `label_price_${this.labelIndex}`
-                            }
-                        }
-                        break;
-                    case 'img':
-                        if (par.startsWith('ga')) {
-                            if (component.label == '商品图') {
-                                component.style.name = `gp${this.controlIndex.imgGpIndex}`
-                                this.controlIndex.imgGpIndex++
-                            } else if (component.label == '商品一维码') {
-                                component.style.name = `gbp${this.controlIndex.imgGbpIndex}`
-                                this.controlIndex.imgGbpIndex++
-                            }
-                        }
-                        break
-                    case 'line':
-                        if (par.startsWith('ga')) {
-                            if (component.label == '线条') {
-                                component.style.name = `gpul${this.controlIndex.lineGpulIndex}`
-                                this.controlIndex.lineGpulIndex++
-                            }
-                        }
-                        break
-                    case 'cont':
-                        if (component.label == '商品容器') {
-                            component.style.name = `ga${this.controlIndex.contGaIndex}`
-                            this.controlIndex.contGaIndex++
-                        }
-                        break
-                    default:
-                        component.style.name = `${component.type}_${this[`${component.type}Index`]}`
-                        break;
-                }
+                this.setName(component, par, G)
             } else { // 拖拽组合组件
                 component = deepCopy(this.componentTempData[index])
                 component.style.top = y
@@ -266,6 +227,106 @@ export default {
             eventBus.$emit('setOldName', component.style.name)
             eventBus.$emit('childPageCanvas', this.childPageIndex)
         },
+
+        dragUpdate (component, par, G) {
+            if (par == component.style.parent) return
+            this.updateIndex(G)
+            component.style.parent = par
+            component.style.base = par
+            if (par.startsWith('ga')) {
+                switch (component.type) {
+                    case 'label':
+                        let arr = []
+                        if (component.label == '商品附加信息') {
+                            const index = this.getIndex(`gi${G}`)
+                            component.style.name = `gi${G}_${index}`
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        },
+        // 获取索引 赋值给名称
+        getIndex (key) {
+            let keyArr = [], resIndex = 0
+            this.componentData.forEach(v => {
+                // 在同一个商品区域下的数据
+                if (v.style.name.startsWith(`gi`) && key.startsWith((v.style.name.split('_'))[0])) {
+                    // 获取控件名称索引
+                    const val = (v.style.name.split('_'))[1]
+                    keyArr.push(val)
+                }
+            })
+            // 索引值数组排序
+            const sortKeyArr = keyArr.sort((a, b) => a - b)
+            // 索引与值不相等 就赋值索引 跳出循环
+            for (let i = 0; i < sortKeyArr.length; i++) {
+                const v = sortKeyArr[i];
+                // 索引 != 值 
+                if (v != i) {
+                    resIndex = i
+                    break
+                } else {
+                    resIndex = i + 1
+                }
+            }
+            return resIndex
+        },
+
+        // 控件名称设置
+        setName (component, par, G) {
+            this.updateIndex(G)
+            console.log(G)
+            switch (component.type) {
+                case 'label':
+                    if (par.startsWith('ga')) {
+                        if (component.label == '商品名称') {
+                            component.style.name = `gn${this.controlIndex.labelGnIndex}`
+                            this.controlIndex.labelGnIndex++
+                        } else if (component.label == '商品附加信息') {
+                            component.style.name = `gi${G}_${this.controlIndex.labelGiIndex}`
+                            this.controlIndex.labelGiIndex++
+                        } else if (component.label == '单位') {
+                            component.style.name = `gu${G}_${this.controlIndex.labelGuIndex}`
+                            this.controlIndex.labelGuIndex++
+                        } else {
+                            component.style.name = `label_price_${this.labelIndex}`
+                        }
+                    }
+                    break;
+                case 'img':
+                    if (par.startsWith('ga')) {
+                        if (component.label == '商品图') {
+                            component.style.name = `gp${this.controlIndex.imgGpIndex}`
+                            this.controlIndex.imgGpIndex++
+                        } else if (component.label == '商品一维码') {
+                            component.style.name = `gbp${this.controlIndex.imgGbpIndex}`
+                            this.controlIndex.imgGbpIndex++
+                        }
+                    }
+                    break
+                case 'line':
+                    if (par.startsWith('ga')) {
+                        if (component.label == '线条') {
+                            component.style.name = `gpul${this.controlIndex.lineGpulIndex}`
+                            this.controlIndex.lineGpulIndex++
+                        }
+                    }
+                    break
+                case 'cont':
+                    if (component.label == '商品容器') {
+                        component.style.name = `ga${this.controlIndex.contGaIndex}`
+                        this.controlIndex.contGaIndex++
+                    }
+                    break
+                default:
+                    component.style.name = `${component.type}_${this[`${component.type}Index`]}`
+                    break;
+            }
+        },
+
         // 更新控件index
         updateIndex (G) {
             let arrKeyObj = {

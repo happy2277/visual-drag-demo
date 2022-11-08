@@ -1,6 +1,6 @@
 <template>
     <div class="compose-list" @dragstart="handleDragStart">
-        <div v-for="(item, index) in componentTempData" :key="index" class="list" draggable :data-index="index" :data-type="'group'">
+        <div v-for="(item, index) in componentTempData" :key="item.id" class="list" draggable :data-index="index" :data-type="'group'">
             <span class="iconfont" :class="'icon-' + item.icon"></span>
             <span>{{item.style.name}}</span>
         </div>

@@ -1,18 +1,18 @@
 <template>
     <div class="child-page-list">
-        <div v-for="(item, index) in getChildPageData" class="box" :class="index == childPageIndex ? 'active' : ''" @click="handleClick(index)">
+        <div v-for="(item, index) in childPageDataList" class="box" :key="index" :class="index == childPageIndex ? 'active' : ''" @click="handleClick(index)">
             <div class="canvas" :style="{
                     width: changeStyleWithScale(canvasStyleData.width) + 'px',
                     height: changeStyleWithScale(canvasStyleData.height) + 'px',
                     transform: `scale(0.1)`
                 }">
                 <template>
-                    <ComponentWrapper v-for="(item1, index) in item.data" :key="index" :config="item1" />
+                    <ComponentWrapper v-for="(item1, index1) in item.data" :key="index1" :config="item1" />
                 </template>
             </div>
         </div>
     </div>
-</template>
+</template>         
 
 <script>
 import { mapState } from 'vuex'
@@ -40,8 +40,8 @@ export default {
             'indexPageData',
             'deepCanvasStyleData',
         ]),
-        getChildPageData () {
-            const childData = this.$store.state.childPageData
+        childPageDataList () {
+            const childData = deepCopy(this.$store.state.childPageData)
             let arr = []
             for (const key in childData) {
                 if (Object.hasOwnProperty.call(childData, key)) {

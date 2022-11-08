@@ -257,6 +257,7 @@ export default {
                     eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
 
                 })
+
             }
 
             const up = () => {
@@ -265,6 +266,8 @@ export default {
                 eventBus.$emit('unmove')
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
+
+                eventBus.$emit('updateName', this.curComponent)
 
             }
 

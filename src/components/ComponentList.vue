@@ -14,7 +14,7 @@
     </div> -->
 
     <div class="component-list" @dragstart="handleDragStart">
-        <div v-for="(item, index) in componentList" :key="index" class="list" draggable :data-index="index" :data-type="'single'" @click="handleAddComponent(item)">
+        <div v-for="(item, index) in componentList" :key="item.id" class="list" draggable :data-index="index" :data-type="'single'" @click="handleAddComponent(item)">
             <span class="iconfont" :class="'icon-' + item.icon"></span>
             <span>{{item.label}}</span>
         </div>
