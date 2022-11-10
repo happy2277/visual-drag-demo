@@ -17,9 +17,9 @@ export default function decomposeComponent (component, editorRect, parentStyle, 
     // 计算出元素新的 top left 坐标
     component.style.left = Math.round(center.x - component.style.width / 2)
     component.style.top = Math.round(center.y - component.style.height / 2)
-    if (!isSetEmptyGroupStyle) {
-        component.groupStyle = {}
-    }
+    // if (!isSetEmptyGroupStyle) {
+    // component.groupStyle = {}
+    // }
 
     calculateOffsetCoordinate(component, true)
 }

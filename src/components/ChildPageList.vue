@@ -126,7 +126,7 @@ export default {
                 eventBus.$emit('clearCanvas')
                 eventBus.$emit('updateIndex')
                 this.$store.commit('setCanvasStyle', { // 页面全局初始数据
-                    name: 'cont_par',
+                    name: 'bg_scr',
                     width: 800,
                     height: 1280,
                     scale: 100,

@@ -23,12 +23,12 @@
             </section>
 
             <!-- 中间画布 -->
-            <section class="center">
+            <section class="center" :style="{paddingBottom: curComponent?.style.name.startsWith('contPrice') ? '50px':'20px'}">
                 <div class="content" @drop="handleDrop" @dragover="handleDragOver" @mousedown="handleMouseDown" @mouseup="deselectCurComponent">
                     <Editor />
                 </div>
 
-                <PriceControlStatusList />
+                <PriceControlStatusList v-if="curComponent?.style.name.startsWith('contPrice')" />
             </section>
             <!-- 右侧属性列表 -->
             <section class="right">
@@ -158,7 +158,7 @@ export default {
 
             if (localStorage.getItem('canvasStyle')) {
                 // this.$store.commit('setCanvasStyle', JSON.parse(localStorage.getItem('canvasStyle'))) 
-                this.$store.commit('setCanvasStyle', canvasData.indexPageData.rootData)
+                this.$store.commit('setCanvasStyle', canvasData[this.childPageIndex].rootData)
             }
 
             if (localStorage.getItem('canvasTempData')) {
@@ -243,7 +243,15 @@ export default {
                             component.style.name = `gi${G}_${index}`
                         }
                         break;
-
+                    case 'group':
+                        this.$set(component.style, 'name', `groupGa${G}`)
+                        component.propValue.map(v => {
+                            v.style.name = v.style.name.replace('G', G)
+                            v.style.parent = par
+                            v.style.base = par
+                            return v
+                        })
+                        break
                     default:
                         break;
                 }
@@ -325,6 +333,11 @@ export default {
                     } else if (component.label == '价格面板') {
                         component.style.name = `contPrice${this.controlIndex.contPIndex}`
                         this.controlIndex.contPIndex++
+                    }
+                    break
+                case 'group':
+                    if (par.startsWith('ga')) {
+                        this.$set(component.style, 'name', `groupGa${G}`)
                     }
                     break
                 default:

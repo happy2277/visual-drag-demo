@@ -1,7 +1,7 @@
 <template>
     <div class="price-control-status-list">
-        <div v-for="(item, index) in arr" class="box" :class="`priceStatus${index}` == priceStatusIndex || (priceStatusAndControlRelevancy.priceStatusIndex && priceStatusAndControlRelevancy.name != null && index == priceStatusAndControlRelevancy.priceStatusIndex) ? 'active' : ''" :key="index" @click="handleClick(index)">
-            {{item.name}}
+        <div v-for="(item, index) in priceStatusList" class="box" :class="`priceStatus${index}` == priceStatusIndex || (priceStatusAndControlRelevancy.priceStatusIndex && priceStatusAndControlRelevancy.name != null && index == priceStatusAndControlRelevancy.priceStatusIndex) ? 'active' : ''" :key="index" @click="handleClick(index)">
+            {{arr[index].name}}
             <!-- <template v-if="compData.length">
                 <div v-for="(item, index) in compData" :key="item.id" :default-style="item.style" :style="getShapeStyle(item.style)" :active="item.id === (curComponent || {}).id" :element="item" :index="index" :class="{ lock: item.isLock }" class="component">
                     <component :is="item.component" v-if="item.component != 'VText'" :id="'component' + item.id" class="component" :style="getComponentStyle(item.style)" :prop-value="item.propValue" :element="item" :request="item.request" />
@@ -17,8 +17,9 @@
 import { mapState } from 'vuex'
 import { getStyle, getComponentRotatedStyle, getShapeStyle, getSVGStyle, getCanvasStyle } from '@/utils/style'
 import eventBus from '@/utils/eventBus'
-import { divide, multiply } from 'mathjs'
+import { divide, im, multiply } from 'mathjs'
 import { deepCopy } from '@/utils/utils'
+import priceStatusList from '@/components/priceControlStatusDataList.js'
 
 export default {
     data () {
@@ -29,7 +30,8 @@ export default {
                 { name: '零售价+原价' },
                 { name: '零售价+会员价' },
                 { name: '零售价+胖柚价' },
-            ]
+            ],
+            priceStatusList
             // compData: []
         }
     },
@@ -95,11 +97,38 @@ export default {
             } else if (this.curComponent.type != 'cont') {
                 return this.$message.warning('请选择容器控件')
             }
+            if (this.priceStatusIndex == index) return
+            const componentData = deepCopy(this.componentData)
+            // 循环删除价格状态相关控件
+            for (let i = 0; i < componentData.length; i++) {
+                const v = componentData[i];
+                if (v.isPriceStatus) {
+                    this.componentData.forEach((item, index) => {
+                        if (v.id == item.id) {
+                            this.componentData.splice(index, 1)
+                        }
+                    })
+                }
+            }
+
             this.priceStatusIndex = index
             this.$store.commit('setPriceStatusAndControlRelevancy', {
                 priceStatusIndex: `priceStatus${index}`,
                 name: this.curComponent.style.name
             })
+
+            this.$set(this.priceStatusList[index]['style'], 'left', this.curComponent.style.left)
+            this.$set(this.priceStatusList[index]['style'], 'top', this.curComponent.style.top)
+
+            eventBus.$emit('updateName', this.priceStatusList[index])
+
+            this.$store.commit('addComponent', { component: this.priceStatusList[index] })
+
+            // this.$store.commit('setCurComponent', {
+            //     component: this.priceStatusList[index],
+            //     index: this.componentData.length - 1,
+            // })
+
         },
         handleInput (element, value) {
             // 根据文本组件高度调整 shape 高度

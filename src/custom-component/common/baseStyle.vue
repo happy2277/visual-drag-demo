@@ -24,7 +24,7 @@
                     <span>{{key == 'xOffset' ? 'x轴偏移量：' : 'y轴偏移量：'}}</span>
                     <span v-text="curComponent.style[key]"></span>
                 </template>
-                <el-input v-else-if="inputKey.includes(key)" disabled v-model="curComponent.style[key]" placeholder="请输入" @change="handleNameChange"></el-input>
+                <el-input v-else-if="inputKey.includes(key)" v-model="curComponent.style[key]" placeholder="请输入" @change="handleNameChange"></el-input>
                 <el-input v-else v-model.number="curComponent.style[key]" type="number" @input="handleNumInput" />
             </el-form-item>
         </el-form>

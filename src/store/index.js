@@ -97,6 +97,24 @@ const data = {
         }, // 初始页数据
         isSaveIndexPageData: true, // 是否保存到初始页数据属性
         whichGoodsNum: 0, // 第几个商品
+        priceStatusIndex: { // 各价格状态 索引状态 true->存在价状  false->不存在价状
+            index0: {
+                isChange: false,
+                changeIndex: 0
+            },
+            index1: {
+                isChange: false,
+                changeIndex: 0
+            },
+            index2: {
+                isChange: false,
+                changeIndex: 0
+            },
+            index3: {
+                isChange: false,
+                changeIndex: 0
+            },
+        }
     },
     mutations: {
         ...compose.mutations,

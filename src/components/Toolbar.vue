@@ -193,21 +193,24 @@ export default {
         },
 
         save () {
-            let resData = {
-                // indexPageData: this.$store.state.indexPageData,
-                ...this.$store.state.childPageData
-            }
-            let res = []
+            // indexPageData: this.$store.state.indexPageData,
+            let resData = deepCopy(this.$store.state.childPageData)
+
+            let res = [], flag = true
             for (const key in resData) {
                 if (Object.hasOwnProperty.call(resData, key)) {
                     const element = resData[key];
                     const data = this.handleSave(element)
-                    console.log(data);
-                    res.push(data)
+                    if (data) {
+                        flag = false
+                        res.push(data)
+                    } else {
+                        flag = true
+                        break
+                    }
                 }
             }
-
-            return
+            if (flag) return
             localStorage.setItem('canvasData', JSON.stringify(resData))
             localStorage.setItem('json', JSON.stringify(res))
             // localStorage.setItem('canvasData', JSON.stringify(componentData))
@@ -227,7 +230,7 @@ export default {
                 if (!v.style.name) {
                     flag = true
                     this.$message.warning('存在未填写控件名称的控件，请检查！')
-                    return []
+                    return
                 }
             })
             if (flag) return

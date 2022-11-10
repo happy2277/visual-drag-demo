@@ -88,7 +88,7 @@ export default {
             dialogVisible: false,
             disabled: false,
             fileList: [],
-            numTypeKeys: ['width', 'height', 'borderWidth', 'borderRadius']
+            numTypeKeys: ['width', 'height', 'borderWidth', 'borderRadius', 'fontWeight']
         }
     },
     computed: {
@@ -98,8 +98,6 @@ export default {
         styleKeys () {
             if (this.curComponent) {
                 const curComponentStyleKeys = Object.keys(this.curComponent.style)
-                console.log(this.curComponent.style)
-                console.table(this.styleData.filter(item => curComponentStyleKeys.includes(item.key)))
                 return this.styleData.filter(item => curComponentStyleKeys.includes(item.key))
             }
 
