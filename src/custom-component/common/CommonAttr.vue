@@ -49,7 +49,8 @@
                         <el-input v-else-if="key == 'str'" v-model.trim="curComponent.style[key]" />
                         <!-- 数字输入 -->
                         <template v-else-if="curComponent.type != 'group'">
-                            <el-input v-if="key == 'fontSize'" v-model.number="curComponent.style[key]" type="number" @change="handleFontSizeChange" />
+                            <el-input v-if="key =='fontSize'" v-model.number="curComponent.style[key]" type="number" @change="handleFontSizeChange" />
+                            <el-input v-else-if="numTypeKeys.includes(key)" v-model.number="curComponent.style[key]" type="number" />
                             <el-input v-else v-model.trim="curComponent.style[key]" type="text" @input="handlePriceInput" />
                         </template>
                     </el-form-item>
@@ -87,6 +88,7 @@ export default {
             dialogVisible: false,
             disabled: false,
             fileList: [],
+            numTypeKeys: ['width', 'height', 'borderWidth', 'borderRadius']
         }
     },
     computed: {
@@ -96,6 +98,8 @@ export default {
         styleKeys () {
             if (this.curComponent) {
                 const curComponentStyleKeys = Object.keys(this.curComponent.style)
+                console.log(this.curComponent.style)
+                console.table(this.styleData.filter(item => curComponentStyleKeys.includes(item.key)))
                 return this.styleData.filter(item => curComponentStyleKeys.includes(item.key))
             }
 
@@ -128,7 +132,7 @@ export default {
     },
     methods: {
         handleFontSizeChange (val) {
-            console.log(val)
+            // console.log(val)
             this.curComponent.style.fontSize = val
             eventBus.$emit('isRefreshLongModeText', true, this.curComponent)
         },

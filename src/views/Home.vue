@@ -28,7 +28,7 @@
                     <Editor />
                 </div>
 
-                <!-- <PriceControlStatusList /> -->
+                <PriceControlStatusList />
             </section>
             <!-- 右侧属性列表 -->
             <section class="right">
@@ -75,6 +75,7 @@ export default {
                 imgGpIndex: 0, // 商品图片
                 imgGbpIndex: 0, // 条码图片
                 contGaIndex: 0, // 商品容器
+                contPIndex: 0, // 价格面板容器
                 lineGpulIndex: 0, // 线条
             },
             imgIndex: 0,
@@ -133,7 +134,7 @@ export default {
             // 用保存的数据恢复画布
             const canvasData = JSON.parse(localStorage.getItem('canvasData'))
             if (localStorage.getItem('canvasData')) {
-                setDefaultcomponentData(canvasData.indexPageData.data)
+                setDefaultcomponentData(canvasData[this.childPageIndex].data)
 
                 for (const key in canvasData) {
                     if (Object.hasOwnProperty.call(canvasData, key)) {
@@ -152,7 +153,7 @@ export default {
                     }
                 }
 
-                this.$store.commit('setComponentData', canvasData.indexPageData.data)
+                this.$store.commit('setComponentData', canvasData[this.childPageIndex].data)
             }
 
             if (localStorage.getItem('canvasStyle')) {
@@ -319,6 +320,11 @@ export default {
                     if (component.label == '商品容器') {
                         component.style.name = `ga${this.controlIndex.contGaIndex}`
                         this.controlIndex.contGaIndex++
+                    } else if (component.label == '媒体播放区') {
+                        component.style.name = `video`
+                    } else if (component.label == '价格面板') {
+                        component.style.name = `contPrice${this.controlIndex.contPIndex}`
+                        this.controlIndex.contPIndex++
                     }
                     break
                 default:
@@ -549,7 +555,7 @@ export default {
 
         .center {
             position: relative;
-            padding: 20px 20px;
+            padding: 20px 20px 50px;
             margin-left: 360px;
             margin-right: 288px;
             height: 100%;

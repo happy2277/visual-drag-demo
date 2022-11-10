@@ -1,16 +1,29 @@
 <template>
     <div class="child-page-list">
-        <div v-for="(item, index) in childPageDataList" class="box" :key="index" :class="index == childPageIndex ? 'active' : ''" @click="handleClick(index)">
-            <div class="canvas" :style="{
+        <!--   -->
+        <div class="border-box" v-for="(item, index) in childPageDataList" :class="index == childPageIndex ? 'active' : ''">
+            <span class="num">{{index.replace(/[^\d]/g, "") * 1 + 1}}</span>
+            <div class="cont-box" :style="{
+                    width: canvasStyleData.width * 0.1 + 10 + 'px',
+                    height: canvasStyleData.height * 0.1 + 10 + 'px',
+                }">
+                <div class="box" :key="index" @click="handleClick(index)" :style="{
+                    width: canvasStyleData.width * 0.1 + 'px',
+                    height: canvasStyleData.height * 0.1 + 'px',
+                }">
+                    <div class="canvas" :style="{
                     width: changeStyleWithScale(canvasStyleData.width) + 'px',
                     height: changeStyleWithScale(canvasStyleData.height) + 'px',
                     transform: `scale(0.1)`
                 }">
-                <template>
-                    <ComponentWrapper v-for="(item1, index1) in item.data" :key="index1" :config="item1" />
-                </template>
+                        <template>
+                            <ComponentWrapper v-for="(item1, index1) in item.data" :key="index1" :config="item1" />
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
 </template>         
 
@@ -81,13 +94,14 @@ export default {
             // 1.点击子页面初始化，如果存在数据则反显
             // 2.切换子页面时，首先保存上个子页面的数据，然后如果新子页面存在数据则反显，否则初始化
             if (index == this.childPageIndex) {
-                this.saveData()
-                this.$store.commit('setChildPageIndex', undefined)
-                this.$store.commit('setIsSaveIndexPageData', true)
-                eventBus.$emit('clearCanvas')
-                eventBus.$emit('updateIndex')
-                this.$store.commit('setComponentData', this.indexPageData['data'])
-                this.$store.commit('setCanvasStyle', this.indexPageData['rootData'])
+                return
+                // this.saveData()
+                // this.$store.commit('setChildPageIndex', undefined)
+                // this.$store.commit('setIsSaveIndexPageData', true)
+                // eventBus.$emit('clearCanvas')
+                // eventBus.$emit('updateIndex')
+                // this.$store.commit('setComponentData', this.indexPageData['data'])
+                // this.$store.commit('setCanvasStyle', this.indexPageData['rootData'])
             } else {
                 if (this.isSaveIndexPageData) {
                     this.$store.commit('setIndexPageData', {
@@ -133,28 +147,40 @@ export default {
 <style lang="scss" scoped>
 .child-page-list {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
+    align-content: flex-start;
     height: calc(100vh - 63px);
     overflow: auto;
+    .border-box {
+        display: flex;
+        margin-top: 10px;
+        .num {
+            font-size: 12px;
+        }
+        .cont-box {
+            margin-left: 10px;
+            padding: 3px;
+            border: 1px solid #f0efef;
+            &:hover {
+                // color: #fff;
+                border: 1px solid #aba7a7;
+            }
+        }
+    }
     .box {
         position: relative;
         padding: 2px;
-        margin-top: 10px;
-        flex: 0 0 80px;
-        width: 80%;
-        height: 80px;
+        // flex: 0 0 80px;
+        // width: 80%;
+        // height: 80px;
         text-align: center;
         line-height: 40px;
         font-size: 14px;
         background-color: #fff;
-        border: 1px solid #f2f2f2;
         cursor: pointer;
         overflow: hidden;
-        &:hover {
-            color: #fff;
-            border: 2px solid #dbdbdb;
-        }
 
         .canvas {
             position: absolute;
@@ -164,8 +190,12 @@ export default {
         }
     }
     .active {
-        border: 2px solid;
-        border-color: rgb(0, 128, 255) !important;
+        color: rgb(0, 128, 255);
+        font-weight: bold;
+        .cont-box {
+            border-width: 2px !important;
+            border-color: rgb(0, 128, 255) !important;
+        }
     }
 }
 </style>

@@ -90,7 +90,7 @@ const data = {
             priceStatusIndex: undefined,
             name: undefined
         }, // 价格控件状态与控件绑定
-        childPageIndex: undefined, // 子页面索引
+        childPageIndex: 'childPage0', // 子页面索引
         indexPageData: {
             data: [],
             rootData: {}

@@ -5,12 +5,12 @@
             <el-form-item v-for="(key, index) in Object.keys(options)" :key="index" :label="options[key]">
                 <el-color-picker v-if="isIncludesColor(key)" v-model="canvasStyleData[key]" show-alpha></el-color-picker>
                 <el-slider class="slider" v-else-if="key == 'opacity'" v-model="canvasStyleData[key]" :min="0" :max="1" :step="0.1"></el-slider>
-                <el-input v-else-if="key == 'name'" v-model.trim="canvasStyleData[key]" />
+                <el-input v-else-if="key == 'name'" v-model.trim="canvasStyleData[key]" disabled />
                 <div v-else-if="key == 'size'" class="size-config">
                     <p>大小</p>
-                    <el-input v-model.number="canvasStyleData['width']" type="number" />
+                    <el-input v-model.number="canvasStyleData['width']" type="number" disabled />
                     <span>*</span>
-                    <el-input v-model.number="canvasStyleData['height']" type="number" />
+                    <el-input v-model.number="canvasStyleData['height']" type="number" disabled />
                 </div>
                 <el-input v-else v-model.number="canvasStyleData[key]" type="number" />
             </el-form-item>

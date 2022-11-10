@@ -1,7 +1,7 @@
 <template>
     <div class="rect-shape">
         <!-- :prop-value="element.propValue" -->
-        <v-text :element="element" />
+        <!-- <v-text :element="element" /> -->
     </div>
 </template>
 

@@ -194,7 +194,7 @@ export default {
 
         save () {
             let resData = {
-                indexPageData: this.$store.state.indexPageData,
+                // indexPageData: this.$store.state.indexPageData,
                 ...this.$store.state.childPageData
             }
             let res = []
@@ -202,11 +202,12 @@ export default {
                 if (Object.hasOwnProperty.call(resData, key)) {
                     const element = resData[key];
                     const data = this.handleSave(element)
+                    console.log(data);
                     res.push(data)
                 }
             }
 
-
+            return
             localStorage.setItem('canvasData', JSON.stringify(resData))
             localStorage.setItem('json', JSON.stringify(res))
             // localStorage.setItem('canvasData', JSON.stringify(componentData))
@@ -225,7 +226,8 @@ export default {
             componentData.some(v => {
                 if (!v.style.name) {
                     flag = true
-                    return this.$message.warning('存在未填写控件名称的控件，请检查！')
+                    this.$message.warning('存在未填写控件名称的控件，请检查！')
+                    return []
                 }
             })
             if (flag) return

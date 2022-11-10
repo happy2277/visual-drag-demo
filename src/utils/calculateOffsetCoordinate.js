@@ -10,18 +10,14 @@ export default function calculateOffsetCoordinate (curComponent, isNeedCalcOffse
     let baseComponentData // 对齐组件
     let { left, top, width, height, objAlign, base } = curComponent.style
     // 存在对齐组件
-    if (base) {
+    if (base && base != 'bg_scr') {
         // 如果对齐组件为根容器
-        if (base == 'bg_scr') {
-            baseComponentData = parentRectInfo
-        } else {
-            componentData.forEach(v => {
-                if (v.style.name == base) {
-                    rectInfo = $(`#component${v.id}`).getBoundingClientRect()
-                    baseComponentData = v.style
-                }
-            })
-        }
+        componentData.forEach(v => {
+            if (v.style.name == base) {
+                rectInfo = $(`#component${v.id}`).getBoundingClientRect()
+                baseComponentData = v.style
+            }
+        })
     } else {
         // 否则 对齐根容器
         rectInfo = parentRectInfo
@@ -45,7 +41,7 @@ export default function calculateOffsetCoordinate (curComponent, isNeedCalcOffse
         baseTop, // 对齐组件top
         baseWidth, // 对齐组件width
         baseHeight // 对齐组件height
-    if (base) {
+    if (base && base != 'bg_scr') {
         baseLeft = baseComponentData.left
         baseTop = baseComponentData.top
         baseWidth = baseComponentData.width
