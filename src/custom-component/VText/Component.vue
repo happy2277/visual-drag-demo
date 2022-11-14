@@ -94,7 +94,7 @@ export default {
             clearInterval(this.timer[this.curComponent?.id])
             const style = this.curComponent?.style || curComponent
             let flag = true
-            if ((style.str != undefined && style.str) || (style.numStr != undefined && style.numStr)) {
+            if ((style?.str != undefined && style?.str) || (style?.numStr != undefined && style?.numStr)) {
                 flag = true
             } else {
                 flag = false

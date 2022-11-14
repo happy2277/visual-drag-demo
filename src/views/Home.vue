@@ -93,7 +93,8 @@ export default {
         'isClickComponent',
         'canvasStyleData',
         'editor',
-        'childPageIndex'
+        'childPageIndex',
+        'priceStatusIndex'
     ]),
     created () {
         this.initChildPageData()
@@ -234,6 +235,7 @@ export default {
             this.updateIndex(G)
             component.style.parent = par
             component.style.base = par
+            console.log(par)
             if (par.startsWith('ga')) {
                 switch (component.type) {
                     case 'label':
@@ -244,12 +246,17 @@ export default {
                         }
                         break;
                     case 'group':
+                        console.log(component.id)
                         this.$set(component.style, 'name', `groupGa${G}`)
-                        component.propValue.map(v => {
-                            v.style.name = v.style.name.replace('G', G)
-                            v.style.parent = par
-                            v.style.base = par
-                            return v
+                        // this.componentData.forEach(v => {
+                        //     if (v.id === component.id) {
+                        //         console.log(v.id, component.id)
+                        //     }
+                        // })
+                        component.propValue.forEach(v => {
+                            this.$set(v.style, 'name', v.style.name.replace('G', G))
+                            this.$set(v.style, 'parent', par)
+                            this.$set(v.style, 'base', par)
                         })
                         break
                     default:
@@ -287,7 +294,6 @@ export default {
         // 控件名称设置
         setName (component, par, G) {
             this.updateIndex(G)
-            console.log(G)
             switch (component.type) {
                 case 'label':
                     if (par.startsWith('ga')) {
@@ -392,15 +398,16 @@ export default {
                             this.controlIndex.lineGpulIndex = item.length
                             break;
                         case 'cont':
-                            let gaArr = []
+                            let gaArr = [], contPriceArr = []
                             item.forEach(v => {
                                 if (v.style.name.startsWith('ga')) {
                                     gaArr.push(v)
-                                } else {
-
+                                } else if (v.style.name.startsWith('contPrice')) {
+                                    contPriceArr.push(v)
                                 }
                             })
                             this.controlIndex.contGaIndex = gaArr.length
+                            this.controlIndex.contPIndex = contPriceArr.length
                             break;
                         case 'img':
                             let gbpArr = [], gpArr = []
@@ -528,7 +535,7 @@ export default {
                     overflow: hidden;
                     ::v-deep .el-collapse-item__wrap {
                         height: 100%;
-                        overflow: auto;
+                        overflow: auto !important;
                     }
                 }
             }

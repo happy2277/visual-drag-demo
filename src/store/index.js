@@ -125,6 +125,11 @@ const data = {
         ...snapshot.mutations,
         ...lock.mutations,
 
+        setPriceStatusIndex (state, { index, isChange, changeIndex }) {
+            Vue.set(state.priceStatusIndex[`index${index}`], 'isChange', isChange)
+            Vue.set(state.priceStatusIndex[`index${index}`], 'changeIndex', changeIndex)
+        },
+
         setIsSaveIndexPageData (state, isSaveIndexPageData) {
             state.isSaveIndexPageData = isSaveIndexPageData
         },

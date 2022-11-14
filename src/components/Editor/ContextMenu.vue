@@ -15,7 +15,7 @@
                 </template>
                 <li v-else @click="unlock">解锁</li>
             </template>
-            <li v-else @click="paste">粘贴</li>
+            <!-- <li v-else @click="paste">粘贴</li> -->
         </ul>
     </div>
 </template>

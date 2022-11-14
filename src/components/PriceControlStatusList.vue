@@ -1,6 +1,6 @@
 <template>
     <div class="price-control-status-list">
-        <div v-for="(item, index) in priceStatusList" class="box" :class="`priceStatus${index}` == priceStatusIndex || (priceStatusAndControlRelevancy.priceStatusIndex && priceStatusAndControlRelevancy.name != null && index == priceStatusAndControlRelevancy.priceStatusIndex) ? 'active' : ''" :key="index" @click="handleClick(index)">
+        <div v-for="(item, index) in priceStatusList" class="box" :class="index == statusIndex? 'active' : ''" :key="index" @click="handleClick(index)">
             {{arr[index].name}}
             <!-- <template v-if="compData.length">
                 <div v-for="(item, index) in compData" :key="item.id" :default-style="item.style" :style="getShapeStyle(item.style)" :active="item.id === (curComponent || {}).id" :element="item" :index="index" :class="{ lock: item.isLock }" class="component">
@@ -20,11 +20,12 @@ import eventBus from '@/utils/eventBus'
 import { divide, im, multiply } from 'mathjs'
 import { deepCopy } from '@/utils/utils'
 import priceStatusList from '@/components/priceControlStatusDataList.js'
+import generateID from '@/utils/generateID'
 
 export default {
     data () {
         return {
-            priceStatusIndex: undefined,
+            statusIndex: undefined,
             arr: [
                 { name: '零售价' },
                 { name: '零售价+原价' },
@@ -32,7 +33,6 @@ export default {
                 { name: '零售价+胖柚价' },
             ],
             priceStatusList
-            // compData: []
         }
     },
     computed: {
@@ -42,25 +42,26 @@ export default {
             'componentData',
             'curComponent',
             'priceStatusAndControlRelevancy',
-            'priceControlStatusData'
+            'priceControlStatusData',
+            'priceStatusIndex'
         ]),
-        compData () {
-            // 关联数据
-            let priceStatusAndControlRelevancy = this.priceStatusAndControlRelevancy
-            // 价格控件状态数据
-            let priceControlStatusData = this.priceControlStatusData
-            const componentData = this.componentData
-            if (priceStatusAndControlRelevancy.priceStatusIndex != null && priceStatusAndControlRelevancy.name != null) {
-                this.priceStatusIndex = priceStatusAndControlRelevancy.priceStatusIndex
-                priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex] = []
-                componentData.forEach(v => {
-                    if (v.style.base == priceStatusAndControlRelevancy.name) {
-                        priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex]['data'].push(v)
-                    }
-                })
-            }
-            return priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex]
-        }
+        // compData () {
+        //     // 关联数据
+        //     let priceStatusAndControlRelevancy = this.priceStatusAndControlRelevancy
+        //     // 价格控件状态数据
+        //     let priceControlStatusData = this.priceControlStatusData
+        //     const componentData = this.componentData
+        //     if (priceStatusAndControlRelevancy.priceStatusIndex != null && priceStatusAndControlRelevancy.name != null) {
+        //         this.statusIndex = priceStatusAndControlRelevancy.priceStatusIndex
+        //         priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex] = []
+        //         componentData.forEach(v => {
+        //             if (v.style.base == priceStatusAndControlRelevancy.name) {
+        //                 priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex]['data'].push(v)
+        //             }
+        //         })
+        //     }
+        //     return priceControlStatusData[priceStatusAndControlRelevancy.priceStatusIndex]
+        // }
     },
     watch: {
         compData: {
@@ -71,15 +72,21 @@ export default {
     },
     created () {
         eventBus.$on('clearPriceStatusChecked', () => {
-            const deepIndex = deepCopy(this.priceStatusIndex)
+            const deepIndex = deepCopy(this.statusIndex)
             for (let i = 0; i < this.componentData.length; i++) {
                 const element = this.componentData[i];
                 if (this.curComponent?.style.name == element.style.name) {
-                    this.priceStatusIndex = deepIndex
+                    this.statusIndex = deepIndex
                     break
                 } else {
-                    this.priceStatusIndex = undefined
+                    this.statusIndex = undefined
                 }
+            }
+        })
+
+        eventBus.$on('setStatusIndex', () => {
+            if (!this.priceStatusIndex[`index${this.statusIndex}`]?.isChange) {
+                this.statusIndex = undefined
             }
         })
     },
@@ -92,51 +99,65 @@ export default {
             return getStyle(style, this.svgFilterAttrs)
         },
         handleClick (index) {
-            if (!this.curComponent) {
+            /*  if (!this.curComponent) {
                 return this.$message.warning('请选择要进行关联的容器控件')
             } else if (this.curComponent.type != 'cont') {
                 return this.$message.warning('请选择容器控件')
-            }
-            if (this.priceStatusIndex == index) return
-            const componentData = deepCopy(this.componentData)
-            // 循环删除价格状态相关控件
-            for (let i = 0; i < componentData.length; i++) {
-                const v = componentData[i];
-                if (v.isPriceStatus) {
-                    this.componentData.forEach((item, index) => {
-                        if (v.id == item.id) {
-                            this.componentData.splice(index, 1)
-                        }
-                    })
-                }
+             } */
+            if (this.statusIndex == index) return
+
+            // 深拷贝价格状态数据，否则使用源数据会导致数据错乱
+            const priceStatusList = deepCopy(this.priceStatusList)
+
+            // 获取价格面板父级数字
+            const contIndex = this.curComponent.style.parent.replace(/[^\d]/g, "")
+
+            // 如果存在已选，则删除
+            // 删除当前商品容器下的所有相关控件
+            const isChange = this.priceStatusIndex[`index${contIndex}`]['isChange']
+            if (isChange) {
+                const componentData = deepCopy(this.componentData)
+                // 循环删除价格状态相关控件
+                componentData.forEach(v => {
+                    // 价格状态控件存在 isPriceStatus  && 父级 == 某个商品容器名
+                    if (v.isPriceStatus && v.style.parent == `ga${contIndex}`) {
+                        this.componentData.forEach((item, index) => {
+                            if (v.id == item.id) {
+                                this.componentData.splice(index, 1)
+                            }
+                        })
+                    }
+                })
             }
 
-            this.priceStatusIndex = index
-            this.$store.commit('setPriceStatusAndControlRelevancy', {
-                priceStatusIndex: `priceStatus${index}`,
-                name: this.curComponent.style.name
+            // 存储面板选择的价格状态索引
+            this.$store.commit('setPriceStatusIndex', {
+                index: contIndex,
+                isChange: true,
+                changeIndex: index
             })
 
-            this.$set(this.priceStatusList[index]['style'], 'left', this.curComponent.style.left)
-            this.$set(this.priceStatusList[index]['style'], 'top', this.curComponent.style.top)
-
-            eventBus.$emit('updateName', this.priceStatusList[index])
-
-            this.$store.commit('addComponent', { component: this.priceStatusList[index] })
-
-            // this.$store.commit('setCurComponent', {
-            //     component: this.priceStatusList[index],
-            //     index: this.componentData.length - 1,
+            this.statusIndex = index
+            // this.$store.commit('setPriceStatusAndControlRelevancy', {
+            //     priceStatusIndex: `priceStatus${index}`,
+            //     name: this.curComponent.style.name
             // })
 
-        },
-        handleInput (element, value) {
-            // 根据文本组件高度调整 shape 高度
-            this.$store.commit('setShapeStyle', { height: this.getTextareaHeight(element, value) })
+            this.$set(priceStatusList[index]['style'], 'left', this.curComponent.style.left)
+            this.$set(priceStatusList[index]['style'], 'top', this.curComponent.style.top)
+            this.$set(priceStatusList[index], 'id', generateID())
+            // 重新赋值id，否则可能导致重复id
+            priceStatusList[index]?.propValue.forEach(v => {
+                this.$set(v, 'id', generateID())
+            })
+
+            eventBus.$emit('updateName', priceStatusList[index])
+
+            this.$store.commit('addComponent', { component: priceStatusList[index] })
         },
         changeComponentsSizeWithScale (scale) {
             const needToChangeAttrs = ['top', 'left', 'width', 'height', 'fontSize']
-            const componentData = this.priceStatusIndex ? this.compData[this.priceStatusIndex] : []
+            const componentData = this.statusIndex ? this.compData[this.statusIndex] : []
             componentData.length && componentData.forEach(component => {
                 Object.keys(component.style).forEach(key => {
                     if (needToChangeAttrs.includes(key)) {

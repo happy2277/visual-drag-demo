@@ -218,6 +218,10 @@ export default {
             this.$store.commit('setCurComponent', { component: this.element, index: this.index })
             if (this.element.isLock) return
 
+            if (this.curComponent.style.name.startsWith('contPrice')) {
+                eventBus.$emit('setStatusIndex')
+            }
+
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
 
             const pos = { ...this.defaultStyle }
@@ -369,7 +373,7 @@ export default {
                 document.removeEventListener('mouseup', up)
                 needSave && this.$store.commit('recordSnapshot')
                 eventBus.$emit('isRefreshLongModeText', true, this.curComponent)
-
+                eventBus.$emit('unmove')
             }
 
             document.addEventListener('mousemove', move)
