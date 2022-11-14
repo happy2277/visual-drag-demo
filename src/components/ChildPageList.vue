@@ -124,7 +124,7 @@ export default {
                 this.$store.commit('setComponentData', this.childPageData[index]['data'])
             } else {
                 eventBus.$emit('clearCanvas')
-                eventBus.$emit('updateIndex')
+                // eventBus.$emit('updateIndex')
                 this.$store.commit('setCanvasStyle', { // 页面全局初始数据
                     name: 'bg_scr',
                     width: 800,

@@ -146,6 +146,8 @@ export default {
             this.$set(priceStatusList[index]['style'], 'left', this.curComponent.style.left)
             this.$set(priceStatusList[index]['style'], 'top', this.curComponent.style.top)
             this.$set(priceStatusList[index], 'id', generateID())
+            this.$set(priceStatusList[index], 'isChange', true)
+            this.$set(priceStatusList[index], 'changeIndex', index)
             // 重新赋值id，否则可能导致重复id
             priceStatusList[index]?.propValue.forEach(v => {
                 this.$set(v, 'id', generateID())
