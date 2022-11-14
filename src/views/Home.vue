@@ -105,13 +105,15 @@ export default {
         eventBus.$on('restore', () => {
             this.restore()
         })
-        eventBus.$on('updateIndex', () => {
+
+        /* eventBus.$on('updateIndex', () => {
             for (const key in this.controlIndex) {
                 if (Object.hasOwnProperty.call(this.controlIndex, key)) {
                     this.controlIndex[key] = 0
                 }
             }
-        })
+        }) */
+
         eventBus.$on('updateName', (component) => {
             if (component.type == 'cont') return
             const par = this.handleGetPar(component) || ''
@@ -199,9 +201,9 @@ export default {
                     if (deepG != G) {
                         this.$store.commit('setWhichGoodsNum', G)
                     }
-                    this.updateIndex(G)
+                    // this.updateIndex(G)
                 } else {
-                    this.updateIndex()
+                    // this.updateIndex()
                 }
                 this.setName(component, par, G)
             } else { // 拖拽组合组件
@@ -232,7 +234,7 @@ export default {
 
         dragUpdate (component, par, G) {
             if (par == component.style.parent) return
-            this.updateIndex(G)
+            // this.updateIndex(G)
             component.style.parent = par
             component.style.base = par
             console.log(par)
@@ -246,13 +248,8 @@ export default {
                         }
                         break;
                     case 'group':
-                        console.log(component.id)
-                        this.$set(component.style, 'name', `groupGa${G}`)
-                        // this.componentData.forEach(v => {
-                        //     if (v.id === component.id) {
-                        //         console.log(v.id, component.id)
-                        //     }
-                        // })
+                        const index = this.getIndex(`contPrice${G}`)
+                        this.$set(component.style, 'name', `groupGa${index}`)
                         component.propValue.forEach(v => {
                             this.$set(v.style, 'name', v.style.name.replace('G', G))
                             this.$set(v.style, 'parent', par)
@@ -271,11 +268,21 @@ export default {
                 // 在同一个商品区域下的数据
                 if (v.style.name.startsWith(`gi`) && key.startsWith((v.style.name.split('_'))[0])) {
                     // 获取控件名称索引
+                    const val = Number((v.style.name.split('_'))[1])
+                    keyArr.push(val)
+                } else if (v.style.name.startsWith(`gu`) && key.startsWith((v.style.name.split('_'))[0])) {
                     const val = (v.style.name.split('_'))[1]
                     keyArr.push(val)
+                } else if (!v.style.name.startsWith(`gi`) && !v.style.name.startsWith(`gu`) && v.style.name.startsWith(key)) {
+                    const val = v.style.name.replace(/[^\d]/g, "")
+                    keyArr.push(val)
                 }
+
             })
-            // 索引值数组排序
+            if (!keyArr.length) {
+                return resIndex = 0
+            }
+
             const sortKeyArr = keyArr.sort((a, b) => a - b)
             // 索引与值不相等 就赋值索引 跳出循环
             for (let i = 0; i < sortKeyArr.length; i++) {
@@ -293,58 +300,50 @@ export default {
 
         // 控件名称设置
         setName (component, par, G) {
-            this.updateIndex(G)
+            // this.updateIndex(G)
+            let index
             switch (component.type) {
                 case 'label':
-                    if (par.startsWith('ga')) {
-                        if (component.label == '商品名称') {
-                            component.style.name = `gn${this.controlIndex.labelGnIndex}`
-                            this.controlIndex.labelGnIndex++
-                        } else if (component.label == '商品附加信息') {
-                            component.style.name = `gi${G}_${this.controlIndex.labelGiIndex}`
-                            this.controlIndex.labelGiIndex++
-                        } else if (component.label == '单位') {
-                            component.style.name = `gu${G}_${this.controlIndex.labelGuIndex}`
-                            this.controlIndex.labelGuIndex++
-                        } else {
-                            component.style.name = `label_price_${this.labelIndex}`
-                        }
+                    if (component.label == '商品名称') {
+                        index = this.getIndex('gn')
+                        component.style.name = `gn${index}`
+                    }
+                    if (component.label == '商品附加信息') {
+                        index = this.getIndex(`gi${G}`)
+                        component.style.name = `gi${G}_${index}`
+                    } else if (component.label == '单位') {
+                        index = this.getIndex(`gu${G}`)
+                        component.style.name = `gu${G}_${index}`
                     }
                     break;
                 case 'img':
-                    if (par.startsWith('ga')) {
-                        if (component.label == '商品图') {
-                            component.style.name = `gp${this.controlIndex.imgGpIndex}`
-                            this.controlIndex.imgGpIndex++
-                        } else if (component.label == '商品一维码') {
-                            component.style.name = `gbp${this.controlIndex.imgGbpIndex}`
-                            this.controlIndex.imgGbpIndex++
-                        }
+                    if (component.label == '商品图') {
+                        index = this.getIndex('gp')
+                        component.style.name = `gp${index}`
+                    } else if (component.label == '商品一维码') {
+                        index = this.getIndex('gbp')
+                        component.style.name = `gbp${index}`
                     }
                     break
                 case 'line':
-                    if (par.startsWith('ga')) {
-                        if (component.label == '线条') {
-                            component.style.name = `gpul${this.controlIndex.lineGpulIndex}`
-                            this.controlIndex.lineGpulIndex++
-                        }
+                    if (component.label == '线条') {
+                        index = this.getIndex('gpul')
+                        component.style.name = `gpul${index}`
                     }
                     break
                 case 'cont':
                     if (component.label == '商品容器') {
-                        component.style.name = `ga${this.controlIndex.contGaIndex}`
-                        this.controlIndex.contGaIndex++
+                        index = this.getIndex('ga')
+                        component.style.name = `ga${index}`
                     } else if (component.label == '媒体播放区') {
                         component.style.name = `video`
                     } else if (component.label == '价格面板') {
-                        component.style.name = `contPrice${this.controlIndex.contPIndex}`
-                        this.controlIndex.contPIndex++
+                        index = this.getIndex('contPrice')
+                        component.style.name = `contPrice${index}`
                     }
                     break
                 case 'group':
-                    if (par.startsWith('ga')) {
-                        this.$set(component.style, 'name', `groupGa${G}`)
-                    }
+                    this.$set(component.style, 'name', `groupGa${G}`)
                     break
                 default:
                     component.style.name = `${component.type}_${this[`${component.type}Index`]}`
@@ -353,7 +352,7 @@ export default {
         },
 
         // 更新控件index
-        updateIndex (G) {
+        /* updateIndex (G) {
             let arrKeyObj = {
                 label: [],
                 img: [],
@@ -426,7 +425,7 @@ export default {
                     }
                 }
             }
-        },
+        }, */
 
         // 获取父级控件名称
         handleGetPar (component) {
@@ -465,18 +464,6 @@ export default {
 
             return par
         },
-
-        // ArrayCallback (arr, label) {
-        //     let ary = []
-        //     arr.forEach(v => {
-        //         if (v.style.name.startsWith('ga')) {
-        //             ary.push(v)
-        //         } else if (v.style.label == label) {
-        //             ary.push(v)
-        //         }
-        //     })
-        //     return ary
-        // },
 
         handleDragOver (e) {
             e.preventDefault()
