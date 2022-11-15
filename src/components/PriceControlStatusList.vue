@@ -84,17 +84,18 @@ export default {
             }
         })
 
-        eventBus.$on('setStatusIndex', () => {
-            if (!this.priceStatusIndex[`index${this.statusIndex}`]?.isChange) {
-                this.statusIndex = undefined
-            }
+        // 先$off解决$on毁掉重复执行
+        eventBus.$off('setStatusIndex').$on('setStatusIndex', () => {
+            this.statusIndex = this.curComponent?.isChange ? this.curComponent.changeIndex : undefined
+
+            // 赋值已存在的状态，解决首次无法替换数据
+            const index = this.curComponent.style.parent.replace(/[^\d]/g, "")
+            this.$set(this.priceStatusIndex[`index${index}`], 'isChange', this.curComponent.isChange)
+            this.$set(this.priceStatusIndex[`index${index}`], 'changeIndex', this.curComponent.changeIndex || 0)
         })
     },
     methods: {
         getShapeStyle,
-        getPriceStatusStyle () {
-
-        },
         getComponentStyle (style) {
             return getStyle(style, this.svgFilterAttrs)
         },
@@ -146,16 +147,18 @@ export default {
             this.$set(priceStatusList[index]['style'], 'left', this.curComponent.style.left)
             this.$set(priceStatusList[index]['style'], 'top', this.curComponent.style.top)
             this.$set(priceStatusList[index], 'id', generateID())
-            this.$set(priceStatusList[index], 'isChange', true)
-            this.$set(priceStatusList[index], 'changeIndex', index)
+            this.$set(this.curComponent, 'isChange', true)
+            this.$set(this.curComponent, 'changeIndex', index)
+
             // 重新赋值id，否则可能导致重复id
             priceStatusList[index]?.propValue.forEach(v => {
                 this.$set(v, 'id', generateID())
             })
 
+            this.$store.commit('addComponent', { component: priceStatusList[index] })
+
             eventBus.$emit('updateName', priceStatusList[index])
 
-            this.$store.commit('addComponent', { component: priceStatusList[index] })
         },
         changeComponentsSizeWithScale (scale) {
             const needToChangeAttrs = ['top', 'left', 'width', 'height', 'fontSize']

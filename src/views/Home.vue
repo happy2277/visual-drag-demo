@@ -28,7 +28,7 @@
                     <Editor />
                 </div>
 
-                <PriceControlStatusList v-if="curComponent?.style.name.startsWith('contPrice')" />
+                <PriceControlStatusList v-show="curComponent?.style.name.startsWith('contPrice')" />
             </section>
             <!-- 右侧属性列表 -->
             <section class="right">
@@ -78,11 +78,6 @@ export default {
                 contPIndex: 0, // 价格面板容器
                 lineGpulIndex: 0, // 线条
             },
-            imgIndex: 0,
-            contIndex: 0,
-            lineIndex: 0,
-            barIndex: 0,
-            groupIndex: 0,
             activeNames: ['1', '2', '3']
         }
     },
@@ -148,9 +143,29 @@ export default {
                             if (v.rootParent) {
                                 data.splice(i, 1)
                             }
-                            this[`${v.type}Index`]++
                         })
                         if (key.startsWith('childPage')) {
+                            data.forEach((v, i) => {
+                                if (v.type == 'group') {
+                                    v.propValue.forEach((item, index) => {
+                                        if (item.isPriceStatus && v.isChange != undefined && v.changeIndex != undefined) {
+                                            this.$store.commit('setPriceStatusIndex', {
+                                                index: index,
+                                                isChange: item.isChange,
+                                                changeIndex: item.changeIndex
+                                            })
+                                        }
+
+                                    })
+                                } else if (v.isPriceStatus && v.isChange != undefined && v.changeIndex != undefined) {
+                                    this.$store.commit('setPriceStatusIndex', {
+                                        index: i,
+                                        isChange: v.isChange,
+                                        changeIndex: v.changeIndex
+                                    })
+                                }
+                            })
+
                             this.$store.commit('setChildPageData', { childPageData: data, rootData, key })
                         }
                     }
@@ -237,7 +252,7 @@ export default {
             // this.updateIndex(G)
             component.style.parent = par
             component.style.base = par
-            console.log(par)
+
             if (par.startsWith('ga')) {
                 switch (component.type) {
                     case 'label':
@@ -248,7 +263,7 @@ export default {
                         }
                         break;
                     case 'group':
-                        const index = this.getIndex(`contPrice${G}`)
+                        const index = this.getIndex(`groupGa`)
                         this.$set(component.style, 'name', `groupGa${index}`)
                         component.propValue.forEach(v => {
                             this.$set(v.style, 'name', v.style.name.replace('G', G))
@@ -270,9 +285,11 @@ export default {
                     // 获取控件名称索引
                     const val = Number((v.style.name.split('_'))[1])
                     keyArr.push(val)
+
                 } else if (v.style.name.startsWith(`gu`) && key.startsWith((v.style.name.split('_'))[0])) {
                     const val = (v.style.name.split('_'))[1]
                     keyArr.push(val)
+
                 } else if (!v.style.name.startsWith(`gi`) && !v.style.name.startsWith(`gu`) && v.style.name.startsWith(key)) {
                     const val = v.style.name.replace(/[^\d]/g, "")
                     keyArr.push(val)
@@ -336,7 +353,8 @@ export default {
                         index = this.getIndex('ga')
                         component.style.name = `ga${index}`
                     } else if (component.label == '媒体播放区') {
-                        component.style.name = `video`
+                        index = this.getIndex('video')
+                        component.style.name = `video${index}`
                     } else if (component.label == '价格面板') {
                         index = this.getIndex('contPrice')
                         component.style.name = `contPrice${index}`
@@ -347,6 +365,7 @@ export default {
                     break
                 default:
                     component.style.name = `${component.type}_${this[`${component.type}Index`]}`
+                    console.log(1111)
                     break;
             }
         },
