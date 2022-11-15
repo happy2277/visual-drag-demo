@@ -25,7 +25,7 @@
             <!-- 中间画布 -->
             <section class="center" :style="{paddingBottom: curComponent?.style.name.startsWith('contPrice') ? '50px':'20px'}">
                 <div class="content" @drop="handleDrop" @dragover="handleDragOver" @mousedown="handleMouseDown" @mouseup="deselectCurComponent">
-                    <Editor />
+                    <Editor ref="editor" />
                 </div>
 
                 <PriceControlStatusList v-show="curComponent?.style.name.startsWith('contPrice')" />
@@ -110,10 +110,11 @@ export default {
         }) */
 
         eventBus.$on('updateName', (component) => {
-            if (component.type == 'cont') return
-            const par = this.handleGetPar(component) || ''
-            const deepG = par.replace(/[^\d]/g, "") || this.$store.state.whichGoodsNum
-            this.dragUpdate(component, par, deepG)
+            if (component.type != 'cont' || (component.type == 'cont' && component.style.name.startsWith('contPrice'))) {
+                const par = this.handleGetPar(component) || ''
+                const deepG = par.replace(/[^\d]/g, "") || this.$store.state.whichGoodsNum
+                this.dragUpdate(component, par, deepG)
+            }
         })
     },
     methods: {
@@ -250,6 +251,7 @@ export default {
         dragUpdate (component, par, G) {
             if (par == component.style.parent) return
             // this.updateIndex(G)
+            console.log(par);
             component.style.parent = par
             component.style.base = par
 
@@ -494,6 +496,8 @@ export default {
             e.stopPropagation()
             this.$store.commit('setClickComponentStatus', false)
             this.$store.commit('setInEditorStatus', true)
+
+            this.$refs.editor.handleMouseDown(e)
         },
 
         deselectCurComponent (e) {

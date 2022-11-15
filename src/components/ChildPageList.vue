@@ -31,7 +31,7 @@
 import { mapState } from 'vuex'
 import eventBus from '@/utils/eventBus'
 import ComponentWrapper from './Editor/ComponentWrapper'
-import { deepCopy } from '@/utils/utils'
+import { deepCopy, $ } from '@/utils/utils'
 import { getStyle, getCanvasStyle } from '@/utils/style'
 import { changeStyleWithScale } from '@/utils/translate'
 
@@ -116,6 +116,10 @@ export default {
                 this.initChildPage(index)
                 this.$store.commit('setChildPageIndex', index)
             }
+
+            // 滚动条回顶
+            $('.content').scrollTop = 0
+
         },
         // 初始化子页面数据
         initChildPage (index) {

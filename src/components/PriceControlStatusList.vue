@@ -105,6 +105,11 @@ export default {
             } else if (this.curComponent.type != 'cont') {
                 return this.$message.warning('请选择容器控件')
              } */
+
+            if (!this.curComponent.style.parent.startsWith('ga')) {
+                return this.$message.warning('该容器必须在商品容器中，请放入后再选择！')
+            }
+
             if (this.statusIndex == index) return
 
             // 深拷贝价格状态数据，否则使用源数据会导致数据错乱

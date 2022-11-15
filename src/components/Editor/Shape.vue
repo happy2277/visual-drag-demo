@@ -218,7 +218,7 @@ export default {
             this.$store.commit('setCurComponent', { component: this.element, index: this.index })
             if (this.element.isLock) return
 
-            if (this.curComponent.style.name.startsWith('contPrice')) {
+            if (this.curComponent.style.name.startsWith('contPrice') && this.curComponent.style.parent.startsWith('ga')) {
                 eventBus.$emit('setStatusIndex')
             }
 
@@ -270,7 +270,9 @@ export default {
                             contPriceObj = v
                         }
                     })
-                    this.scopeLimitation({ pos, contPriceObj })
+                    if (contPriceObj) {
+                        this.scopeLimitation({ pos, contPriceObj })
+                    }
                 }
             }
 
