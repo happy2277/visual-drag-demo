@@ -220,7 +220,7 @@ export default {
                 } else {
                     // this.updateIndex()
                 }
-                this.setName(component, par, G)
+                this.setName(component, G)
             } else { // 拖拽组合组件
                 component = deepCopy(this.componentTempData[index])
                 component.style.top = y
@@ -274,6 +274,7 @@ export default {
                     default:
                         break;
                 }
+                // this.setName(component, G)
             }
         },
         // 获取索引 赋值给名称
@@ -316,7 +317,7 @@ export default {
         },
 
         // 控件名称设置
-        setName (component, par, G) {
+        setName (component, G) {
             // this.updateIndex(G)
             let index
             switch (component.type) {

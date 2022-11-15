@@ -14,7 +14,7 @@ import { mapState } from 'vuex'
 import calculateComponentPositonAndSize from '@/utils/calculateComponentPositonAndSize'
 import calculateOffsetCoordinate from '@/utils/calculateOffsetCoordinate'
 import { mod360 } from '@/utils/translate'
-import { isPreventDrop } from '@/utils/utils'
+import { isPreventDrop, $ } from '@/utils/utils'
 
 export default {
     props: {
@@ -262,6 +262,16 @@ export default {
 
                 })
 
+                // 价格范围限制
+                let contPriceObj
+                if (this.element.isPriceStatus) {
+                    this.componentData.forEach(v => {
+                        if (v.style.name.startsWith('contPrice') && pos.parent == v.style.parent) {
+                            contPriceObj = v
+                        }
+                    })
+                    this.scopeLimitation({ pos, contPriceObj })
+                }
             }
 
             const up = () => {
@@ -277,6 +287,32 @@ export default {
 
             document.addEventListener('mousemove', move)
             document.addEventListener('mouseup', up)
+        },
+
+        // 价格状态范围限制
+        scopeLimitation ({ pos, contPriceObj }) {
+            const contPriceStyle = { ...contPriceObj.style }
+
+            // 左侧
+            if (pos.left <= contPriceStyle.left) {
+                this.$set(this.defaultStyle, 'left', contPriceStyle.left)
+            }
+            // 上
+            if (pos.top <= contPriceStyle.top) {
+                this.$set(this.defaultStyle, 'top', contPriceStyle.top)
+            }
+            // 下
+            const posBottom = pos.top + pos.height
+            const contPriceBottom = contPriceStyle.top + contPriceStyle.height
+            if (posBottom >= contPriceBottom) {
+                this.$set(this.defaultStyle, 'top', contPriceBottom - pos.height)
+            }
+            // 右
+            const posRight = pos.left + pos.width
+            const contPriceRight = contPriceStyle.left + contPriceStyle.width
+            if (posRight >= contPriceRight) {
+                this.$set(this.defaultStyle, 'left', contPriceRight - pos.width)
+            }
         },
 
         selectCurComponent (e) {
@@ -365,6 +401,7 @@ export default {
                     // curX - startX > 0 true 表示向右移动 false 表示向左移动
                     eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
 
+
                 })
             }
 
@@ -391,6 +428,7 @@ export default {
 
             return false
         },
+
     },
 }
 </script>
