@@ -2,7 +2,7 @@
     <div class="attr-container">
         <p class="title">根容器属性</p>
         <el-form style="padding: 20px;" label-position="left" label-width="80px">
-            <el-form-item v-for="(key, index) in Object.keys(options)" :key="index" :label="options[key]">
+            <el-form-item v-for="(key, index) in Object.keys(options)" :key="index" :label="options[key]" :style="{marginBottom: `10px`}">
                 <el-color-picker v-if="isIncludesColor(key)" v-model="canvasStyleData[key]" show-alpha></el-color-picker>
                 <el-slider class="slider" v-else-if="key == 'opacity'" v-model="canvasStyleData[key]" :min="0" :max="1" :step="0.1"></el-slider>
                 <el-input v-else-if="key == 'name'" v-model.trim="canvasStyleData[key]" disabled />

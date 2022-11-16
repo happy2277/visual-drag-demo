@@ -198,6 +198,8 @@ const data = {
         setCurComponent (state, { component, index }) {
             state.curComponent = component
             state.curComponentIndex = index
+
+            // 获取上层options
             state.componentParents = [{ label: 'bg_scr', value: 'bg_scr' }]
             const componentData = [...state.componentData]
             componentData.length && componentData.forEach(v => {
@@ -235,6 +237,8 @@ const data = {
             } else {
                 state.componentData.push(component)
             }
+
+            // 获取上层options
             state.componentParents = [{ label: 'bg_scr', value: 'bg_scr' }]
             const componentData = [...state.componentData]
             componentData.length && componentData.forEach(v => {

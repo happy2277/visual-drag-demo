@@ -2,7 +2,7 @@
     <el-collapse-item title="基本" name="base" class="base-container">
         <!--  label-position="right" label-width="120px" -->
         <el-form label-position="left" label-width="80px">
-            <el-form-item v-for="({ key, label }, index) in baseStyleData" :key="index" :label="label">
+            <el-form-item v-for="({ key, label }, index) in baseStyleData" :key="index" :label="label" :style="{marginBottom: `10px`}">
                 <template v-if="selectKey.includes(key)">
                     <el-select v-if="key == 'parent'" v-model="curComponent.style[key]" clearable placeholder="请选择" @change="handleParentChange" @clear="handleClear">
                         <el-option v-for="(item, i) in parentOptions" :key="item.value" :value="item.value" :label="item.label"></el-option>

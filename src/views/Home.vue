@@ -140,13 +140,14 @@ export default {
                         const item = canvasData[key]
                         const data = item.data;
                         const rootData = item.rootData
-                        data.forEach((v, i) => {
-                            if (v.rootParent) {
-                                data.splice(i, 1)
-                            }
-                        })
+
+                        // 删除根容器
+                        data.splice(0, 1)
+
+                        // 子页面数据
                         if (key.startsWith('childPage')) {
                             data.forEach((v, i) => {
+                                // 组合情况
                                 if (v.type == 'group') {
                                     v.propValue.forEach((item, index) => {
                                         if (item.isPriceStatus && v.isChange != undefined && v.changeIndex != undefined) {
@@ -158,7 +159,7 @@ export default {
                                         }
 
                                     })
-                                } else if (v.isPriceStatus && v.isChange != undefined && v.changeIndex != undefined) {
+                                } else if (v.isPriceStatus && v.isChange != undefined && v.changeIndex != undefined) { // 价格状态 && 已选择 && 选择索引
                                     this.$store.commit('setPriceStatusIndex', {
                                         index: i,
                                         isChange: v.isChange,

@@ -115,6 +115,8 @@ export default {
                 }
                 this.initChildPage(index)
                 this.$store.commit('setChildPageIndex', index)
+
+                this.$store.commit('setCurComponent', { compoennt: null })
             }
 
             // 滚动条回顶

@@ -4,7 +4,7 @@
             <BaseStyle ref="baseStyle"></BaseStyle>
             <el-collapse-item title="样式" name="style">
                 <el-form label-position="left" label-width="90px">
-                    <el-form-item v-for="({ key, label }, index) in styleKeys" :key="index" :label="showLabel({key, label})" :style="{'margin-bottom': showLabel({key, label}) == '' || label == ''? 0 : `18px` }">
+                    <el-form-item v-for="({ key, label }, index) in styleKeys" :key="index" :label="showLabel({key, label})" :style="{'margin-bottom': showLabel({key, label}) == '' || label == ''? 0 : `10px` }">
                         <!-- 颜色 -->
                         <el-color-picker v-if="isIncludesColor(key)" v-model="curComponent.style[key]" show-alpha></el-color-picker>
                         <!-- 选择 -->
