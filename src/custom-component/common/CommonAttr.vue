@@ -3,7 +3,7 @@
         <el-collapse v-model="activeName" @change="onChange">
             <BaseStyle ref="baseStyle"></BaseStyle>
             <el-collapse-item title="样式" name="style">
-                <el-form>
+                <el-form label-position="left" label-width="90px">
                     <el-form-item v-for="({ key, label }, index) in styleKeys" :key="index" :label="showLabel({key, label})" :style="{'margin-bottom': showLabel({key, label}) == '' || label == ''? 0 : `18px` }">
                         <!-- 颜色 -->
                         <el-color-picker v-if="isIncludesColor(key)" v-model="curComponent.style[key]" show-alpha></el-color-picker>
@@ -20,7 +20,11 @@
                             </el-select>
                         </template>
                         <!-- 滑块 -->
-                        <el-slider class="slider" v-else-if="sliderKey.includes(key)" v-model="curComponent.style[key]" :min="0" :max="key == 'opacity' ? 1 : 100" :step="key == 'opacity' ? 0.1 : 1"></el-slider>
+                        <template v-else-if="sliderKey.includes(key)">
+                            <el-slider class="slider" v-model="curComponent.style[key]" :min="sliderMin(key)" :max="sliderMax(key)" :step="sliderStep(key)" :show-tooltip="false"></el-slider>
+                            <span class="slider-num">{{curComponent.style[key]}}</span>
+                        </template>
+                        <!-- <el-slider class="slider" v-else-if="sliderKey.includes(key)" v-model="curComponent.style[key]" :min="0" :max="key == 'opacity' ? 1 : 100" :step="key == 'opacity' ? 0.1 : 1"></el-slider> -->
                         <!-- 上传图片 -->
                         <template v-else-if="key == 'url'">
                             <el-upload v-show="!curComponent.propValue.url" action="#" list-type="picture-card" :auto-upload="false" :file-list="fileList" :on-change="handleUploadChange">
@@ -82,8 +86,8 @@ export default {
             controlAlignmentOptions,
             longModeOptions,
             selectKey,
-            activeName: 'base',
-            sliderKey: ['opacity', 'percentage'],
+            activeName: ['base', 'style'],
+            sliderKey: ['opacity', 'percentage', 'fontSize', 'borderWidth', 'fontWeight', 'borderRadius'],
             dialogImageUrl: '',
             dialogVisible: false,
             disabled: false,
@@ -154,6 +158,56 @@ export default {
 
         handlePriceInput (val) {
             this.curComponent.style.numStr = val.replace(/[^\d^\.]/g, '')
+        },
+
+        sliderMin (key) {
+            let res = 0
+            switch (key) {
+                case 'fontSize':
+                    res = 12
+                    break;
+                case 'fontWeight':
+                    res = 100
+                    break;
+                default:
+                    break;
+            }
+
+            return res
+        },
+
+        sliderMax (key) {
+            let res = 0
+            switch (key) {
+                case 'opacity':
+                    res = 1
+                    break;
+                case 'fontWeight':
+                    res = 900
+                    break;
+                default:
+                    res = 100
+                    break;
+            }
+
+            return res
+        },
+
+        sliderStep (key) {
+            let res = 0
+            switch (key) {
+                case 'opacity':
+                    res = 0.1
+                    break;
+                case 'fontWeight':
+                    res = 100
+                    break;
+                default:
+                    res = 1
+                    break;
+            }
+
+            return res
         },
 
         onChange () {
@@ -232,7 +286,13 @@ export default {
         padding: 0 10px;
     }
     .slider {
-        margin-top: 20px;
+        width: 75%;
+        // margin-top: 20px;
+    }
+    .slider-num {
+        position: absolute;
+        right: 0;
+        top: 3px;
     }
 }
 </style>

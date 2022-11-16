@@ -1,13 +1,13 @@
 import { exp } from "mathjs"
 export const baseStyleData = [
-    { key: 'parent', label: '上级控件（默认根容器）' },
-    { key: 'name', label: '控件名称（唯一）' },
+    { key: 'parent', label: '上层控件' },
+    { key: 'name', label: '名称' },
     { key: 'base', label: '对齐控件' },
-    { key: 'objAlign', label: '控件对齐方式' },
+    { key: 'objAlign', label: '对齐方式' },
     { key: 'left', label: 'x 坐标' },
     { key: 'top', label: 'y 坐标' },
-    { key: 'xOffset', label: '' },
-    { key: 'yOffset', label: '' },
+    // { key: 'xOffset', label: '' },
+    // { key: 'yOffset', label: '' },
 ]
 
 export const styleData = [

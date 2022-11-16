@@ -198,8 +198,9 @@ const data = {
         setCurComponent (state, { component, index }) {
             state.curComponent = component
             state.curComponentIndex = index
-            state.componentParents = []
-            state.componentData.length && state.componentData.forEach(v => {
+            state.componentParents = [{ label: 'bg_scr', value: 'bg_scr' }]
+            const componentData = [...state.componentData]
+            componentData.length && componentData.forEach(v => {
                 if (component?.id != v?.id && v.style.parent != component?.name && v.style.name) {
                     state.componentParents.push({
                         label: v.style.name,
@@ -234,8 +235,9 @@ const data = {
             } else {
                 state.componentData.push(component)
             }
-            state.componentParents = []
-            state.componentData.length && state.componentData.forEach(v => {
+            state.componentParents = [{ label: 'bg_scr', value: 'bg_scr' }]
+            const componentData = [...state.componentData]
+            componentData.length && componentData.forEach(v => {
                 if (component?.id != v.id && v.style.name) {
                     state.componentParents.push({
                         label: v.style.name,
