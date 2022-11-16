@@ -11,7 +11,7 @@
             <el-button style="margin-left: 10px;" @click="preview(false)">预览</el-button>
             <el-button @click="handleConfirm">保存</el-button>
             <el-button @click="saveTemp">保存为组合模板</el-button>
-            <el-button @click="clearCanvas">清空画布</el-button>
+            <el-button @click="handleClearCanvas">清空画布</el-button>
             <el-button :disabled="!areaData.components.length" @click="compose">组合</el-button>
             <el-button :disabled="!curComponent || curComponent.isLock || curComponent.component != 'Group'" @click="decompose">
                 拆分
@@ -378,7 +378,7 @@ export default {
             }
             return obj
         },
-
+        // 获取颜色rgba值
         getColorObj (colorVal) {
             let obj = {}
             obj.r = colorVal[0]
@@ -387,10 +387,11 @@ export default {
             obj.a = colorVal[3]
             return obj
         },
+        // 颜色值计算
         colorCalc ({ r, g, b, a }) {
             return a * 255 * 256 * 256 * 256 + r * 256 * 256 + g * 256 + b * 1
         },
-
+        // 保存组合
         saveTemp () {
             const componentData = deepCopy(this.componentData)
             let flag = false
@@ -434,12 +435,25 @@ export default {
             }
         },
 
+        // 清空画布
         clearCanvas () {
             this.$store.commit('setCurComponent', { component: null, index: null })
             this.$store.commit('setComponentData', [])
             this.$store.commit('recordSnapshot')
         },
 
+        // 清空画布 并清空子页面数据
+        handleClearCanvas () {
+            this.clearCanvas()
+
+            this.$store.commit('setChildPageData', {
+                childPageData: {},
+                rootData: this.canvasStyleData,
+                key: this.$store.state.childPageIndex
+            })
+        },
+
+        // 预览关闭
         handlePreviewChange () {
             this.isShowPreview = false
             this.$store.commit('setEditMode', 'edit')

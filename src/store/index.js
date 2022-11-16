@@ -165,7 +165,7 @@ const data = {
         },
 
         setChildPageData (state, { childPageData, rootData, key }) {
-            if (Object.keys(childPageData).length && key) {
+            if (childPageData != undefined && key) {
                 Vue.set(state.childPageData[key], 'data', childPageData)
                 Vue.set(state.childPageData[key], 'rootData', rootData)
             }
