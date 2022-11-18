@@ -398,7 +398,7 @@ export default {
 
         // name赋值
         setNameVal (component, val) {
-            this.$set(component, 'name', val)
+            this.$set(component.style, 'name', val)
         },
 
         // 更新控件index
