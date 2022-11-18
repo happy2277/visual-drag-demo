@@ -71,8 +71,9 @@ export default {
         }
     },
     created () {
-        eventBus.$on('clearPriceStatusChecked', () => {
-            const deepIndex = deepCopy(this.statusIndex)
+        eventBus.$off('clearPriceStatusChecked').$on('clearPriceStatusChecked', (isNew) => {
+            const deepIndex = isNew ? undefined : deepCopy(this.statusIndex)
+
             for (let i = 0; i < this.componentData.length; i++) {
                 const element = this.componentData[i];
                 if (this.curComponent?.style.name == element.style.name) {
@@ -84,7 +85,7 @@ export default {
             }
         })
 
-        // 先$off解决$on毁掉重复执行
+        // 先$off解决$on回调重复执行
         eventBus.$off('setStatusIndex').$on('setStatusIndex', () => {
             this.statusIndex = this.curComponent?.isChange ? this.curComponent.changeIndex : undefined
 
@@ -151,6 +152,7 @@ export default {
 
             this.$set(priceStatusList[index]['style'], 'left', this.curComponent.style.left)
             this.$set(priceStatusList[index]['style'], 'top', this.curComponent.style.top)
+            this.$set(priceStatusList[index], 'contPriceName', this.curComponent.style.name)
             this.$set(priceStatusList[index], 'id', generateID())
             this.$set(this.curComponent, 'isChange', true)
             this.$set(this.curComponent, 'changeIndex', index)
@@ -158,6 +160,7 @@ export default {
             // 重新赋值id，否则可能导致重复id
             priceStatusList[index]?.propValue.forEach(v => {
                 this.$set(v, 'id', generateID())
+                this.$set(v, 'contPriceName', this.curComponent.style.name)
             })
 
             this.$store.commit('addComponent', { component: priceStatusList[index] })

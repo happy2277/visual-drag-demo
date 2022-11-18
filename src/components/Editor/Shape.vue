@@ -215,11 +215,16 @@ export default {
             }
 
             e.stopPropagation()
+
             this.$store.commit('setCurComponent', { component: this.element, index: this.index })
+            // 锁定
             if (this.element.isLock) return
 
             if (this.curComponent.style.name.startsWith('contPrice') && this.curComponent.style.parent.startsWith('ga')) {
                 eventBus.$emit('setStatusIndex')
+            }
+            if (this.curComponent.style.name.startsWith('contPrice') && !this.curComponent.style.parent.startsWith('ga')) {
+                this.$store.commit('setCurComponent', { component: this.element, index: this.index, isNew: true })
             }
 
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
@@ -262,21 +267,22 @@ export default {
 
                 })
 
-                // 价格范围限制
-                let contPriceObj
-                if (this.element.isPriceStatus) {
+                // 范围限制
+                if (this.element.isPriceStatus || pos.name.startsWith('contPrice')) {
                     this.componentData.forEach(v => {
+                        // 价格状态控件禁止超出价格面板容器
                         if (v.style.name.startsWith('contPrice') && pos.parent == v.style.parent) {
-                            contPriceObj = v
+                            this.scopeLimitation(pos, v)
+                        }
+                        // 价格面板容器禁止超出商品容器
+                        if (pos.name.startsWith('contPrice') && pos.parent == v.style.name) {
+                            this.scopeLimitation(pos, v)
                         }
                     })
-                    if (contPriceObj) {
-                        this.scopeLimitation({ pos, contPriceObj })
-                    }
                 }
             }
 
-            const up = () => {
+            const up = (e) => {
                 hasMove && this.$store.commit('recordSnapshot')
                 // 触发元素停止移动事件，用于隐藏标线
                 eventBus.$emit('unmove')
@@ -285,14 +291,62 @@ export default {
 
                 eventBus.$emit('updateName', this.curComponent)
 
+                if (this.element.type == 'cont' && this.element.style.name.startsWith('contPrice')) {
+                    const curX = e.clientX
+                    const curY = e.clientY
+
+                    this.updateChildPageParent(curY - startY > 0, curX - startX > 0)
+
+                    // this.onlyOneContPrice(startTop, startLeft)
+                }
+
             }
 
             document.addEventListener('mousemove', move)
             document.addEventListener('mouseup', up)
         },
 
-        // 价格状态范围限制
-        scopeLimitation ({ pos, contPriceObj }) {
+        // 限制一个商品容器只能放置一个价格面板容器，当多出时返回到开始拖动位置
+        onlyOneContPrice (startTop, startLeft) {
+            this.componentData.forEach(v => {
+                if (v.style.name.startsWith('contPrice') && v.style.parent.startsWith('ga') && this.defaultStyle.parent == v.style.parent) {
+                    this.defaultStyle.top = startTop
+                    this.defaultStyle.left = startLeft
+                    eventBus.$emit('updateName', this.curComponent)
+                    this.$message.warning('商品容器内只能有一个价格面板')
+                }
+            })
+        },
+
+        // 移动价格面板时，更新
+        updateChildPageParent (isDownShift, isRightShift) {
+            const curStyle = this.element.style
+            this.componentData.forEach(v => {
+                if (v.isPriceStatus && v.style.parent == curStyle.parent) {
+                    // 是否向下移
+                    if (isDownShift) {
+                        const compPosition = v.style.top + v.style.height
+                        if (compPosition <= curStyle.top) {
+
+                        }
+                    } else if (!isDownShift) {
+
+                    }
+
+                    // 是否向右移
+                    if (isRightShift) {
+
+                    } else if (!isRightShift) {
+
+                    }
+
+                }
+            })
+
+        },
+
+        // 范围限制
+        scopeLimitation (pos, contPriceObj) {
             const contPriceStyle = { ...contPriceObj.style }
 
             // 左侧

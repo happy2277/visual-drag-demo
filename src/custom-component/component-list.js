@@ -59,7 +59,7 @@ const list = [
             // color: '',
             borderColor: 'rgba(0, 0, 0, 0)',
             borderWidth: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0)',
+            backgroundColor: 'rgba(170, 66, 66, 0.78)',
             borderStyle: 'solid',
             borderRadius: 0,
             // verticalAlign: 'middle',

@@ -116,6 +116,11 @@ export default {
                 this.dragUpdate(component, par, deepG)
             }
         })
+
+        eventBus.$off('updateParent').$on('updateParent', (component) => {
+            const par = this.handleGetPar(component) || ''
+            this.updateParent(component, par)
+        })
     },
     methods: {
         initChildPageData () {
@@ -128,6 +133,7 @@ export default {
                 this.$set(data, v, { data: [], rootData: [] })
             })
             this.$store.commit('setInitChildPageData', data)
+
         },
         restore () {
             // 用保存的数据恢复画布
@@ -145,31 +151,33 @@ export default {
                         data.splice(0, 1)
 
                         // 子页面数据
-                        if (key.startsWith('childPage')) {
-                            data.forEach((v, i) => {
-                                // 组合情况
-                                if (v.type == 'group') {
-                                    v.propValue.forEach((item, index) => {
-                                        if (item.isPriceStatus && v.isChange != undefined && v.changeIndex != undefined) {
-                                            this.$store.commit('setPriceStatusIndex', {
-                                                index: index,
-                                                isChange: item.isChange,
-                                                changeIndex: item.changeIndex
-                                            })
-                                        }
+                        // if (key.startsWith('childPage')) {
+                        // data.forEach((v, i) => {
+                        //     // 组合情况
+                        //     if (v.type == 'group') {
+                        //         v.propValue.forEach((item, index) => {
+                        //             if (v.isChange != undefined && v.changeIndex != undefined) {
+                        //                 console.log(222)
+                        //                 this.$store.commit('setPriceStatusIndex', {
+                        //                     index: index,
+                        //                     isChange: item.isChange,
+                        //                     changeIndex: item.changeIndex
+                        //                 })
+                        //             }
 
-                                    })
-                                } else if (v.isPriceStatus && v.isChange != undefined && v.changeIndex != undefined) { // 价格状态 && 已选择 && 选择索引
-                                    this.$store.commit('setPriceStatusIndex', {
-                                        index: i,
-                                        isChange: v.isChange,
-                                        changeIndex: v.changeIndex
-                                    })
-                                }
-                            })
+                        //         })
+                        //     } else if (v.isChange != undefined && v.changeIndex != undefined) { // 价格状态 && 已选择 && 选择索引
+                        //         console.log(v)
+                        //         this.$store.commit('setPriceStatusIndex', {
+                        //             index: i,
+                        //             isChange: v.isChange,
+                        //             changeIndex: v.changeIndex
+                        //         })
+                        //     }
+                        // })
 
-                            this.$store.commit('setChildPageData', { childPageData: data, rootData, key })
-                        }
+                        this.$store.commit('setChildPageData', { childPageData: data, rootData, key })
+                        // }
                     }
                 }
 
@@ -236,25 +244,33 @@ export default {
             // 根据画面比例修改组件样式比例 https://github.com/woai3c/visual-drag-demo/issues/91
             changeComponentSizeWithScale(component)
 
-            this.$store.commit('addComponent', { component })
-            this.$store.commit('recordSnapshot')
+            setTimeout(() => {
+                this.$store.commit('addComponent', { component })
+                this.$store.commit('recordSnapshot')
 
-            // 拖拽并选中
-            this.$store.commit('setCurComponent', {
-                component: component,
-                index: this.componentData.length - 1,
-            })
+                // 拖拽并选中
+                this.$store.commit('setCurComponent', {
+                    component: component,
+                    index: this.componentData.length - 1,
+                    isNew: true
+                })
 
-            eventBus.$emit('setOldName', component.style.name)
-            eventBus.$emit('childPageCanvas', this.childPageIndex)
+                eventBus.$emit('setOldName', component.style.name)
+                eventBus.$emit('childPageCanvas', this.childPageIndex)
+            }, 150);
+
+        },
+
+        // 更新父层及对齐控件字段
+        updateParent (component, par) {
+            component.style.parent = par
+            component.style.base = par
         },
 
         dragUpdate (component, par, G) {
             if (par == component.style.parent) return
             // this.updateIndex(G)
-            console.log(par);
-            component.style.parent = par
-            component.style.base = par
+            this.updateParent(component, par)
 
             if (par.startsWith('ga')) {
                 switch (component.type) {

@@ -8,7 +8,7 @@ import layer from './layer'
 import snapshot from './snapshot'
 import lock from './lock'
 import toast from '@/utils/toast'
-import { unique } from '@/utils/utils'
+import { deepCopy, unique } from '@/utils/utils'
 import eventBus from '@/utils/eventBus'
 import decomposeComponent from '@/utils/decomposeComponent'
 
@@ -127,6 +127,7 @@ const data = {
 
         setPriceStatusIndex (state, { index, isChange, changeIndex }) {
             if (index != undefined && isChange != this.undefined && changeIndex != undefined) {
+                console.log(index, isChange, changeIndex)
                 Vue.set(state.priceStatusIndex[`index${index}`], 'isChange', isChange)
                 Vue.set(state.priceStatusIndex[`index${index}`], 'changeIndex', changeIndex)
             }
@@ -195,7 +196,7 @@ const data = {
             state.componentTempData = componentTempData.filter(v => v.type == 'group')
         },
 
-        setCurComponent (state, { component, index }) {
+        setCurComponent (state, { component, index, isNew }) {
             state.curComponent = component
             state.curComponentIndex = index
 
@@ -210,7 +211,14 @@ const data = {
                     })
                 }
             })
-            eventBus.$emit('clearPriceStatusChecked')
+
+            if (component?.style.name.startsWith('contPrice')) {
+                if (isNew) {
+                    eventBus.$emit('clearPriceStatusChecked', true)
+                } else {
+                    eventBus.$emit('clearPriceStatusChecked')
+                }
+            }
         },
 
         setShapeStyle ({ curComponent }, { top, left, width, height, rotate, xOffset, yOffset }) {
@@ -270,6 +278,48 @@ const data = {
             if (/\d/.test(index)) {
                 state.componentData.splice(index, 1)
             }
+
+            // 处理价格状态是否选中
+            Vue.nextTick(() => {
+                let contPriceObj = {}
+                let contPriceKey = []
+                state.componentData.forEach(v => {
+                    if (v.style.name.startsWith('contPrice')) {
+                        contPriceKey.push(v.style.name)
+                    }
+                    if (v['contPriceName']) {
+                        // 判断contPriceObj对象是否存在 v['contPriceName'] 此key
+                        if (Reflect.has(contPriceObj, v['contPriceName'])) {
+                            contPriceObj[v['contPriceName']].push(v)
+                        } else {
+                            contPriceObj[v['contPriceName']] = [v]
+                        }
+                    }
+                })
+
+                if (contPriceKey.length) {
+                    contPriceKey.forEach(v => {
+                        if (!contPriceObj[v]) {
+                            state.componentData.forEach(item => {
+                                // 删除空价格状态数据内的字段
+                                if (item.style.name == v) {
+                                    delete item.isChange
+                                    delete item.changeIndex
+                                }
+                            })
+
+                            // 重置可选的价格状态
+                            this.commit('setPriceStatusIndex', {
+                                index: v.replace(/[^\d]/g, ""),
+                                isChange: false,
+                                changeIndex: 0
+                            })
+                        }
+                    })
+                }
+                console.log(state.priceStatusIndex)
+            })
+
         },
 
         setIsNeedCalcOffset (state, isNeedCalcOffset) {
