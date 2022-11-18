@@ -35,6 +35,7 @@
 import { baseStyleData, controlAlignmentOptions } from '@/utils/attr'
 import calculateOffsetCoordinate from '@/utils/calculateOffsetCoordinate'
 import eventBus from '@/utils/eventBus'
+import { mapState } from 'vuex'
 
 export default {
     data () {
@@ -51,21 +52,13 @@ export default {
         }
     },
     computed: {
-        curComponent () {
-            return this.$store.state.curComponent
-        },
-        componentData () {
-            return this.$store.state.componentData
-        },
-        parentOptions () {
-            return this.$store.state.componentParents
-        },
-        canvasStyleData () {
-            return this.$store.state.canvasStyleData
-        },
-        isNeedCalcOffset () {
-            return this.$store.state.isNeedCalcOffset
-        }
+        ...mapState([
+            'curComponent',
+            'componentData',
+            'parentOptions',
+            'canvasStyleData',
+            'isNeedCalcOffset',
+        ])
     },
     watch: {
         'curComponent': {
@@ -120,21 +113,9 @@ export default {
             }
         },
         handleVisibleChange (val) {
-            // 控件对齐方式选择无改变值下拉框隐藏时
-            // if (!val) {
-            //     if (this.objAlign == this.curComponent.style.objAlign) {
-            //         this.getComponentOption(this.objAlign)
-            //     }
-            // }
         },
         // 控件对齐方式选择
         handleControlChange (val) {
-            // if (!this.parent && !this.base) {
-            //     this.objAlign = ''
-            //     this.curComponent.style['objAlign'] = ''
-            //     this.$message.warning('请先选择父级或需要对齐的控件')
-            //     return
-            // }
             this.objAlign = val
 
             if (val !== '' || val !== null || val !== undefined) {

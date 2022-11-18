@@ -134,6 +134,11 @@ export default {
             })
             this.$store.commit('setInitChildPageData', data)
 
+            // this.$store.commit('setCanvasStyle', {
+            //     ...this.canvasStyleData,
+            //     width: 1080,
+            //     height: 600
+            // })
         },
         restore () {
             // 用保存的数据恢复画布
@@ -256,7 +261,6 @@ export default {
                 })
 
                 eventBus.$emit('setOldName', component.style.name)
-                eventBus.$emit('childPageCanvas', this.childPageIndex)
             }, 150);
 
         },
@@ -278,7 +282,7 @@ export default {
                         let arr = []
                         if (component.label == '商品附加信息') {
                             const index = this.getIndex(`gi${G}`)
-                            component.style.name = `gi${G}_${index}`
+                            this.setNameVal(component, `gi${G}_${index}`)
                         }
                         break;
                     case 'group':
@@ -301,17 +305,19 @@ export default {
             let keyArr = [], resIndex = 0
             this.componentData.forEach(v => {
                 // 在同一个商品区域下的数据
-                if (v.style.name.startsWith(`gi`) && key.startsWith((v.style.name.split('_'))[0])) {
+                const name = v.style.name
+                const nameSplit = name.split('_')
+                if (name.startsWith(`gi`) && key.startsWith((nameSplit)[0])) {
                     // 获取控件名称索引
-                    const val = Number((v.style.name.split('_'))[1])
+                    const val = Number((nameSplit)[1])
                     keyArr.push(val)
 
-                } else if (v.style.name.startsWith(`gu`) && key.startsWith((v.style.name.split('_'))[0])) {
-                    const val = (v.style.name.split('_'))[1]
+                } else if (name.startsWith(`gu`) && key.startsWith((nameSplit)[0])) {
+                    const val = (nameSplit)[1]
                     keyArr.push(val)
 
-                } else if (!v.style.name.startsWith(`gi`) && !v.style.name.startsWith(`gu`) && v.style.name.startsWith(key)) {
-                    const val = v.style.name.replace(/[^\d]/g, "")
+                } else if (!name.startsWith(`gi`) && !name.startsWith(`gu`) && name.startsWith(key)) {
+                    const val = name.replace(/[^\d]/g, "")
                     keyArr.push(val)
                 }
 
@@ -338,46 +344,46 @@ export default {
         // 控件名称设置
         setName (component, G) {
             // this.updateIndex(G)
-            let index
+            let index, label = component.label
             switch (component.type) {
                 case 'label':
-                    if (component.label == '商品名称') {
+                    if (label == '商品名称') {
                         index = this.getIndex('gn')
-                        component.style.name = `gn${index}`
+                        this.setNameVal(component, `gn${index}`)
                     }
-                    if (component.label == '商品附加信息') {
+                    if (label == '商品附加信息') {
                         index = this.getIndex(`gi${G}`)
-                        component.style.name = `gi${G}_${index}`
-                    } else if (component.label == '单位') {
+                        this.setNameVal(component, `gi${G}_${index}`)
+                    } else if (label == '单位') {
                         index = this.getIndex(`gu${G}`)
-                        component.style.name = `gu${G}_${index}`
+                        this.setNameVal(component, `gu${G}_${index}`)
                     }
                     break;
                 case 'img':
-                    if (component.label == '商品图') {
+                    if (label == '商品图') {
                         index = this.getIndex('gp')
-                        component.style.name = `gp${index}`
-                    } else if (component.label == '商品一维码') {
+                        this.setNameVal(component, `gp${index}`)
+                    } else if (label == '商品一维码') {
                         index = this.getIndex('gbp')
-                        component.style.name = `gbp${index}`
+                        this.setNameVal(component, `gbp${index}`)
                     }
                     break
                 case 'line':
-                    if (component.label == '线条') {
+                    if (label == '线条') {
                         index = this.getIndex('gpul')
-                        component.style.name = `gpul${index}`
+                        this.setNameVal(component, `gpul${index}`)
                     }
                     break
                 case 'cont':
-                    if (component.label == '商品容器') {
+                    if (label == '商品容器') {
                         index = this.getIndex('ga')
-                        component.style.name = `ga${index}`
-                    } else if (component.label == '媒体播放区') {
+                        this.setNameVal(component, `ga${index}`)
+                    } else if (label == '媒体播放区') {
                         index = this.getIndex('video')
-                        component.style.name = `video${index}`
-                    } else if (component.label == '价格面板') {
+                        this.setNameVal(component, `video${index}`)
+                    } else if (label == '价格面板') {
                         index = this.getIndex('contPrice')
-                        component.style.name = `contPrice${index}`
+                        this.setNameVal(component, `contPrice${index}`)
                     }
                     break
                 case 'group':
@@ -388,6 +394,11 @@ export default {
                     console.log(1111)
                     break;
             }
+        },
+
+        // name赋值
+        setNameVal (component, val) {
+            this.$set(component, 'name', val)
         },
 
         // 更新控件index

@@ -289,16 +289,17 @@ export default {
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
 
-                eventBus.$emit('updateName', this.curComponent)
 
-                if (this.element.type == 'cont' && this.element.style.name.startsWith('contPrice')) {
+                if (this.element.type == 'cont' && this.defaultStyle.name.startsWith('contPrice')) {
                     const curX = e.clientX
                     const curY = e.clientY
 
                     this.updateChildPageParent(curY - startY > 0, curX - startX > 0)
 
-                    // this.onlyOneContPrice(startTop, startLeft)
+                    this.onlyOneContPrice(startTop, startLeft)
                 }
+
+                eventBus.$emit('updateName', this.curComponent)
 
             }
 
@@ -308,14 +309,18 @@ export default {
 
         // 限制一个商品容器只能放置一个价格面板容器，当多出时返回到开始拖动位置
         onlyOneContPrice (startTop, startLeft) {
-            this.componentData.forEach(v => {
-                if (v.style.name.startsWith('contPrice') && v.style.parent.startsWith('ga') && this.defaultStyle.parent == v.style.parent) {
-                    this.defaultStyle.top = startTop
-                    this.defaultStyle.left = startLeft
-                    eventBus.$emit('updateName', this.curComponent)
-                    this.$message.warning('商品容器内只能有一个价格面板')
-                }
-            })
+
+            const contPrice = this.componentData.find(v => v.style.name.startsWith('contPrice') && v.style.parent.startsWith('ga') && this.defaultStyle.parent == v.style.parent)
+            console.log(contPrice)
+            // this.componentData.forEach(v => {
+            //     if (v.style.name.startsWith('contPrice') && v.style.parent.startsWith('ga') && this.defaultStyle.parent == v.style.parent) {
+            //         console.log(this.defaultStyle.parent, v.style.parent, this.defaultStyle.parent == v.style.parent)
+            //         this.defaultStyle.top = startTop
+            //         this.defaultStyle.left = startLeft
+            //         eventBus.$emit('updateName', this.curComponent)
+            //         this.$message.warning('商品容器内只能有一个价格面板')
+            //     }
+            // })
         },
 
         // 移动价格面板时，更新

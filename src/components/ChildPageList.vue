@@ -66,9 +66,6 @@ export default {
         }
     },
     created () {
-        eventBus.$on('childPageCanvas', (childPageIndex) => {
-            // this.$set(this, 'copyData', deepCopy(this.childPageData[childPageIndex].data))
-        })
 
     },
     methods: {
@@ -95,13 +92,6 @@ export default {
             // 2.切换子页面时，首先保存上个子页面的数据，然后如果新子页面存在数据则反显，否则初始化
             if (index == this.childPageIndex) {
                 return
-                // this.saveData()
-                // this.$store.commit('setChildPageIndex', undefined)
-                // this.$store.commit('setIsSaveIndexPageData', true)
-                // eventBus.$emit('clearCanvas')
-                // eventBus.$emit('updateIndex')
-                // this.$store.commit('setComponentData', this.indexPageData['data'])
-                // this.$store.commit('setCanvasStyle', this.indexPageData['rootData'])
             } else {
                 if (this.isSaveIndexPageData) {
                     this.$store.commit('setIndexPageData', {
@@ -130,20 +120,8 @@ export default {
                 this.$store.commit('setComponentData', this.childPageData[index]['data'])
             } else {
                 eventBus.$emit('clearCanvas')
-                // eventBus.$emit('updateIndex')
-                this.$store.commit('setCanvasStyle', { // 页面全局初始数据
-                    name: 'bg_scr',
-                    width: 800,
-                    height: 1280,
-                    scale: 100,
-                    // color: 'rgba(0, 0, 0, 1)',
-                    backgroundColor: 'rgba(255, 255, 255, 1)',
-                    fontSize: 14,
-                    borderWidth: 0,
-                    borderRadius: 0,
-                    opacity: 1,
-                    rotate: 0
-                })
+
+                this.$store.commit('setCanvasStyle', this.canvasStyleData)
             }
         },
     },

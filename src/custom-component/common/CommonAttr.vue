@@ -96,9 +96,6 @@ export default {
         }
     },
     computed: {
-        parentOptions () {
-            return this.$store.state.componentParents
-        },
         styleKeys () {
             if (this.curComponent) {
                 const curComponentStyleKeys = Object.keys(this.curComponent.style)
@@ -110,14 +107,6 @@ export default {
         curComponent () {
             return this.$store.state.curComponent
         },
-    },
-    watch: {
-        // 'curComponent.style.fontSize': {
-        //     handler (val) {
-        //         this.getTextHeight(this.curComponent)
-        //     },
-        //     deep: true
-        // }
     },
     created () {
         // this.activeName = this.curComponent.collapseName
