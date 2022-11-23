@@ -261,8 +261,26 @@ export default {
                 })
 
                 eventBus.$emit('setOldName', component.style.name)
+
+                this.onlyOneContPrice(component.style.parent)
             }, 150);
 
+        },
+        // 限制一个商品容器只能放置一个价格面板容器，多余删除
+        onlyOneContPrice (par) {
+            let contPriceArr = []
+            this.componentData.forEach(v => {
+                // 价格面板 && 当前控件父层 == 某个父层
+                if (par == v.style.parent && par.startsWith('ga') && v.style.name.startsWith('contPrice')) {
+                    // 获取相同商品容器下的价格面板容器
+                    contPriceArr.push(v)
+                }
+            })
+            // 判断价格面板容器数量是否大于1，超过删除
+            if (contPriceArr.length > 1) {
+                this.$store.commit('deleteComponent', this.componentData.length - 1)
+                this.$message.warning('商品容器内只能有一个价格面板，请重新拖取')
+            }
         },
 
         // 更新父层及对齐控件字段
@@ -270,7 +288,7 @@ export default {
             component.style.parent = par
             component.style.base = par
         },
-
+        // 拖拽控件更新指定数据
         dragUpdate (component, par, G) {
             if (par == component.style.parent) return
             // this.updateIndex(G)
@@ -398,6 +416,7 @@ export default {
 
         // name赋值
         setNameVal (component, val) {
+            console.log(component, val)
             this.$set(component.style, 'name', val)
         },
 
@@ -527,7 +546,7 @@ export default {
 
             this.$refs.editor.handleMouseDown(e)
         },
-
+        // 取消选择当前控件
         deselectCurComponent (e) {
             if (!this.isClickComponent) {
                 this.$store.commit('setCurComponent', { component: null, index: null })

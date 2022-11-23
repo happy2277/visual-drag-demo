@@ -1,6 +1,6 @@
+
 <template>
     <div class="child-page-list">
-        <!--   -->
         <div class="border-box" v-for="(item, index) in childPageDataList" :class="index == childPageIndex ? 'active' : ''">
             <span class="num">{{index.replace(/[^\d]/g, "") * 1 + 1}}</span>
             <div class="cont-box" :style="{
@@ -14,7 +14,8 @@
                     <div class="canvas" :style="{
                     width: changeStyleWithScale(canvasStyleData.width) + 'px',
                     height: changeStyleWithScale(canvasStyleData.height) + 'px',
-                    transform: `scale(0.1)`
+                    transform: `scale(0.1)`,
+                    'background-color': childPageData[index]?.rootData?.backgroundColor
                 }">
                         <template>
                             <ComponentWrapper v-for="(item1, index1) in item.data" :key="index1" :config="item1" />
@@ -54,7 +55,7 @@ export default {
             'deepCanvasStyleData',
         ]),
         childPageDataList () {
-            const childData = deepCopy(this.$store.state.childPageData)
+            const childData = deepCopy(this.childPageData)
             let arr = []
             for (const key in childData) {
                 if (Object.hasOwnProperty.call(childData, key)) {
@@ -155,7 +156,7 @@ export default {
     }
     .box {
         position: relative;
-        padding: 2px;
+        // padding: 2px;
         // flex: 0 0 80px;
         // width: 80%;
         // height: 80px;

@@ -290,16 +290,16 @@ export default {
                 document.removeEventListener('mouseup', up)
 
 
+                eventBus.$emit('updateName', this.curComponent)
+
                 if (this.element.type == 'cont' && this.defaultStyle.name.startsWith('contPrice')) {
                     const curX = e.clientX
                     const curY = e.clientY
 
                     this.updateChildPageParent(curY - startY > 0, curX - startX > 0)
 
-                    this.onlyOneContPrice(startTop, startLeft)
+                    this.onlyOneContPrice(this.curComponent.style.parent, startTop, startLeft)
                 }
-
-                eventBus.$emit('updateName', this.curComponent)
 
             }
 
@@ -308,19 +308,22 @@ export default {
         },
 
         // 限制一个商品容器只能放置一个价格面板容器，当多出时返回到开始拖动位置
-        onlyOneContPrice (startTop, startLeft) {
-
-            const contPrice = this.componentData.find(v => v.style.name.startsWith('contPrice') && v.style.parent.startsWith('ga') && this.defaultStyle.parent == v.style.parent)
-            console.log(contPrice)
-            // this.componentData.forEach(v => {
-            //     if (v.style.name.startsWith('contPrice') && v.style.parent.startsWith('ga') && this.defaultStyle.parent == v.style.parent) {
-            //         console.log(this.defaultStyle.parent, v.style.parent, this.defaultStyle.parent == v.style.parent)
-            //         this.defaultStyle.top = startTop
-            //         this.defaultStyle.left = startLeft
-            //         eventBus.$emit('updateName', this.curComponent)
-            //         this.$message.warning('商品容器内只能有一个价格面板')
-            //     }
-            // })
+        onlyOneContPrice (par, startTop, startLeft) {
+            let contPriceArr = []
+            this.componentData.forEach(v => {
+                // 价格面板 && 当前控件父层 == 某个父层
+                if (par == v.style.parent && v.style.name.startsWith('contPrice')) {
+                    // 获取相同商品容器下的价格面板容器
+                    contPriceArr.push(v)
+                }
+            })
+            // 判断价格面板容器数量是否大于1，超过则将当前的放回原位
+            if (contPriceArr.length > 1) {
+                this.defaultStyle.top = startTop
+                this.defaultStyle.left = startLeft
+                eventBus.$emit('updateName', this.curComponent)
+                this.$message.warning('商品容器内只能有一个价格面板')
+            }
         },
 
         // 移动价格面板时，更新

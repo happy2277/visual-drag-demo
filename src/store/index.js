@@ -279,7 +279,7 @@ const data = {
                 state.componentData.splice(index, 1)
             }
 
-            // 处理价格状态是否选中
+            // 处理价格状态按钮是否选中
             Vue.nextTick(() => {
                 let contPriceObj = {}
                 let contPriceKey = []
