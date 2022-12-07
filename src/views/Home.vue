@@ -60,6 +60,7 @@ import CanvasAttr from '@/components/CanvasAttr'
 import { changeComponentSizeWithScale } from '@/utils/changeComponentsSizeWithScale'
 import { setDefaultcomponentData } from '@/store/snapshot'
 import decomposeComponent from '@/utils/decomposeComponent'
+import { variance, version } from 'mathjs'
 
 export default {
     components: { Editor, ComponentList, Toolbar, RealTimeComponentList, CanvasAttr, ComposeList, ChildPageList, PriceControlStatusList },
@@ -78,7 +79,8 @@ export default {
                 contPIndex: 0, // 价格面板容器
                 lineGpulIndex: 0, // 线条
             },
-            activeNames: ['1', '2', '3']
+            activeNames: ['1', '2', '3'],
+            componentList
         }
     },
     computed: mapState([
@@ -123,6 +125,7 @@ export default {
         })
     },
     methods: {
+        // 初始化子页面数据
         initChildPageData () {
             let keys = []
             let data = {}
@@ -130,7 +133,7 @@ export default {
                 keys.push(`childPage${i}`)
             }
             keys.forEach(v => {
-                this.$set(data, v, { data: [], rootData: [] })
+                this.$set(data, v, { data: [], rootData: {} })
             })
             this.$store.commit('setInitChildPageData', data)
 
@@ -216,6 +219,12 @@ export default {
             if (type == 'single') {
                 // component = deepCopy(componentList[tag][index])
                 component = deepCopy(componentList[index])
+
+                if (component.isOnly != undefined && component.isOnly) {
+                    this.$message.warning('该控件已有，只能存在一个')
+                    return
+                }
+
                 component.style.top = y
                 component.style.left = x
                 component.style.xOffset = x
@@ -226,6 +235,16 @@ export default {
                 component.style.parent = par
                 component.style.base = par
                 const deepG = this.$store.state.whichGoodsNum
+
+                if (component.isOnly != undefined && !component.isOnly) {
+                    this.componentList.forEach(v => {
+                        if (component.label == v.label) {
+                            this.$set(v, 'isOnly', true)
+                            this.$set(component, 'isOnly', true)
+                        }
+                    })
+                }
+
                 if (par.startsWith('ga')) {
                     G = par.replace(/[^\d]/g, "")
                     if (deepG != G) {
@@ -398,7 +417,7 @@ export default {
                         this.setNameVal(component, `ga${index}`)
                     } else if (label == '媒体播放区') {
                         index = this.getIndex('video')
-                        this.setNameVal(component, `video${index}`)
+                        this.setNameVal(component, `video`)
                     } else if (label == '价格面板') {
                         index = this.getIndex('contPrice')
                         this.setNameVal(component, `contPrice${index}`)
@@ -416,7 +435,6 @@ export default {
 
         // name赋值
         setNameVal (component, val) {
-            console.log(component, val)
             this.$set(component.style, 'name', val)
         },
 

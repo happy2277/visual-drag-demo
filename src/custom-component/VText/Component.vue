@@ -160,9 +160,9 @@ export default {
         },
         // 长文本模式4  循环滚动 
         scrollStr () {
-            const componentDom = $(`#component${this.curComponent.id}`)
+            const componentDom = $(`#editor #component${this.curComponent.id}`)
             const componentW = componentDom.getBoundingClientRect().width
-            const vTextDom = $(`#component${this.curComponent.id} .v-text`)
+            const vTextDom = $(`#editor #component${this.curComponent.id} .v-text`)
             const textW = vTextDom.getBoundingClientRect().width
             let i = 0
             const textSize = (this.getTextSize(this.curComponent.style.fontSize, '', this.curComponent.style.str || this.curComponent.style.numStr))

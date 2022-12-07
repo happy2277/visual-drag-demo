@@ -136,7 +136,7 @@ export default {
         },
         // 获取文本高度 限制字体大小
         getTextHeight ({ id }) {
-            const dom = $(`#component${id} .v-text`)
+            const dom = $(`#editor #component${id} .v-text`)
             const { height } = dom.getBoundingClientRect()
             if (height > this.curComponent.style.height) {
                 this.curComponent.style.height = this.curComponent.style.height

@@ -22,6 +22,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import componentList from '@/custom-component/component-list'
 
 export default {
     data () {
@@ -63,6 +64,14 @@ export default {
         },
 
         deleteComponent () {
+            console.log(componentList, this.curComponent, this.$store.state.componentData)
+            const curComponent = this.curComponent
+            componentList.forEach(v => {
+                if (curComponent.label == v.label && curComponent.isOnly != undefined && curComponent.isOnly) {
+                    this.$set(v, 'isOnly', false)
+                }
+            })
+
             this.$store.commit('deleteComponent')
             this.$store.commit('recordSnapshot')
         },

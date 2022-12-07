@@ -193,7 +193,9 @@ const data = {
         },
 
         setComponentTempData (state, componentTempData = []) {
-            state.componentTempData = componentTempData.filter(v => v.type == 'group')
+            console.log(componentTempData)
+            const newTemp = componentTempData.filter(v => v.type == 'group')
+            state.componentTempData = [...newTemp, ...state.componentTempData]
         },
 
         setCurComponent (state, { component, index, isNew }) {
@@ -324,7 +326,8 @@ const data = {
 
         setIsNeedCalcOffset (state, isNeedCalcOffset) {
             state.isNeedCalcOffset = isNeedCalcOffset
-        }
+        },
+
     },
 }
 

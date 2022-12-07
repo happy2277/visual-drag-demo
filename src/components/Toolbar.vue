@@ -10,7 +10,11 @@
 
             <el-button style="margin-left: 10px;" @click="preview(false)">预览</el-button>
             <el-button @click="handleConfirm">保存</el-button>
-            <el-button @click="saveTemp">保存为组合模板</el-button>
+            <el-button @click="saveTemp">保存为组合模板
+                <el-tooltip class="item" effect="dark" :content="tempTooltipContent" placement="bottom">
+                    <i class="el-icon-question"></i>
+                </el-tooltip>
+            </el-button>
             <el-button @click="handleClearCanvas">清空画布</el-button>
             <el-button :disabled="!areaData.components.length" @click="compose">组合</el-button>
             <el-button :disabled="!curComponent || curComponent.isLock || curComponent.component != 'Group'" @click="decompose">
@@ -47,6 +51,7 @@ import { commonStyle, commonAttr } from '@/custom-component/component-list'
 import eventBus from '@/utils/eventBus'
 import { $, deepCopy } from '@/utils/utils'
 import changeComponentsSizeWithScale, { changeComponentSizeWithScale } from '@/utils/changeComponentsSizeWithScale'
+import componentList from '@/custom-component/component-list'
 
 export default {
     components: { Preview },
@@ -56,6 +61,9 @@ export default {
             timer: null,
             isScreenshot: false,
             scale: 100,
+            tempTooltipContent: `
+                组合分为两种：
+            `
         }
     },
     computed: mapState([
@@ -421,7 +429,7 @@ export default {
                 }).catch(() => { });
             } else {
                 // 存在组合
-                this.$confirm('存在组合控件，是否将组合控件保存为模板控件?', '提示', {
+                this.$confirm('存在组合控件，是否保存?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -437,6 +445,13 @@ export default {
 
         // 清空画布
         clearCanvas () {
+            // 初始化 存在isOnly字段 的控件
+            componentList.forEach(v => {
+                if (v.isOnly != undefined) {
+                    this.$set(v, 'isOnly', false)
+                }
+            })
+
             this.$store.commit('setCurComponent', { component: null, index: null })
             this.$store.commit('setComponentData', [])
             this.$store.commit('recordSnapshot')

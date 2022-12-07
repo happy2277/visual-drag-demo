@@ -14,7 +14,7 @@ export default function calculateOffsetCoordinate (curComponent, isNeedCalcOffse
         // 如果对齐组件为根容器
         componentData.forEach(v => {
             if (v.style.name == base) {
-                rectInfo = $(`#component${v.id}`).getBoundingClientRect()
+                rectInfo = $(`#editor #component${v.id}`).getBoundingClientRect()
                 baseComponentData = v.style
             }
         })

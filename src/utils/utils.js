@@ -1,3 +1,11 @@
+/*
+ * @Description: 
+ * @Author: ggs
+ * @Date: 2022-09-30 10:09:50
+ * @LastEditors: ggs
+ * @LastEditTime: 2022-12-06 09:21:21
+ * @FilePath: \price_sign_test\src\utils\utils.js
+ */
 import Vue from 'vue'
 
 export function deepCopy (target) {
@@ -41,4 +49,8 @@ export function unique (arr, key) {
         return item;
     }, []);
     return arr
+}
+
+export function updateComponentList (componentList, curComponent) {
+
 }

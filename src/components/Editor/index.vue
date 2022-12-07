@@ -175,7 +175,7 @@ export default {
                 let style = {}
                 if (component.component == 'Group') {
                     component.propValue.forEach(item => {
-                        const rectInfo = $(`#component${item.id}`).getBoundingClientRect()
+                        const rectInfo = $(`#editor #component${item.id}`).getBoundingClientRect()
                         style.left = rectInfo.left - this.editorX
                         style.top = rectInfo.top - this.editorY
                         style.right = rectInfo.right - this.editorX

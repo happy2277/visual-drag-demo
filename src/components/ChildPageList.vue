@@ -35,12 +35,14 @@ import ComponentWrapper from './Editor/ComponentWrapper'
 import { deepCopy, $ } from '@/utils/utils'
 import { getStyle, getCanvasStyle } from '@/utils/style'
 import { changeStyleWithScale } from '@/utils/translate'
+import compoenntList from '@/custom-component/component-list'
 
 export default {
     components: { ComponentWrapper },
     data () {
         return {
-            copyData: []
+            copyData: [],
+            compoenntList
         }
     },
     computed: {

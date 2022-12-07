@@ -117,6 +117,7 @@ const list = [
         propValue: '',
         type: 'cont',
         icon: 'juxing',
+        isOnly: false,
         style: {
             name: '',
             parent: '',
